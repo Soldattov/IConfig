@@ -1,0 +1,33 @@
+# наши среды разработок
+.idea/
+.vscode/
+
+# Python
+__pycache__/
+*.py[cod]
+*.pyc
+.pytest_cache/
+.mypy_cache/
+
+# Виртуальный окружения
+.venv/
+venv/
+env/
+migrations
+src/migrations
+
+# Django
+*.sqlite3
+*.log
+db.sqlite3
+
+# Environment files
+.env
+.env.local
+secrets.json
+avtorization.txt
+
+# System
+.DS_Store
+Thumbs.db
+desktop.ini
