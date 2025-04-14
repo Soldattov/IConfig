@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="ru">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -20,6 +21,103 @@
             padding: 0;
             box-sizing: border-box;
             font-family: 'Roboto', sans-serif;
+        }
+
+        .hidden {
+            display: none !important;
+        }
+
+        .user-menu {
+            position: absolute;
+            background: var(--secondary);
+            padding: 8px 12px;
+            border-radius: 6px;
+            box-shadow: 0 0 12px rgba(0, 0, 0, 0.3);
+            display: flex;
+            flex-direction: column;
+            align-items: stretch;
+            gap: 5px;
+            z-index: 1000;
+        }
+
+        .user-action {
+            background: transparent;
+            color: var(--text);
+            border: none;
+            padding: 6px 10px;
+            text-align: left;
+            cursor: pointer;
+            font-size: 14px;
+            border-radius: 4px;
+        }
+
+        .user-action:hover {
+            background: var(--accent);
+            color: white;
+        }
+
+        .modal {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: var(--primary);
+            padding: 30px;
+            border-radius: 8px;
+            z-index: 2000;
+            box-shadow: 0 0 20px rgba(0, 0, 0, 0.6);
+        }
+
+        .modal-content {
+            position: relative;
+        }
+
+        .modal-close {
+            position: absolute;
+            top: 15px;
+            right: 15px;
+            background: none;
+            border: none;
+            font-size: 26px;
+            color: var(--text);
+            cursor: pointer;
+        }
+
+        .modal-content form {
+            display: flex;
+            flex-direction: column;
+            align-items: stretch;
+            gap: 15px;
+            margin-top: 30px;
+        }
+
+        .modal-content input {
+            width: 100%;
+            padding: 14px 16px;
+            font-size: 15px;
+            border: none;
+            border-radius: 6px;
+            background: var(--secondary);
+            color: var(--text);
+        }
+
+        .modal-content button[type="submit"] {
+            align-self: stretch;
+            margin-top: 10px;
+            padding: 14px;
+            background-color: var(--accent);
+            color: white;
+            border: none;
+            border-radius: 6px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .modal-content button[type="submit"]:hover {
+            background-color: #ff4a2a;
+            transform: translateY(-2px);
         }
 
         body {
@@ -395,24 +493,26 @@
         }
     </style>
 </head>
+
 <body>
     <header class="header">
         <div class="container">
             <div class="header-top">
-    <a href="#" class="logo">
-        <img src="https://www.meme-arsenal.com/memes/a706819c0690421e2fb711ea578742cb.jpg" alt="Snitch PC Logo" width="60">
-    </a>
+                <a href="#" class="logo">
+                    <img src="https://www.meme-arsenal.com/memes/a706819c0690421e2fb711ea578742cb.jpg"
+                        alt="Snitch PC Logo" width="60">
+                </a>
 
-    <div class="header-search">
-        <input type="text" placeholder="Поиск игровых ПК, ноутбуков и комплектующих...">
-    </div>
+                <div class="header-search">
+                    <input type="text" placeholder="Поиск игровых ПК, ноутбуков и комплектующих...">
+                </div>
 
-    <div class="header-actions">
-        <a href="#"><i class="far fa-user"></i></a>
-        <a href="#"><i class="far fa-heart"></i><span>3</span></a>
-        <a href="#"><i class="fas fa-shopping-cart"></i><span>2</span></a>
-    </div>
-</div>
+                <div class="header-actions">
+                    <button id="user-icon" class="btn-user"><i class="far fa-user"></i></button>
+                    <a href="#"><i class="far fa-heart"></i><span>3</span></a>
+                    <a href="#"><i class="fas fa-shopping-cart"></i><span>2</span></a>
+                </div>
+            </div>
         </div>
 
         <nav class="nav">
@@ -447,11 +547,13 @@
         </nav>
     </header>
 
+    {% include 'users/modals.html' %}
     <section class="hero">
         <div class="container">
             <div class="hero-content">
                 <h1 class="hero-title">Мощные игровые компьютеры от Snitch PC</h1>
-                <p class="hero-text">Соберите свою идеальную конфигурацию или выберите готовую сборку от наших специалистов. Гарантия качества и бесплатная доставка.</p>
+                <p class="hero-text">Соберите свою идеальную конфигурацию или выберите готовую сборку от наших
+                    специалистов. Гарантия качества и бесплатная доставка.</p>
                 <a href="#" class="btn">Перейти в конфигуратор</a>
             </div>
         </div>
@@ -463,7 +565,8 @@
             <div class="products-grid">
                 <div class="product-card">
                     <div class="product-image">
-                        <img src="https://hyperpc.ru/images/product/dynamic/evo-rgb/hyperpc-dynamic-evo-rgb-black.jpg" alt="Игровой ПК">
+                        <img src="https://hyperpc.ru/images/product/dynamic/evo-rgb/hyperpc-dynamic-evo-rgb-black.jpg"
+                            alt="Игровой ПК">
                     </div>
                     <div class="product-info">
                         <h3 class="product-title">Snitch Dynamic Pro</h3>
@@ -518,7 +621,8 @@
             <div class="products-grid">
                 <div class="product-card">
                     <div class="product-image">
-                        <img src="https://delta-game.ru/wp-content/uploads/2022/08/asus-tuf-gaming-a15-fa507rm-fa507rr-7.webp" alt="Игровой ноутбук">
+                        <img src="https://delta-game.ru/wp-content/uploads/2022/08/asus-tuf-gaming-a15-fa507rm-fa507rr-7.webp"
+                            alt="Игровой ноутбук">
                     </div>
                     <div class="product-info">
                         <h3 class="product-title">Ноутбук ASUS TUF Gaming A15 FA507NV-LP103</h3>
@@ -530,7 +634,8 @@
 
                 <div class="product-card">
                     <div class="product-image">
-                        <img src="https://delta-game.ru/wp-content/uploads/2023/12/maibenben-x527.webp" alt="Игровой ноутбук">
+                        <img src="https://delta-game.ru/wp-content/uploads/2023/12/maibenben-x527.webp"
+                            alt="Игровой ноутбук">
                     </div>
                     <div class="product-info">
                         <h3 class="product-title">Ноутбук Maibenben X527 (X527FSFNLGRE0)</h3>
@@ -542,7 +647,8 @@
 
                 <div class="product-card">
                     <div class="product-image">
-                        <img src="https://delta-game.ru/wp-content/uploads/2024/02/msi-thin-15-b12u-4.webp" alt="Игровой ноутбук">
+                        <img src="https://delta-game.ru/wp-content/uploads/2024/02/msi-thin-15-b12u-4.webp"
+                            alt="Игровой ноутбук">
                     </div>
                     <div class="product-info">
                         <h3 class="product-title">Ноутбук MSI Thin 15 B12UC-1628XRU</h3>
@@ -554,7 +660,8 @@
 
                 <div class="product-card">
                     <div class="product-image">
-                        <img src="https://delta-game.ru/wp-content/uploads/2023/08/asus-tuf-gaming-f15-fx507zv4-lp047-2.webp" alt="Игровой ноутбук">
+                        <img src="https://delta-game.ru/wp-content/uploads/2023/08/asus-tuf-gaming-f15-fx507zv4-lp047-2.webp"
+                            alt="Игровой ноутбук">
                     </div>
                     <div class="product-info">
                         <h3 class="product-title">Ноутбук ASUS TUF Gaming F15 FX507ZC4-HN143</h3>
@@ -570,7 +677,8 @@
     <section class="configurator">
         <div class="container">
             <h2 class="configurator-title">Соберите ПК своей мечты</h2>
-            <p class="configurator-text">Наш конфигуратор позволяет выбрать комплектующие под ваш бюджет и задачи. Получите профессиональную консультацию и гарантию на сборку.</p>
+            <p class="configurator-text">Наш конфигуратор позволяет выбрать комплектующие под ваш бюджет и задачи.
+                Получите профессиональную консультацию и гарантию на сборку.</p>
             <a href="#" class="btn">Перейти в конфигуратор</a>
         </div>
     </section>
@@ -624,5 +732,105 @@
             </div>
         </div>
     </footer>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+
+            // Модалки
+            const modals = document.querySelectorAll('.modal');
+            const closeButtons = document.querySelectorAll('.modal-close');
+            const loginBtn = document.getElementById('login-btn');
+            const registerBtn = document.getElementById('register-btn');
+            const loginModal = document.getElementById('login-modal');
+            const registerModal = document.getElementById('register-modal');
+
+            // Меню пользователя (иконка и окно под ней)
+            const userIcon = document.getElementById('user-icon');
+            const userMenu = document.getElementById('user-menu');
+
+            // Показываем или скрываем меню пользователя при клике на иконку
+            userIcon?.addEventListener('click', function (e) {
+                const rect = userIcon.getBoundingClientRect();
+                userMenu.style.left = rect.left + "px";
+                userMenu.style.top = (rect.bottom + 5) + "px";
+                userMenu.classList.toggle('hidden');
+                modals.forEach(modal => modal.classList.add('hidden')); // если модалки были открыты — закрываем
+                e.stopPropagation();
+            });
+
+            // Закрываем user-menu при клике вне иконки и меню
+            document.addEventListener('click', function (e) {
+                if (!userMenu.contains(e.target) && e.target !== userIcon) {
+                    userMenu.classList.add('hidden');
+                }
+            });
+
+            // Показываем модалку входа
+            loginBtn?.addEventListener('click', function () {
+                modals.forEach(modal => modal.classList.add('hidden'));
+                loginModal.classList.remove('hidden');
+                userMenu.classList.add('hidden');
+            });
+
+            // Показываем модалку регистрации
+            registerBtn?.addEventListener('click', function () {
+                modals.forEach(modal => modal.classList.add('hidden'));
+                registerModal.classList.remove('hidden');
+                userMenu.classList.add('hidden');
+            });
+
+            // Закрытие модалки только по крестику
+            closeButtons.forEach(button => {
+                button.addEventListener('click', function () {
+                    modals.forEach(modal => modal.classList.add('hidden'));
+                });
+            });
+
+            // Проверка паролей при регистрации перед отправкой
+            const registerForm = document.getElementById('register-form');
+
+            if (registerForm) {
+                registerForm.addEventListener('submit', function (e) {
+                    let valid = true;
+                    const password = registerForm.querySelector('input[name="password1"]');
+                    const confirm = registerForm.querySelector('input[name="password2"]');
+                    let errorContainer = registerForm.querySelector('.form-error');
+
+                    if (!errorContainer) {
+                        errorContainer = document.createElement('div');
+                        errorContainer.classList.add('form-error');
+                        registerForm.prepend(errorContainer);
+                    }
+
+                    errorContainer.innerText = '';  // сбрасываем текст ошибок
+                    [password, confirm].forEach(input => input.style.border = '');
+
+                    if (password.value.length < 8) {
+                        errorContainer.innerText = "Пароль должен быть не короче 8 символов.";
+                        valid = false;
+                        password.style.border = "1px solid red";
+                    } else if (password.value !== confirm.value) {
+                        errorContainer.innerText = "Пароли не совпадают.";
+                        valid = false;
+                        password.style.border = "1px solid red";
+                        confirm.style.border = "1px solid red";
+                    }
+
+                    if (!valid) {
+                        e.preventDefault();  // отменяем отправку формы, если ошибка
+                    }
+                });
+            }
+
+            // Если сервер передал login_error — открыть окно входа автоматически
+            if (typeof login_error !== 'undefined' && login_error) {
+                loginModal?.classList.remove('hidden');
+            }
+
+        });
+    </script>
+
+
 </body>
+
 </html>
