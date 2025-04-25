@@ -66,9 +66,6 @@ def parse_gpu_page(driver, url):
     print(f"Сохранён GPU: {gpu.model}")
     return gpu
 
-
-
-
     pictures_list = []
     for i in pictures_soup:
         _ = pictures_list.append(i.get('data-src'))

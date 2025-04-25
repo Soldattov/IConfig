@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Список комплектующих</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+        }
+        .component {
+            border: 1px solid #ccc;
+            padding: 15px;
+            margin-bottom: 10px;
+            border-radius: 5px;
+        }
+        .component img {
+            max-width: 100px;
+            height: auto;
+        }
+    </style>
+</head>
+<body>
+    <h1>Список комплектующих</h1>
+
+    <h2>Видеокарты (GPU)</h2>
+    <div>
+        {% for gpu in gpus %}
+            <div class="component">
+                <img src="{{ gpu.picture.url }}" alt="{{ gpu.model }}">
+                <p><strong>Модель:</strong> {{gpu.model}}</p>
+                <p><strong>Частота:</strong> {{ gpu.frequency }} МГц</p>
+                <p><strong>Цена:</strong> {{ gpu.price }} ₽</p>
+            </div>
+        {% endfor %}
+    </div>
+
+    <h2>Процессоры (CPU)</h2>
+    <div>
+        {% for cpu in cpus %}
+            <div class="component">
+                <img src="{{ cpu.picture.url }}" alt="{{ cpu.model }}">
+                <p><strong>Модель:</strong> {{ cpu.model }}</p>
+                <p><strong>Ядра:</strong> {{ cpu.cores_amount }}</p>
+                <p><strong>Цена:</strong> {{ cpu.price }} ₽</p>
+            </div>
+        {% endfor %}
+    </div>
+
+    <h2>материнки</h2>
+    <div>
+        {% for motherboard in motherboards %}
+            <div class="component">
+                <img src="{{ motherboard.picture.url }}" alt="{{ motherboard.model }}">
+                <p><strong>Модель:</strong> {{ motherboard.model }}</p>
+                <p><strong>чипсет:</strong> {{ motherboard.chipset }}</p>
+                <p><strong>Цена:</strong> {{ motherboard.price }} ₽</p>
+            </div>
+        {% endfor %}
+    </div>
+
+    <h2>оперативка</h2>
+    <div>
+        {% for ram in rams %}
+            <div class="component">
+                <img src="{{ ram.picture.url }}" alt="{{ ram.model }}">
+                <p><strong>Модель:</strong> {{ ram.model }}</p>
+                <p><strong>количество памяти:</strong> {{ ram.amount }}</p>
+                <p><strong>Цена:</strong> {{ ram.price }} ₽</p>
+            </div>
+        {% endfor %}
+    </div>
+
+    <h2>охлаждение</h2>
+    <div>
+        {% for cooling in coolings %}
+            <div class="component">
+                <img src="{{ cooling.picture.url }}" alt="{{ cooling.model }}">
+                <p><strong>Модель:</strong> {{ cooling.model }}</p>
+                <p><strong>сокет:</strong> {{ cooling.socket }}</p>
+                <p><strong>Цена:</strong> {{ cooling.price }} ₽</p>
+            </div>
+        {% endfor %}
+    </div>
+
+    <h2>блоки питания</h2>
+    <div>
+        {% for power_supply in power_supplies %}
+            <div class="component">
+                <img src="{{ power_supply.picture.url }}" alt="{{ power_supply.model }}">
+                <p><strong>Модель:</strong> {{ power_supply.model }}</p>
+                <p><strong>мощность:</strong> {{ power_supply.power }}</p>
+                <p><strong>Цена:</strong> {{ power_supply.price }} ₽</p>
+            </div>
+        {% endfor %}
+    </div>
+
+    <h2>накопитель</h2>
+    <div>
+        {% for storage in storages %}
+            <div class="component">
+                <img src="{{ storage.picture.url }}" alt="{{ storage.model }}">
+                <p><strong>Модель:</strong> {{ storage.model }}</p>
+                <p><strong>объем памяти:</strong> {{ storage.capacity }}</p>
+                <p><strong>Цена:</strong> {{ storage.price }} ₽</p>
+            </div>
+        {% endfor %}
+    </div>
+
+    <h2>корпус</h2>
+    <div>
+        {% for case in cases %}
+            <div class="component">
+                <img src="{{ case.picture.url }}" alt="{{ case.model }}">
+                <p><strong>Модель:</strong> {{ case.model }}</p>
+                <p><strong>поддерживаемый форм-фактор:</strong> {{ case.supported_form_factor }}</p>
+                <p><strong>Цена:</strong> {{ case.price }} ₽</p>
+            </div>
+        {% endfor %}
+    </div>
+    <!-- Аналогично добавьте секции для других компонентов -->
+</body>
+</html>

@@ -1,10 +1,12 @@
 from tkinter.constants import CASCADE
 
+from django.conf import settings
 from django.db import models
+
 
 class Project(models.Model):
     user = models.ForeignKey(
-        Users,
+        settings.AUTH_USER_MODEL,
         on_delete=models.CASCADE
     )
     title = models.CharField(max_length=20)
@@ -119,10 +121,8 @@ class Motherboard(models.Model):
         Project,
         on_delete=models.CASCADE
     )
-    manufacturer = models.CharField(max_length=6)
-    line = models.CharField(max_length=10)
+    model = models.CharField(max_length=20)
     chipset = models.CharField(max_length=10)
-    suffix = models.CharField(max_length=4)
     picture = models.ImageField(upload_to='motherboard_images/', blank=True, null=True)
 
     form_factor = models.CharField(max_length=10)
@@ -141,8 +141,7 @@ class RAM(models.Model):
         Project,
         on_delete=models.CASCADE
     )
-    manufacturer = models.CharField(max_length=6)
-    line = models.CharField(max_length=10)
+    model = models.CharField(max_length=20)
     picture = models.ImageField(upload_to='ram_images/', blank=True, null=True)
 
     modules = models.IntegerField(blank=True,null=True)
@@ -157,11 +156,8 @@ class Cooling(models.Model):
         Project,
         on_delete=models.CASCADE
     )
-    manufacturer = models.CharField(max_length=6)
     typee = models.CharField(max_length=20)
-    line = models.CharField(max_length=10)
-    model = models.IntegerField()
-    suffix = models.CharField(max_length=4)
+    model = models.CharField(max_length=20)
     picture = models.ImageField(upload_to='cooling_images/', blank=True, null=True)
 
     socket = models.CharField(max_length=9)
@@ -178,8 +174,7 @@ class PowerSupply(models.Model):
         Project,
         on_delete=models.CASCADE
     )
-    manufacturer = models.CharField(max_length=6)
-    line = models.CharField(max_length=10)
+    model = models.CharField(max_length=20)
     picture = models.ImageField(upload_to='powersupply_images/', blank=True, null=True)
 
     power = models.IntegerField()
@@ -192,8 +187,7 @@ class Storage(models.Model):
         Project,
         on_delete=models.CASCADE
     )
-    manufacturer = models.CharField(max_length=6)
-    line = models.CharField(max_length=10)
+    model = models.CharField(max_length=20)
     picture = models.ImageField(upload_to='storage_images/', blank=True, null=True)
 
     capacity = models.IntegerField()
@@ -206,8 +200,7 @@ class Case(models.Model):
         Project,
         on_delete=models.CASCADE
     )
-    manufacturer = models.CharField(max_length=6)
-    model = models.CharField(max_length=10)
+    model = models.CharField(max_length=20)
     picture = models.ImageField(upload_to='case_images/', blank=True, null=True)
 
     supported_form_factor = models.CharField(max_length=10)
