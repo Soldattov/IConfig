@@ -1,12 +1,15 @@
 import os
 import django
 from config.models import GPU, CPU, Motherboard, RAM, Cooling, PowerSupply, Storage, Case
+import sys
 
 os.environ.setdefault("DJANGO_SETTINGS_MODULE", "IConfigurator.settings")
 django.setup()
+sys.path.append(os.path.dirname(os.path.abspath(__file__)) + '/../..')
+
 
 import pickle
-import sys
+import json
 
 from tqdm import tqdm
 from random import randint
@@ -17,6 +20,18 @@ import undetected_chromedriver as uc
 import requests
 from django.core.files import File
 from io import BytesIO
+import logging
+
+# Настройка логгера
+logging.basicConfig(
+    level=logging.INFO,
+    format='%(asctime)s [%(levelname)s] %(message)s',
+    handlers=[
+        logging.FileHandler("parser.log"),  # Логи будут записываться в файл
+        logging.StreamHandler()            # Логи также будут выводиться в консоль
+    ]
+)
+logger = logging.getLogger('parser_logger')
 
 def download_image(image_url):
     """ Скачивает изображение и возвращает объект File. """
@@ -30,140 +45,85 @@ def download_image(image_url):
         return File(file_content, name=file_name)
     return None
 
-def parse_gpu_page(driver, url):
-    """ Парсит страницу товара по ссылке. """
-    driver.get(url)
-    pause(randint(7, 11))
-    soup = BeautifulSoup(driver.page_source, 'lxml')
-
-    model = soup.find('div', text='модель', class_="product-card-description__title").text.strip()
-    price = int(soup.find('div', class_="product-buy__price").text.replace(' ', '').replace('₽', ''))
-    #manufacturer = soup.find('span', text='Производитель').find_next('div').text.strip()
-    #core = soup.find('span', text='графический процессор').find_next('div').text.strip()
-    #line = soup.find('span', text='линейка производителя видеокарты').find_next('div').text.strip()
-    frequency = int(soup.find('span', text='Частота ядра').find_next('div').text.strip().split()[0])
-    memory_amount = int(soup.find('span', text='Объем памяти').find_next('div').text.strip().split()[0])
-    tdp = int(soup.find('span', text='TDP').find_next('div').text.strip().split()[0])
-    size = int(soup.find('span', text='Размер').find_next('div').text.strip().split()[0])
-    consumption = int(soup.find('span', text='Потребление').find_next('div').text.strip().split()[0])
-    main_picture = soup.find('img', class_="product-images-slider__main-img")
-    image_url = main_picture.get('src') if main_picture else  None
-    image_file = download_image(image_url)
-
-    # Создание объекта GPU
-    gpu = GPU.objects.create(
-        project=None,  # Если project обязателен, укажите его
-        model=model,
-        frequency=frequency,
-        memory_amount=memory_amount,
-        image=image_file,
-        tdp=tdp,
-        size=size,
-        consumption=consumption,
-        price=price
-    )
-    gpu.save()
-    print(f"Сохранён GPU: {gpu.model}")
-    return gpu
-
-    pictures_list = []
-    for i in pictures_soup:
-        _ = pictures_list.append(i.get('data-src'))
-        if _ is not None:
-            pictures_list.append(_)
-
-    span_tags = soup.find_all('span')
-    for i in span_tags:
-        if bool(str(i).find('data-go-back-catalog') != -1):
-            category = i
-
-    tech_spec = {}
-    for f1, f2 in zip(charcs, cvalue):
-        tech_spec[f1.text.rstrip().lstrip()] = f2.text.rstrip().lstrip()
-
-    notebook = {}
-
-    notebook["Категория"] = category.text.lstrip(': ')
-    notebook["Наименование"] = name.text[15:]
-    notebook["Цена"] = int(price.text.replace(' ', '')[:-1])
-    notebook["Доступность"] = avail.text if avail is not None else 'Товара нет в наличии'
-    notebook["Ссылка на товар"] = url
-    notebook["Описание"] = desc.text
-    notebook["Главное изображение"] = main_picture.get('src') if main_picture is not None else 'У товара нет картинок'
-    notebook["Лист с картинками"] = pictures_list
-    notebook["Характеристики"] = list(tech_spec.items())
-
-    # for i, j in notebook.items():
-    #     print(i, j)
-    return notebook
-
-def parse_cpu_page(driver, url):
-    """ Парсит страницу процессора по ссылке. """
-    driver.get(url)
-    pause(randint(7, 11))
-    soup = BeautifulSoup(driver.page_source, 'lxml')
-
-    # Извлечение данных
-    model = soup.find('span', text='Модель').find_next('div').text.strip()
-    frequency = int(soup.find('span', text='Базовая частота').find_next('div').text.strip().split()[0])
-    cores = int(soup.find('span', text='Количество ядер').find_next('div').text.strip())
-    threads = int(soup.find('span', text='Количество потоков').find_next('div').text.strip())
-    socket = soup.find('span', text='Сокет').find_next('div').text.strip()
-    price = int(soup.find('div', class_="product-buy__price").text.replace(' ', '').replace('₽', ''))
-    main_picture = soup.find('img', class_="product-images-slider__main-img")
-    image_url = main_picture.get('src') if main_picture else None
-
-    # Скачивание изображения
-    image_file = download_image(image_url)
-
-    # Создание объекта CPU
-    cpu = CPU.objects.create(
-        project=None,
-        model=model,
-        frequency=frequency,
-        cores=cores,
-        threads=threads,
-        socket=socket,
-        price=price,
-        picture=image_file
-    )
-    print(f"Сохранён CPU: {cpu.model}")
-    return cpu
-
-def get_all_category_page_urls(driver, url_to_parse):
-    """ Получаем URL категории и парсим ссылки с неё."""
-    page = 1
-    url = url_to_parse.format(page=page)
-    driver.get(url=url)
-    pause(10)
-
-    soup = BeautifulSoup(driver.page_source, 'lxml')
-
-    span_tags = soup.find_all('span')
-    for i in span_tags:
-        if bool(str(i).find('data-role="items-count"') != -1):
-            number_of_pages = [int(x) for x in str(i) if x.isdigit()]
-
-    res = int(''.join(map(str, number_of_pages)))
-    pages_total = ((res // 18) + 1)
-    print(f'Всего в категории {pages_total} страницы')
-
-    urls = []
-
-    while True:
-        page_urls = get_urls_from_page(driver)
-        urls += page_urls
-
-        if page >= pages_total:
-            break
-
-        page += 1
-        url = url_to_parse.format(page=page)
+def parse_gpu_page2(driver, url):
+    try:
+        logger.info(f"Начинаем парсинг страницы: {url}")
         driver.get(url)
-        pause(randint(6, 9))
+        pause(randint(7, 11))
+        soup = BeautifulSoup(driver.page_source, 'lxml')
 
-    return urls
+        logger.debug(f"страница {url} успешно загружена")
 
+        # Извлечение данных
+        #name_tag = soup.find('div', class_="product-card-description__title")
+        price_tag = soup.find('div', class_="product-buy__price")
+        main_picture = soup.find('img', class_="header-product__image-img loaded")
+
+        # Проверка наличия тегов
+        #model = name_tag.text.strip() if name_tag else None
+        price = int(price_tag.text.replace(' ', '').replace('₽', '')) if price_tag else 0
+        image_url = main_picture.get('src') if main_picture else None
+
+        # Логирование
+        #if not name_tag: logger.warning(f"Модель не найдена на странице: {url}")
+        if not price_tag:
+            logger.warning(f"Цена не найдена на странице: {url}")
+        if not main_picture:
+            logger.warning(f"Изображение не найдено на странице: {url}")
+
+        # Скачивание изображения
+        image_file = download_image(image_url)
+
+        # Характеристики
+        charcs = soup.find_all('div', class_="product-characteristics__spec-title")
+        cvalue = soup.find_all('div', class_="product-characteristics__spec-value")
+        tech_spec = {}
+        for f1, f2 in zip(charcs, cvalue):
+            tech_spec[f1.text.rstrip().lstrip()] = f2.text.rstrip().lstrip()
+
+        model = tech_spec.get("Модель", None)
+        if not model:
+            logger.warning(f"Модель не найдена на странице: {url}")
+        # Извлечение характеристик с проверкой
+        frequency = int(tech_spec.get("Частота ядра", "0").split()[0]) if tech_spec.get("Частота ядра") else 0
+        memory_amount = int(tech_spec.get("Объем памяти", "0").split()[0]) if tech_spec.get("Объем памяти") else 0
+        tdp = int(tech_spec.get("TDP", "0").split()[0]) if tech_spec.get("TDP") else 0
+        size = int(tech_spec.get("Размер", "0").split()[0]) if tech_spec.get("Размер") else 0
+        consumption = int(tech_spec.get("Потребление", "0").split()[0]) if tech_spec.get("Потребление") else 0
+
+        # Создание словаря GPU
+        gpu = {
+            "model": model,
+            "price": price,
+            "frequency": frequency,
+            "memory_amount": memory_amount,
+            "tdp": tdp,
+            "size": size,
+            "consumption": consumption,
+            "picture": image_url,
+        }
+
+        logger.info(f"Спарсены данные: {gpu['model']}")
+        return gpu
+
+    except Exception as e:
+        logger.error(f"Ошибка при парсинге страницы {url}: {e}")
+        return None
+
+def save_to_json(data, file_name="parsed_data.json"):
+    """
+    Сохраняет данные в JSON-файл.
+    :param data: Список словарей с данными.
+    :param file_name: Имя файла для сохранения.
+    """
+    # Убедитесь, что папка для файла существует
+    os.makedirs(os.path.dirname(file_name), exist_ok=True)
+
+    # Сохранение данных в JSON
+    with open(file_name, "w", encoding="utf-8") as file:
+        json.dump(data, file, ensure_ascii=False, indent=4)
+
+    print(f"Данные успешно сохранены в файл {file_name}")
 
 def get_urls_from_page(driver):
     """ Собирает все ссылки на текущей странице. """
@@ -176,36 +136,40 @@ def get_urls_from_page(driver):
 
 def main():
     driver = uc.Chrome()
-
     urls_to_parse = [
-        'https://www.dns-shop.ru/catalog/17a89a9916404e77/protsessory/?p={page}',
+        'https://www.dns-shop.ru/catalog/17a89aab16404e77/videokarty/?p={page}',
     ]
 
-    for index, url in enumerate(urls_to_parse):
-        print(f'Парсинг категории {index + 1}:')
-        parsed_urls = get_all_category_page_urls(driver, url)
+    parsed_data = []
+    for url_template in urls_to_parse:
+        page = 1
+        while True:
+            url = url_template.format(page=page)
+            logger.info(f"Парсим страницу категории: {url}")
+            driver.get(url)
+            pause(randint(6, 9))
+            soup = BeautifulSoup(driver.page_source, 'lxml')
 
-        for product_url in tqdm(parsed_urls, ncols=70, unit='товаров', colour='blue'):
-            try:
-                parse_cpu_page(driver, product_url)
-            except Exception as e:
-                print(f"Ошибка при обработке товара {product_url}: {e}")
+            # Получаем ссылки на товары
+            product_urls = get_urls_from_page(driver)
+            if not product_urls:
+                break
+
+            for product_url in tqdm(product_urls, ncols=70, unit='товаров', colour='blue'):
+                try:
+                    gpu_data = parse_gpu_page2(driver, product_url)
+                    if gpu_data:
+                        parsed_data.append(gpu_data)
+                        save_to_json(parsed_data, file_name='parsed.json')
+                except Exception as e:
+                    logger.error(f"Ошибка при парсинге {product_url}: {e}")
+
+            page += 1
 
     driver.quit()
-    print('=' * 20)
-    print('Все готово!')
+    logger.info("Парсинг завершен.")
+    print("Все готово!")
 
-    urls = []
-    for index, url in enumerate(urls_to_parse):
-        print(f'Получение списка всех ссылок из {index+1} категории:')
-        parsed_url = get_all_category_page_urls(driver, url)
-        urls.append(parsed_url)
-
-    print("Запись всех ссылок в файл url.txt:")
-    with open('urls.txt', 'w') as file:
-        for url in urls:
-            for link in url:
-                file.write(link + "\n")
 
 if __name__ == '__main__':
     main()

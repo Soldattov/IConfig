@@ -1,5 +1,5 @@
 from django.core.management.base import BaseCommand
-from config.parser.general_parser import main
+from config.parser.dns_parser import main
 
 class Command(BaseCommand):
     help = 'Запускает парсер комплектующих'
