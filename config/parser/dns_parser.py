@@ -1,6 +1,8 @@
 import os
 import django
-from config.models import GPU, CPU, Motherboard, RAM, Cooling, PowerSupply, Storage, Case
+
+from IConfigurator import settings
+from config.models import ParsedGPU, CPU, Motherboard, RAM, Cooling, PowerSupply, Storage, Case
 import sys
 
 os.environ.setdefault("DJANGO_SETTINGS_MODULE", "IConfigurator.settings")
@@ -33,46 +35,49 @@ logging.basicConfig(
 )
 logger = logging.getLogger('parser_logger')
 
-def download_image(image_url):
+def download_image(image_url, model):
     """ Скачивает изображение и возвращает объект File. """
     if not image_url:
         return None
 
-    response = requests.get(image_url)
-    if response.status_code == 200:
-        file_name = image_url.split('/')[-1]  # Извлекаем имя файла из URL
-        file_content = BytesIO(response.content)
-        return File(file_content, name=file_name)
+    try:
+        response = requests.get(image_url)
+        if response.status_code == 200:
+            # Создаем директорию для изображений, если ее нет
+            image_dir = os.path.join(settings.MEDIA_ROOT, 'gpu_images')
+            os.makedirs(image_dir, exist_ok=True)
+
+            # Генерируем имя файла на основе модели
+            file_name = f"{model.replace(' ', '_')}.jpg"
+            file_path = os.path.join(image_dir, file_name)
+
+            logger.info(f"путь для сохранения изображения: {file_path}")
+
+            # Сохраняем изображение
+            with open(file_path, 'wb') as f:
+                f.write(response.content)
+
+            # Возвращаем путь для сохранения в модели
+            return f'gpu_images/{file_name}'
+    except Exception as e:
+        logger.error(f"Ошибка при загрузке изображения: {e}")
     return None
+
 
 def parse_gpu_page2(driver, url):
     try:
         logger.info(f"Начинаем парсинг страницы: {url}")
+        print(f"MEDIA_ROOT: {settings.MEDIA_ROOT}")
         driver.get(url)
         pause(randint(7, 11))
         soup = BeautifulSoup(driver.page_source, 'lxml')
 
-        logger.debug(f"страница {url} успешно загружена")
-
         # Извлечение данных
-        #name_tag = soup.find('div', class_="product-card-description__title")
         price_tag = soup.find('div', class_="product-buy__price")
         main_picture = soup.find('img', class_="header-product__image-img loaded")
 
-        # Проверка наличия тегов
-        #model = name_tag.text.strip() if name_tag else None
         price = int(price_tag.text.replace(' ', '').replace('₽', '')) if price_tag else 0
         image_url = main_picture.get('src') if main_picture else None
-
-        # Логирование
-        #if not name_tag: logger.warning(f"Модель не найдена на странице: {url}")
-        if not price_tag:
-            logger.warning(f"Цена не найдена на странице: {url}")
-        if not main_picture:
-            logger.warning(f"Изображение не найдено на странице: {url}")
-
-        # Скачивание изображения
-        image_file = download_image(image_url)
 
         # Характеристики
         charcs = soup.find_all('div', class_="product-characteristics__spec-title")
@@ -84,26 +89,38 @@ def parse_gpu_page2(driver, url):
         model = tech_spec.get("Модель", None)
         if not model:
             logger.warning(f"Модель не найдена на странице: {url}")
-        # Извлечение характеристик с проверкой
-        frequency = int(tech_spec.get("Частота ядра", "0").split()[0]) if tech_spec.get("Частота ядра") else 0
-        memory_amount = int(tech_spec.get("Объем памяти", "0").split()[0]) if tech_spec.get("Объем памяти") else 0
-        tdp = int(tech_spec.get("TDP", "0").split()[0]) if tech_spec.get("TDP") else 0
-        size = int(tech_spec.get("Размер", "0").split()[0]) if tech_spec.get("Размер") else 0
-        consumption = int(tech_spec.get("Потребление", "0").split()[0]) if tech_spec.get("Потребление") else 0
+            return None
 
-        # Создание словаря GPU
-        gpu = {
-            "model": model,
-            "price": price,
-            "frequency": frequency,
-            "memory_amount": memory_amount,
-            "tdp": tdp,
-            "size": size,
-            "consumption": consumption,
-            "picture": image_url,
-        }
+        # Скачивание изображения
+        image_path = download_image(image_url, model)
 
-        logger.info(f"Спарсены данные: {gpu['model']}")
+        frequency = int(tech_spec.get("Частота ядра", "0").split()[0]) if tech_spec.get("Частота ядра") else 0,
+        memory_amount = int(tech_spec.get("Объем памяти", "0").split()[0]) if tech_spec.get("Объем памяти") else 0,
+        tdp = int(tech_spec.get("TDP", "0").split()[0]) if tech_spec.get("TDP") else 0,
+        size = int(tech_spec.get("Размер", "0").split()[0]) if tech_spec.get("Размер") else 0,
+        consumption = int(tech_spec.get("Потребление", "0").split()[0]) if tech_spec.get("Потребление") else 0,
+
+        # Создание объекта GPU и сохранение в базу
+        gpu,created = ParsedGPU.objects.update_or_create(
+            model=model,
+            defaults={
+                'price': price,
+                'frequency': frequency,
+                'memory_amount': memory_amount,
+                'tdp': tdp,
+                'size': size,
+                'consumption': consumption,
+                'picture': image_path
+            }
+        )
+
+
+        if image_path:
+            gpu.picture.name = image_path
+
+        gpu.save()
+
+        logger.info(f"{'Создан' if created else 'Обновлен'} GPU: {model}")
         return gpu
 
     except Exception as e:

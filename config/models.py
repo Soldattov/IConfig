@@ -14,27 +14,63 @@ class Project(models.Model):
     budget = models.IntegerField()
     description = models.CharField(max_length=500)
 
-class GPU(models.Model):
-    project = models.ForeignKey(
-        Project,
-        on_delete=models.CASCADE
-    )
-    model = models.CharField(max_length=30)
+    def add_component(self, component):
+        component_type = None
+        """Добавляет компонент в проект"""
+        if isinstance(component, ParsedGPU):
+            component_type = 'gpu'
+        elif isinstance(component, ParsedCPU):
+            component_type = 'cpu'
+
+        ProjectComponent.objects.get_or_create(
+            project=self,
+            component_type=component_type,
+            component_id=component.id
+        )
+
+    def get_components(self):
+        """Возвращает все компоненты проекта"""
+        components = []
+        for pc in self.projectcomponent_set.all():
+            if pc.component_type == 'gpu':
+                components.append(ParsedGPU.objects.get(id=pc.component_id))
+            elif pc.component_type == 'cpu':
+                components.append(ParsedCPU.objects.get(id=pc.component_id))
+            # ... другие типы ...
+        return components
+
+
+class ProjectComponent(models.Model):
+    project = models.ForeignKey(Project, on_delete=models.CASCADE)
+    component_type = models.CharField(max_length=50)  # 'gpu', 'cpu', etc.
+    component_id = models.PositiveIntegerField()
+
+    class Meta:
+        unique_together = ('project', 'component_type', 'component_id')
+
+
+class BaseComponent(models.Model):
+    model = models.CharField(max_length=100)
+    price = models.IntegerField()
+    picture = models.ImageField(upload_to='components/', blank=True, null=True)
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+    class Meta:
+        abstract = True
+
+class ParsedGPU(BaseComponent):
     frequency = models.IntegerField()
     memory_amount = models.IntegerField()
-    picture = models.ImageField(upload_to='gpu_images/', blank=True, null=True)
-
     tdp = models.IntegerField()
     size = models.IntegerField()
     consumption = models.IntegerField()
-
-    price = models.IntegerField()
     relative_power = models.IntegerField()
 
     def calculatePower(self):
         base_power = 100
         match self.model:
-            #отсчет идет от RTX 4060 согласно бенчмарку
+            # отсчет идет от RTX 4060 согласно бенчмарку
             case model if "SUPER" in model:
                 self.relative_power = int(base_power * 1.07)
             case model if "Ti" in model:
@@ -75,10 +111,42 @@ class GPU(models.Model):
                 self.relative_power = int(base_power * 0.59)
             case _:
                 self.relative_power = base_power
-    
+
     def save(self, *args, **kwargs):
         self.calculatePower()
         super().save(*args, **kwargs)
+
+class GPU(models.Model):
+    project = models.ForeignKey(
+        Project,
+        on_delete=models.CASCADE
+    )
+    model = models.CharField(max_length=30)
+    frequency = models.IntegerField()
+    memory_amount = models.IntegerField()
+    picture = models.ImageField(upload_to='gpu_images/', blank=True, null=True)
+
+    tdp = models.IntegerField()
+    size = models.IntegerField()
+    consumption = models.IntegerField()
+
+    price = models.IntegerField()
+    relative_power = models.IntegerField()
+
+
+class ParsedCPU(models.Model):
+    model = models.CharField(max_length=15)
+    cores_amount = models.IntegerField()
+    frequency = models.IntegerField()
+    picture = models.ImageField(upload_to='parsed_cpu_images/', blank=True, null=True)
+    socket = models.CharField(max_length=9)
+    tdp = models.IntegerField()
+    consumption = models.IntegerField()
+    price = models.IntegerField()
+    relative_power = models.IntegerField()
+
+    def __str__(self):
+        return self.model
 
 class CPU(models.Model):
     project = models.ForeignKey(
