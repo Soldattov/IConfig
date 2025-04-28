@@ -1,0 +1,17 @@
+<script>
+    fetch('main/index.html')
+        .then(response => response.text())
+        .then(html => {
+            const parser = new DOMParser();
+            const doc = parser.parseFromString(html, 'text/html');
+            const styles = doc.querySelectorAll('style, link[rel="stylesheet"]');
+            styles.forEach(style => document.head.appendChild(style.cloneNode(true)));
+        });
+</script>
+{% block content %}
+<div class="container">
+    <h2>Здравствуйте, {{ user.first_name }}</h2>
+    <p>Ваш email: {{ user.email }}</p>
+    <a href="{% url 'logout' %}" class="btn">Выйти</a>
+</div>
+{% endblock %}

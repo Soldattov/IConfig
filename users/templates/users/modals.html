@@ -1,0 +1,57 @@
+<!-- Мини-меню пользователя -->
+<div id="user-menu" class="user-menu hidden">
+    {% if user.is_authenticated %}
+    <div class="user-greeting">Здравствуйте, {{ user.first_name }}!</div>
+    <a href="{% url 'profile' %}" class="user-action">Личный кабинет</a>
+    <a href="{% url 'logout' %}" class="user-action">Выйти</a>
+    {% else %}
+    <button id="login-btn" class="user-action">Вход</button>
+    <button id="register-btn" class="user-action">Регистрация</button>
+    {% endif %}
+</div>
+
+<!-- Окно Регистрации -->
+<div id="register-modal" class="modal hidden">
+    <div class="modal-content">
+        <button class="modal-close" aria-label="Закрыть">&times;</button>
+        <h2>Регистрация</h2>
+
+        {% if register_error %}
+        <div class="form-error">{{ register_error }}</div>
+        {% endif %}
+
+        <form id="register-form" method="post" action="{% url 'register' %}">
+            {% csrf_token %}
+            <input type="text" name="first_name" placeholder="Имя" required>
+            <input type="email" name="email" placeholder="Электронная почта" required>
+            <input type="password" name="password1" placeholder="Пароль" required>
+            <input type="password" name="password2" placeholder="Повторите пароль" required>
+            <button type="submit" class="btn">Зарегистрироваться</button>
+        </form>
+    </div>
+</div>
+
+<!-- Окно Входа -->
+<div id="login-modal" class="modal hidden">
+    <div class="modal-content">
+        <button class="modal-close" aria-label="Закрыть">&times;</button>
+        <h2>Вход</h2>
+
+        {% if login_error %}
+        <div class="form-error">{{ login_error }}</div>
+        <script>
+            document.addEventListener('DOMContentLoaded', function () {
+                const loginModal = document.getElementById('login-modal');
+                if (loginModal) loginModal.classList.remove('hidden'); // показать окно с ошибкой!
+            });
+        </script>
+        {% endif %}
+
+        <form method="post" action="{% url 'login' %}">
+            {% csrf_token %}
+            <input type="email" name="username" placeholder="Электронная почта" required>
+            <input type="password" name="password" placeholder="Пароль" required>
+            <button type="submit" class="btn">Войти</button>
+        </form>
+    </div>
+</div>
