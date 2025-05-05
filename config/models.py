@@ -11,7 +11,7 @@ class Project(models.Model):
     )
     title = models.CharField(max_length=20)
     time_creation = models.DateTimeField(auto_now_add=True)
-    budget = models.IntegerField()
+    budget = models.CharField()
     description = models.CharField(max_length=500)
 
     def add_component(self, component):
@@ -51,7 +51,7 @@ class ProjectComponent(models.Model):
 
 class BaseComponent(models.Model):
     model = models.CharField(max_length=100)
-    price = models.IntegerField()
+    price = models.CharField()
     picture = models.ImageField(upload_to='components/', blank=True, null=True)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
@@ -60,57 +60,60 @@ class BaseComponent(models.Model):
         abstract = True
 
 class ParsedGPU(BaseComponent):
-    frequency = models.IntegerField()
-    memory_amount = models.IntegerField()
-    tdp = models.IntegerField()
-    size = models.IntegerField()
-    consumption = models.IntegerField()
-    relative_power = models.IntegerField()
+    frequency = models.CharField(max_length=50)
+    memory_amount = models.CharField(max_length=50)
+    size = models.CharField(max_length=50)
+    consumption = models.CharField(max_length=50)
+    relative_power = models.CharField(max_length=50)  
 
     def calculatePower(self):
         base_power = 100
+     
+        if not self.model:
+            self.relative_power = str(base_power)
+            return
+
         match self.model:
-            # отсчет идет от RTX 4060 согласно бенчмарку
             case model if "SUPER" in model:
-                self.relative_power = int(base_power * 1.07)
+                self.relative_power = str(int(base_power * 1.07))
             case model if "Ti" in model:
-                self.relative_power = int(base_power * 1.05)
+                self.relative_power = str(int(base_power * 1.05))
             case model if "XT" in model:
-                self.relative_power = int(base_power * 1.07)
+                self.relative_power = str(int(base_power * 1.07))
             case model if "XTX" in model:
-                self.relative_power = int(base_power * 1.09)
+                self.relative_power = str(int(base_power * 1.09))
             case model if "RX 6700" in model:
-                self.relative_power = int(base_power * 0.97)
+                self.relative_power = str(int(base_power * 0.97))
             case model if "RTX 2080" in model:
-                self.relative_power = int(base_power * 0.95)
+                self.relative_power = str(int(base_power * 0.95))
             case model if "RTX 3060" in model:
-                self.relative_power = int(base_power * 0.865)
+                self.relative_power = str(int(base_power * 0.865))
             case model if "RX 7600" in model:
-                self.relative_power = int(base_power * 0.84)
+                self.relative_power = str(int(base_power * 0.84))
             case model if "RTX 2070" in model:
-                self.relative_power = int(base_power * 0.817)
+                self.relative_power = str(int(base_power * 0.817))
             case model if "Arc B580" in model:
-                self.relative_power = int(base_power * 0.793)
+                self.relative_power = str(int(base_power * 0.793))
             case model if "GTX 1080" in model:
-                self.relative_power = int(base_power * 0.79)
+                self.relative_power = str(int(base_power * 0.79))
             case model if "RX 6600" in model:
-                self.relative_power = int(base_power * 0.765)
+                self.relative_power = str(int(base_power * 0.765))
             case model if "RTX 4050" in model:
-                self.relative_power = int(base_power * 0.73)
+                self.relative_power = str(int(base_power * 0.73))
             case model if "RX 5700" in model:
-                self.relative_power = int(base_power * 0.727)
+                self.relative_power = str(int(base_power * 0.727))
             case model if "RX 2060" in model:
-                self.relative_power = int(base_power * 0.716)
+                self.relative_power = str(int(base_power * 0.716))
             case model if "Arc B570" in model:
-                self.relative_power = int(base_power * 0.697)
+                self.relative_power = str(int(base_power * 0.697))
             case model if "GTX 1070" in model:
-                self.relative_power = int(base_power * 0.684)
+                self.relative_power = str(int(base_power * 0.684))
             case model if "Arc A770" in model:
-                self.relative_power = int(base_power * 0.667)
+                self.relative_power = str(int(base_power * 0.667))
             case model if "GTX 1660" in model:
-                self.relative_power = int(base_power * 0.59)
+                self.relative_power = str(int(base_power * 0.59))
             case _:
-                self.relative_power = base_power
+                self.relative_power = str(base_power)
 
     def save(self, *args, **kwargs):
         self.calculatePower()
@@ -122,31 +125,31 @@ class GPU(models.Model):
         on_delete=models.CASCADE
     )
     model = models.CharField(max_length=30)
-    frequency = models.IntegerField()
-    memory_amount = models.IntegerField()
+    frequency = models.CharField()
+    memory_amount = models.CharField()
     picture = models.ImageField(upload_to='gpu_images/', blank=True, null=True)
 
-    tdp = models.IntegerField()
-    size = models.IntegerField()
-    consumption = models.IntegerField()
+    size = models.CharField()
+    consumption = models.CharField()
 
-    price = models.IntegerField()
-    relative_power = models.IntegerField()
+    price = models.CharField()
+    relative_power = models.CharField()
 
 
 class ParsedCPU(models.Model):
     model = models.CharField(max_length=15)
-    cores_amount = models.IntegerField()
-    frequency = models.IntegerField()
+    cores_amount = models.CharField(max_length=10)
+    frequency = models.CharField(max_length=10)
     picture = models.ImageField(upload_to='parsed_cpu_images/', blank=True, null=True)
     socket = models.CharField(max_length=9)
-    tdp = models.IntegerField()
-    consumption = models.IntegerField()
-    price = models.IntegerField()
-    relative_power = models.IntegerField()
+    tdp = models.CharField(max_length=10)
+    consumption = models.CharField(max_length=10)
+    price = models.CharField(max_length=10)
+    relative_power = models.CharField(max_length=10)
 
     def __str__(self):
         return self.model
+
 
 class CPU(models.Model):
     project = models.ForeignKey(
@@ -154,35 +157,36 @@ class CPU(models.Model):
         on_delete=models.CASCADE
     )
     model = models.CharField(max_length=15)
-    cores_amount = models.IntegerField()
-    frequency = models.IntegerField()
+    cores_amount = models.CharField(max_length=10)
+    frequency = models.CharField(max_length=10)
     picture = models.ImageField(upload_to='cpu_images/', blank=True, null=True)
-
     socket = models.CharField(max_length=9)
-    tdp = models.IntegerField()
-    consumption = models.IntegerField()
-
-    price = models.IntegerField()
-    relative_power = models.IntegerField()
+    tdp = models.CharField(max_length=10)
+    consumption = models.CharField(max_length=10)
+    price = models.CharField(max_length=10)
+    relative_power = models.CharField(max_length=10)
 
     def calculatePower(self):
         """
-        Вычисляет relative_power на основе характеристик CPU.
+        Вычисляет relative_power на основе модели CPU.
         """
         base_power = 100
-
-        if "i9" in self.model:
-            self.relative_power = int(base_power * 1.5)
-        elif "i7" in self.model:
-            self.relative_power = int(base_power * 1.2)
-        elif "i5" in self.model:
-            self.relative_power = int(base_power * 1.1)
+        model_lower = self.model.lower()
+        if "i9" in model_lower:
+            self.relative_power = str(int(base_power * 1.5))
+        elif "i7" in model_lower:
+            self.relative_power = str(int(base_power * 1.2))
+        elif "i5" in model_lower:
+            self.relative_power = str(int(base_power * 1.1))
         else:
-            self.relative_power = base_power
+            self.relative_power = str(base_power)
 
     def save(self, *args, **kwargs):
         self.calculatePower()
         super().save(*args, **kwargs)
+
+    def __str__(self):
+        return self.model
 
 class Motherboard(models.Model):
     project = models.ForeignKey(
@@ -195,14 +199,14 @@ class Motherboard(models.Model):
 
     form_factor = models.CharField(max_length=10)
     socket = models.CharField(max_length=9)
-    ram_slots = models.IntegerField()
+    ram_slots = models.CharField()
     ram_type = models.CharField(max_length=9)
-    nvme_slot = models.IntegerField(blank=True,null=True)
-    sata_slot = models.IntegerField(blank=True,null=True)
-    consumption = models.IntegerField()
+    nvme_slot = models.CharField(blank=True,null=True)
+    sata_slot = models.CharField(blank=True,null=True)
+    consumption = models.CharField()
 
-    price = models.IntegerField()
-    relative_power = models.IntegerField()
+    price = models.CharField()
+    relative_power = models.CharField()
 
 class RAM(models.Model):
     project = models.ForeignKey(
@@ -212,12 +216,12 @@ class RAM(models.Model):
     model = models.CharField(max_length=20)
     picture = models.ImageField(upload_to='ram_images/', blank=True, null=True)
 
-    modules = models.IntegerField(blank=True,null=True)
-    amount = models.IntegerField()
+    modules = models.CharField(blank=True,null=True)
+    amount = models.CharField()
     typee = models.CharField(max_length=9)
 
-    price = models.IntegerField()
-    relative_power = models.IntegerField()
+    price = models.CharField()
+    relative_power = models.CharField()
 
 class Cooling(models.Model):
     project = models.ForeignKey(
@@ -229,13 +233,13 @@ class Cooling(models.Model):
     picture = models.ImageField(upload_to='cooling_images/', blank=True, null=True)
 
     socket = models.CharField(max_length=9)
-    tdp = models.IntegerField()
-    consumption = models.IntegerField()
-    size = models.IntegerField()
+    tdp = models.CharField()
+    consumption = models.CharField()
+    size = models.CharField()
     backlight = models.CharField(max_length=5, null=True)
 
-    price = models.IntegerField()
-    relative_power = models.IntegerField()
+    price = models.CharField()
+    relative_power = models.CharField()
 
 class PowerSupply(models.Model):
     project = models.ForeignKey(
@@ -245,10 +249,10 @@ class PowerSupply(models.Model):
     model = models.CharField(max_length=20)
     picture = models.ImageField(upload_to='powersupply_images/', blank=True, null=True)
 
-    power = models.IntegerField()
+    power = models.CharField()
 
-    price = models.IntegerField()
-    relative_power = models.IntegerField()
+    price = models.CharField()
+    relative_power = models.CharField()
 
 class Storage(models.Model):
     project = models.ForeignKey(
@@ -258,10 +262,10 @@ class Storage(models.Model):
     model = models.CharField(max_length=20)
     picture = models.ImageField(upload_to='storage_images/', blank=True, null=True)
 
-    capacity = models.IntegerField()
+    capacity = models.CharField()
     typee = models.CharField(max_length=4)
 
-    price = models.IntegerField()
+    price = models.CharField()
 
 class Case(models.Model):
     project = models.ForeignKey(
@@ -272,7 +276,7 @@ class Case(models.Model):
     picture = models.ImageField(upload_to='case_images/', blank=True, null=True)
 
     supported_form_factor = models.CharField(max_length=10)
-    size = models.IntegerField()
+    size = models.CharField()
     backlight = models.CharField(max_length=5, null=True)
 
-    price = models.IntegerField()
+    price = models.CharField()

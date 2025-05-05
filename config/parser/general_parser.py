@@ -54,20 +54,17 @@ def parse_product_page(driver, url, model_class, fields_to_parse):
     # Словарь для хранения спарсенных данных
     parsed_data = {}
 
+    spec_titles = soup.find_all('div', class_='product-characteristics__spec-title')
+    spec_values = soup.find_all('div', class_='product-characteristics__spec-value')
+    tech_spec = {title.text.strip(): value.text.strip() for title, value in zip(spec_titles, spec_values)}
+
     for field, label in fields_to_parse.items():
-        try:
-            title = soup.find('span', text=label)
-            if title:
-                value = title.find_next_sibling('div', class_='product-characteristics__spec-value')
-                parsed_data[field] = value.text.strip()
-                if value:
-                    logger.debug(f"парсинг поля {field}: {value}")
-            else:
-                logger.warning(f"не удалось найти характеристику {field} на странице {url}")
-                parsed_data[field] = None  # Если характеристика не найдена
-        except Exception as e:
-            logger.error(f"Ошибка при парсинге поля {field}: {e}")
-            parsed_data[field] = None
+        raw_value = tech_spec.get(label, None)
+        parsed_data[field] = raw_value
+        if raw_value:
+            logger.debug(f"Парсинг поля {field}: {raw_value}")
+        else:
+            logger.warning(f"Не удалось найти характеристику '{label}' на странице {url}")
 
     # Парсинг цены
     price_tag = soup.find('div', class_="product-buy__price")
@@ -169,7 +166,7 @@ case_fields_to_parse = {
 }
 
 def main():
-    driver = uc.Chrome()
+    driver = uc.Chrome(version_main=135)
     try:
         urls_to_parse = {
             'GPU': ('https://www.dns-shop.ru/catalog/17a89aab16404e77/videokarty/?p={page}', gpu_fields_to_parse, GPU),
