@@ -1,0 +1,1060 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Snitch PC - Конфигуратор ПК</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root {
+            --primary: #1e1e2d;
+            --secondary: #2d2d42;
+            --accent: #ff5e3a;
+            --text: #ffffff;
+            --text-secondary: #b5b5c3;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Roboto', sans-serif;
+        }
+
+        body {
+            background-color: #0f0f19;
+            color: var(--text);
+        }
+
+        .container {
+            width: 100%;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 15px;
+        }
+
+        /* Header (полностью идентично главной странице) */
+        .header {
+            background-color: var(--primary);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        .header-top {
+            display: flex;
+            align-items: center;
+            padding: 15px 0;
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            margin-right: 30px;
+        }
+
+        .logo img {
+            height: 40px;
+            margin-right: 10px;
+        }
+
+        .logo span {
+            font-size: 24px;
+            font-weight: 700;
+            color: var(--text);
+        }
+
+        .header-search {
+            flex-grow: 1;
+            position: relative;
+        }
+
+        .header-search input {
+            width: 100%;
+            padding: 12px 20px;
+            background-color: var(--secondary);
+            border: none;
+            border-radius: 6px;
+            color: var(--text);
+            font-size: 14px;
+        }
+
+        .header-actions {
+            display: flex;
+            margin-left: 30px;
+        }
+
+        .header-actions a {
+            color: var(--text);
+            margin-left: 20px;
+            font-size: 18px;
+            position: relative;
+        }
+
+        .header-actions a span {
+            position: absolute;
+            top: -8px;
+            right: -8px;
+            background-color: var(--accent);
+            color: white;
+            border-radius: 50%;
+            width: 18px;
+            height: 18px;
+            font-size: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        /* Navigation (полностью идентично главной странице) */
+        .nav {
+            background-color: var(--primary);
+        }
+
+        .nav-list {
+            display: flex;
+            list-style: none;
+        }
+
+        .nav-list li {
+            position: relative;
+        }
+
+        .nav-list li:hover .submenu {
+            display: block;
+        }
+
+        .nav-list li a {
+            display: block;
+            color: var(--text);
+            text-decoration: none;
+            padding: 18px 20px;
+            font-size: 15px;
+            font-weight: 500;
+            transition: all 0.3s;
+        }
+
+        .nav-list li a:hover {
+            color: var(--accent);
+        }
+
+        .submenu {
+            display: none;
+            position: absolute;
+            top: 100%;
+            left: 0;
+            background-color: var(--secondary);
+            min-width: 200px;
+            border-radius: 0 0 6px 6px;
+            z-index: 10;
+        }
+
+        .submenu li a {
+            padding: 12px 20px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+        }
+
+        /* Конфигуратор (полная версия) */
+        .configurator-page {
+            padding: 30px 0 50px;
+        }
+
+        .configurator-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+
+        .configurator-title {
+            font-size: 28px;
+            font-weight: 700;
+        }
+
+        .configurator-nav {
+            display: flex;
+            gap: 15px;
+        }
+
+        .configurator-nav a {
+            color: var(--text-secondary);
+            text-decoration: none;
+            font-size: 14px;
+        }
+
+        .configurator-nav a.active {
+            color: var(--accent);
+            font-weight: 500;
+        }
+
+        .configurator-wrapper {
+            display: flex;
+            gap: 30px;
+        }
+
+        .components-sidebar {
+            width: 300px;
+            flex-shrink: 0;
+        }
+
+        .component-category {
+            background: var(--primary);
+            border-radius: 8px;
+            margin-bottom: 20px;
+            overflow: hidden;
+        }
+
+        .category-header {
+            background: var(--secondary);
+            padding: 15px 20px;
+            font-weight: 600;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            cursor: pointer;
+            user-select: none;
+        }
+
+        .category-header i {
+            transition: transform 0.3s ease;
+        }
+
+        .category-header i.rotated {
+            transform: rotate(180deg);
+        }
+
+        .category-content {
+            padding: 15px;
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height 0.3s ease-out;
+        }
+
+        .category-content.expanded {
+            max-height: 1000px;
+            transition: max-height 0.5s ease-in;
+        }
+
+        .component-option {
+            display: flex;
+            justify-content: space-between;
+            padding: 12px 0;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+            cursor: pointer;
+            align-items: center;
+        }
+
+        .component-option:last-child {
+            border-bottom: none;
+        }
+
+        .component-option.active {
+            color: var(--accent);
+        }
+
+        .component-option.disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+            pointer-events: none;
+        }
+
+        .component-option.locked {
+            position: relative;
+        }
+
+        .component-option.locked::after {
+            content: '🔒';
+            position: absolute;
+            right: 10px;
+            top: 50%;
+            transform: translateY(-50%);
+            font-size: 16px;
+        }
+
+        .component-image {
+            width: 40px;
+            height: 40px;
+            margin-right: 10px;
+            object-fit: contain;
+        }
+
+        .component-info {
+            flex-grow: 1;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .component-name {
+            font-weight: 500;
+        }
+
+        .component-price {
+            font-weight: 600;
+        }
+
+        .configurator-main {
+            flex-grow: 1;
+        }
+
+        .pc-preview {
+            background: var(--primary);
+            border-radius: 8px;
+            padding: 30px;
+            margin-bottom: 30px;
+            text-align: center;
+        }
+
+        .pc-image {
+            max-width: 100%;
+            height: 300px;
+            object-fit: contain;
+            margin-bottom: 20px;
+        }
+
+        .pc-specs {
+            background: var(--primary);
+            border-radius: 8px;
+            padding: 25px;
+            margin-bottom: 30px;
+        }
+
+        .spec-item {
+            display: flex;
+            justify-content: space-between;
+            padding: 12px 0;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+        }
+
+        .spec-name {
+            color: var(--text-secondary);
+        }
+
+        .spec-value {
+            font-weight: 500;
+        }
+
+        .total-block {
+            background: var(--primary);
+            border-radius: 8px;
+            padding: 25px;
+            margin-bottom: 30px;
+        }
+
+        .total-row {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 15px;
+
+        }
+
+        .total-label {
+            font-size: 18px;
+        }
+
+        .total-price {
+            font-size: 24px;
+            font-weight: 700;
+            color: var(--accent);
+        }
+
+        .action-buttons {
+            display: flex;
+            gap: 15px;
+        }
+
+        .btn {
+            display: inline-block;
+            padding: 14px 30px;
+            background-color: var(--accent);
+            color: white;
+            border-radius: 6px;
+            text-decoration: none;
+            font-weight: 600;
+            font-size: 16px;
+            transition: all 0.3s;
+            border: none;
+            cursor: pointer;
+            text-align: center;
+        }
+
+        .btn-block {
+            display: block;
+            width: 100%;
+        }
+
+        .btn-outline {
+            background: transparent;
+            border: 1px solid var(--accent);
+            color: var(--accent);
+        }
+
+        .btn:hover {
+            background-color: #ff4a2a;
+            transform: translateY(-2px);
+        }
+
+        .btn-outline:hover {
+            background: rgba(255, 94, 58, 0.1);
+        }
+
+        /* Footer (полностью идентично главной странице) */
+        .footer {
+            background-color: var(--primary);
+            padding: 60px 0 30px;
+        }
+
+        .footer-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 40px;
+            margin-bottom: 40px;
+        }
+
+        .footer-column h3 {
+            font-size: 18px;
+            font-weight: 600;
+            margin-bottom: 20px;
+            position: relative;
+            padding-bottom: 10px;
+        }
+
+        .footer-column h3::after {
+            content: '';
+            position: absolute;
+            left: 0;
+            bottom: 0;
+            width: 40px;
+            height: 2px;
+            background-color: var(--accent);
+        }
+
+        .footer-links {
+            list-style: none;
+        }
+
+        .footer-links li {
+            margin-bottom: 12px;
+        }
+
+        .footer-links a {
+            color: var(--text-secondary);
+            text-decoration: none;
+            font-size: 14px;
+            transition: all 0.3s;
+        }
+
+        .footer-links a:hover {
+            color: var(--accent);
+            padding-left: 5px;
+        }
+
+        .footer-bottom {
+            text-align: center;
+            padding-top: 30px;
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+            color: var(--text-secondary);
+            font-size: 14px;
+        }
+
+        /* Responsive */
+        @media (max-width: 992px) {
+            .configurator-wrapper {
+                flex-direction: column;
+            }
+
+            .components-sidebar {
+                width: 100%;
+            }
+
+            .header-top {
+                flex-wrap: wrap;
+            }
+
+            .logo {
+                margin-bottom: 15px;
+            }
+
+            .header-search {
+                order: 3;
+                width: 100%;
+                margin-top: 15px;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .nav-list {
+                flex-wrap: wrap;
+                justify-content: center;
+            }
+
+            .nav-list li {
+                width: 50%;
+                text-align: center;
+            }
+
+            .action-buttons {
+                flex-direction: column;
+            }
+        }
+
+        .preview-content {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 20px;
+        }
+
+        .preview-image {
+            width: 100%;
+            max-width: 300px;
+            height: 300px;
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .preview-image img {
+            max-width: 100%;
+            max-height: 100%;
+            object-fit: contain;
+        }
+
+        .preview-info {
+            width: 100%;
+            text-align: center;
+        }
+
+        .preview-specs {
+            margin: 15px 0;
+            color: var(--text-secondary);
+            font-size: 16px;
+            line-height: 1.5;
+        }
+
+        .preview-price {
+            font-size: 24px;
+            font-weight: 700;
+            color: var(--accent);
+            margin: 15px 0;
+        }
+
+        #component-preview {
+            background: var(--primary);
+            border-radius: 8px;
+            overflow: hidden;
+        }
+
+        #no-component-selected {
+            text-align: center;
+        }
+
+        #no-component-selected h3 {
+            margin-top: 20px;
+            color: var(--text-secondary);
+        }
+
+        @media (max-width: 768px) {
+            .preview-content {
+                padding: 15px;
+            }
+
+            .preview-image {
+                max-width: 200px;
+                height: 200px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <header class="header">
+        <div class="container">
+            <div class="header-top">
+                <a href="/" class="logo">
+                    <img src="/static/images/logo.png" alt="Snitch PC Logo" width="60">
+                    <span>Snitch PC</span>
+                </a>
+
+                <div class="header-search">
+                    <input type="text" placeholder="Поиск игровых ПК, ноутбуков и комплектующих...">
+                </div>
+
+                <div class="header-actions">
+                    <a href="#"><i class="far fa-user"></i></a>
+                    <a href="#"><i class="far fa-heart"></i><span>3</span></a>
+                    <a href="#"><i class="fas fa-shopping-cart"></i><span>2</span></a>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <div class="configurator-page">
+        <div class="container">
+            <div class="configurator-header">
+                <h1 class="configurator-title">Конфигуратор игрового ПеКа</h1>
+                <div class="configurator-nav">
+                    <a href="#" class="active">Компоненты</a>
+                    <a href="#">Совместимость</a>
+                    <a href="#">Сохранение</a>
+                </div>
+            </div>
+
+            <div class="configurator-wrapper">
+                <div class="components-sidebar">
+                    <!-- Видеокарты -->
+                    <div class="component-category">
+                        <div class="category-header">
+                            <span>Видеокарта</span>
+                            <i class="fas fa-chevron-down"></i>
+                        </div>
+                        <div class="category-content">
+                            {% for gpu in gpus %}
+                            <div class="component-option" data-component="gpu" data-id="{{ gpu.id }}" data-power="{{ gpu.relative_power }}">
+                                <img src="{{ gpu.picture }}" alt="{{ gpu.model }}" class="component-image" onerror="this.src='/static/images/no-image.png'">
+                                <div class="component-info">
+                                    <span class="component-name">{{ gpu.model }}</span>
+                                    <span class="component-price">{{ gpu.price }} ₽</span>
+                                </div>
+                            </div>
+                            {% endfor %}
+                        </div>
+                    </div>
+
+                    <!-- Процессоры -->
+                    <div class="component-category">
+                        <div class="category-header">
+                            <span>Процессор</span>
+                            <i class="fas fa-chevron-down"></i>
+                        </div>
+                        <div class="category-content">
+                            {% for cpu in cpus %}
+                            <div class="component-option locked" data-component="cpu" data-id="{{ cpu.id }}" data-power="{{ cpu.relative_power }}">
+                                <img src="{{ cpu.picture }}" alt="{{ cpu.model }}" class="component-image" onerror="this.src='/static/images/no-image.png'">
+                                <div class="component-info">
+                                    <span class="component-name">{{ cpu.model }}</span>
+                                    <span class="component-price">{{ cpu.price }} ₽</span>
+                                </div>
+                            </div>
+                            {% endfor %}
+                        </div>
+                    </div>
+
+                    <!-- Материнские платы -->
+                    <div class="component-category">
+                        <div class="category-header">
+                            <span>Материнская плата</span>
+                            <i class="fas fa-chevron-down"></i>
+                        </div>
+                        <div class="category-content">
+                            {% for mb in motherboards %}
+                            <div class="component-option locked" data-component="motherboard" data-id="{{ mb.id }}">
+                                <img src="{{ mb.picture }}" alt="{{ mb.model }}" class="component-image" onerror="this.src='/static/images/no-image.png'">
+                                <div class="component-info">
+                                    <span class="component-name">{{ mb.model }}</span>
+                                    <span class="component-price">{{ mb.price }} ₽</span>
+                                </div>
+                            </div>
+                            {% endfor %}
+                        </div>
+                    </div>
+
+                    <!-- Оперативная память -->
+                    <div class="component-category">
+                        <div class="category-header">
+                            <span>Оперативная память</span>
+                            <i class="fas fa-chevron-down"></i>
+                        </div>
+                        <div class="category-content">
+                            {% for ram in rams %}
+                            <div class="component-option" data-component="ram" data-id="{{ ram.id }}">
+                                <img src="{{ ram.picture }}" alt="{{ ram.model }}" class="component-image" onerror="this.src='/static/images/no-image.png'">
+                                <div class="component-info">
+                                    <span class="component-name">{{ ram.model }}</span>
+                                    <span class="component-price">{{ ram.price }} ₽</span>
+                                </div>
+                            </div>
+                            {% endfor %}
+                        </div>
+                    </div>
+
+                    <!-- Системы охлаждения -->
+                    <div class="component-category">
+                        <div class="category-header">
+                            <span>Охлаждение</span>
+                            <i class="fas fa-chevron-down"></i>
+                        </div>
+                        <div class="category-content">
+                            {% for cooling in coolings %}
+                            <div class="component-option" data-component="cooling" data-id="{{ cooling.id }}">
+                                <img src="{{ cooling.picture }}" alt="{{ cooling.model }}" class="component-image" onerror="this.src='/static/images/no-image.png'">
+                                <div class="component-info">
+                                    <span class="component-name">{{ cooling.model }}</span>
+                                    <span class="component-price">{{ cooling.price }} ₽</span>
+                                </div>
+                            </div>
+                            {% endfor %}
+                        </div>
+                    </div>
+
+                    <!-- Блоки питания -->
+                    <div class="component-category">
+                        <div class="category-header">
+                            <span>Блок питания</span>
+                            <i class="fas fa-chevron-down"></i>
+                        </div>
+                        <div class="category-content">
+                            {% for psu in power_supplies %}
+                            <div class="component-option" data-component="psu" data-id="{{ psu.id }}">
+                                <img src="{{ psu.picture }}" alt="{{ psu.model }}" class="component-image" onerror="this.src='/static/images/no-image.png'">
+                                <div class="component-info">
+                                    <span class="component-name">{{ psu.model }}</span>
+                                    <span class="component-price">{{ psu.price }} ₽</span>
+                                </div>
+                            </div>
+                            {% endfor %}
+                        </div>
+                    </div>
+
+                    <!-- Накопители -->
+                    <div class="component-category">
+                        <div class="category-header">
+                            <span>Накопитель</span>
+                            <i class="fas fa-chevron-down"></i>
+                        </div>
+                        <div class="category-content">
+                            {% for storage in storages %}
+                            <div class="component-option" data-component="storage" data-id="{{ storage.id }}">
+                                <img src="{{ storage.picture }}" alt="{{ storage.model }}" class="component-image" onerror="this.src='/static/images/no-image.png'">
+                                <div class="component-info">
+                                    <span class="component-name">{{ storage.model }}</span>
+                                    <span class="component-price">{{ storage.price }} ₽</span>
+                                </div>
+                            </div>
+                            {% endfor %}
+                        </div>
+                    </div>
+
+                    <!-- Корпуса -->
+                    <div class="component-category">
+                        <div class="category-header">
+                            <span>Корпус</span>
+                            <i class="fas fa-chevron-down"></i>
+                        </div>
+                        <div class="category-content">
+                            {% for case in cases %}
+                            <div class="component-option" data-component="case" data-id="{{ case.id }}">
+                                <img src="{{ case.picture }}" alt="{{ case.model }}" class="component-image" onerror="this.src='/static/images/no-image.png'">
+                                <div class="component-info">
+                                    <span class="component-name">{{ case.model }}</span>
+                                    <span class="component-price">{{ case.price }} ₽</span>
+                                </div>
+                            </div>
+                            {% endfor %}
+                        </div>
+                    </div>
+                </div>
+
+                <div class="configurator-main">
+                    <div class="pc-preview">
+                        <div id="component-preview" style="display: none;">
+                            <div class="preview-content">
+                                <div class="preview-image">
+                                    <img id="preview-image" src="" alt="Компонент">
+                                </div>
+                                <div class="preview-info">
+                                    <h3 id="preview-name"></h3>
+                                    <div id="preview-specs" class="preview-specs"></div>
+                                    <div class="preview-price" id="preview-price"></div>
+                                    <button class="btn btn-block" id="add-to-config">Добавить в конфигурацию</button>
+                                </div>
+                            </div>
+                        </div>
+                        <div id="no-component-selected">
+                            <img src="https://hyperpc.ru/images/product/dynamic/evo-rgb/hyperpc-dynamic-evo-rgb-black.jpg" alt="Ваш ПК" class="pc-image">
+                            <h3>Выберите компонент для просмотра</h3>
+                        </div>
+                    </div>
+
+                    <div class="pc-specs">
+                        <div class="spec-item">
+                            <span class="spec-name">Процессор</span>
+                            <span class="spec-value" id="cpu-spec">Не выбран</span>
+                        </div>
+                        <div class="spec-item">
+                            <span class="spec-name">Видеокарта</span>
+                            <span class="spec-value" id="gpu-spec">Не выбран</span>
+                        </div>
+                        <div class="spec-item">
+                            <span class="spec-name">Охлаждение</span>
+                            <span class="spec-value" id="cooling-spec">Не выбран</span>
+                        </div>
+                        <div class="spec-item">
+                            <span class="spec-name">Материнская плата</span>
+                            <span class="spec-value" id="motherboard-spec">Не выбран</span>
+                        </div>
+                        <div class="spec-item">
+                            <span class="spec-name">Оперативная память</span>
+                            <span class="spec-value" id="ram-spec">Не выбран</span>
+                        </div>
+                        <div class="spec-item">
+                            <span class="spec-name">Накопитель</span>
+                            <span class="spec-value" id="storage-spec">Не выбран</span>
+                        </div>
+                        <div class="spec-item">
+                            <span class="spec-name">Блок питания</span>
+                            <span class="spec-value" id="psu-spec">Не выбран</span>
+                        </div>
+                        <div class="spec-item">
+                            <span class="spec-name">Корпус</span>
+                            <span class="spec-value" id="case-spec">Не выбран</span>
+                        </div>
+                    </div>
+
+                    <div class="total-block">
+                        <div class="total-row">
+                            <span class="total-label">Стоимость комплектующих:</span>
+                            <span class="total-price" id="components-price">0 ₽</span>
+                        </div>
+                        <div class="total-row">
+                            <span class="total-label">Сборка и тестирование:</span>
+                            <span class="total-price">9 990 ₽</span>
+                        </div>
+                        <div class="total-row">
+                            <span class="total-label">Итого:</span>
+                            <span class="total-price" id="total-price">9 990 ₽</span>
+                        </div>
+                    </div>
+
+                    <div class="action-buttons">
+                        <button class="btn btn-block">Добавить в корзину</button>
+                        <button class="btn btn-outline btn-block">Сохранить конфигурацию</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Переменная для хранения выбранной видеокарты и её мощности
+            // Используется для фильтрации совместимых процессоров
+            let selectedGPU = null;
+
+            // Обработчик раскрытия/сворачивания категорий компонентов
+            document.querySelectorAll('.category-header').forEach(header => {
+                header.addEventListener('click', function() {
+                    const content = this.nextElementSibling;
+                    const icon = this.querySelector('i');
+                    
+                    // Переключаем класс expanded для анимации
+                    content.classList.toggle('expanded');
+                    
+                    // Анимируем иконку стрелки
+                    icon.classList.toggle('rotated');
+                    
+                    // Устанавливаем max-height для плавной анимации
+                    if (content.classList.contains('expanded')) {
+                        content.style.maxHeight = content.scrollHeight + 'px';
+                    } else {
+                        content.style.maxHeight = '0';
+                    }
+                });
+            });
+
+            // Обработчик выбора компонентов
+            document.querySelectorAll('.component-option').forEach(option => {
+                option.addEventListener('click', function() {
+                    // Проверяем, не заблокирован ли компонент
+                    if (this.classList.contains('locked') || this.classList.contains('disabled')) {
+                        return;
+                    }
+
+                    // Получаем данные компонента из data-атрибутов
+                    const componentType = this.dataset.component;
+                    const componentId = this.dataset.id;
+                    const componentName = this.querySelector('.component-name').textContent;
+                    const componentPrice = parseInt(this.querySelector('.component-price').textContent);
+                    
+                    // Снимаем выделение с других компонентов в категории
+                    this.parentNode.querySelectorAll('.component-option').forEach(el => {
+                        el.classList.remove('active');
+                    });
+
+                    // Выделяем выбранный компонент
+                    this.classList.add('active');
+
+                    // Показываем предварительный просмотр компонента
+                    showComponentPreview(componentType, componentId, componentName, componentPrice);
+
+                    // Специальная обработка для видеокарты
+                    if (componentType === 'gpu') {
+                        // Сохраняем данные выбранной видеокарты
+                        selectedGPU = {
+                            id: componentId,
+                            power: parseInt(this.dataset.power) || 0
+                        };
+                        // Фильтруем процессоры на основе мощности GPU
+                        filterCPUs();
+                        // Разблокируем категорию процессоров
+                        unlockNextCategory('cpu');
+                    }
+                });
+            });
+
+            // Функция фильтрации процессоров на основе мощности GPU
+            function filterCPUs() {
+                if (!selectedGPU) return;
+
+                const cpuOptions = document.querySelectorAll('.component-option[data-component="cpu"]');
+                const gpuPower = selectedGPU.power;
+
+                cpuOptions.forEach(cpu => {
+                    const cpuPower = parseInt(cpu.dataset.power) || 0;
+                    const powerDiff = Math.abs(cpuPower - gpuPower);
+                    
+                    // Отключаем процессоры, мощность которых сильно отличается от GPU
+                    // Разница в мощности не должна превышать 50 единиц
+                    if (powerDiff <= 50) {
+                        cpu.classList.remove('disabled');
+                    } else {
+                        cpu.classList.add('disabled');
+                    }
+                });
+            }
+
+            // Функция разблокировки следующей категории компонентов
+            function unlockNextCategory(category) {
+                const categoryElement = document.querySelector(`.component-option[data-component="${category}"]`).closest('.component-category');
+                categoryElement.querySelectorAll('.component-option').forEach(option => {
+                    option.classList.remove('locked');
+                });
+            }
+
+            // Функция отображения предварительного просмотра компонента
+            function showComponentPreview(type, id, name, price) {
+                const preview = document.getElementById('component-preview');
+                const noSelection = document.getElementById('no-component-selected');
+                const previewImage = document.getElementById('preview-image');
+                const previewName = document.getElementById('preview-name');
+                const previewSpecs = document.getElementById('preview-specs');
+                const previewPrice = document.getElementById('preview-price');
+                const addButton = document.getElementById('add-to-config');
+
+                // Скрываем сообщение о выборе компонента и показываем предпросмотр
+                noSelection.style.display = 'none';
+                preview.style.display = 'block';
+
+                // Загружаем детальные данные компонента через AJAX
+                fetch(`/api/component/${type}/${id}/`)
+                    .then(response => response.json())
+                    .then(data => {
+                        // Устанавливаем изображение компонента
+                        if (data.picture) {
+                            if (data.picture.startsWith('http')) {
+                                previewImage.src = data.picture;
+                            } else {
+                                previewImage.src = `/media/${data.picture}`;
+                            }
+                        } else {
+                            previewImage.src = '/static/images/no-image.png';
+                        }
+
+                        // Обработчик ошибки загрузки изображения
+                        previewImage.onerror = function() {
+                            console.error('Ошибка загрузки изображения:', data.picture);
+                            this.src = '/static/images/no-image.png';
+                        };
+
+                        // Устанавливаем название компонента
+                        previewName.textContent = data.model;
+                        
+                        // Формируем спецификации в зависимости от типа компонента
+                        let specs = '';
+                        switch(type) {
+                            case 'cpu':
+                                specs = `${data.cores_amount} ядер, ${data.frequency}, ${data.socket}`;
+                                break;
+                            case 'motherboard':
+                                specs = `${data.socket}, ${data.form_factor}`;
+                                break;
+                            case 'gpu':
+                                specs = `${data.memory_amount} ГБ, ${data.frequency}`;
+                                break;
+                            case 'ram':
+                                specs = `${data.amount}, ${data.typee}`;
+                                break;
+                            case 'cooling':
+                                specs = `${data.typee}, ${data.socket}`;
+                                break;
+                            case 'psu':
+                                specs = `${data.power} Вт`;
+                                break;
+                            case 'storage':
+                                specs = `${data.capacity}, ${data.typee}`;
+                                break;
+                            case 'case':
+                                specs = `${data.supported_form_factor}, ${data.size}`;
+                                break;
+                        }
+                        previewSpecs.textContent = specs;
+                        previewPrice.textContent = `${price.toLocaleString('ru-RU')} ₽`;
+
+                        // Обновляем обработчик кнопки "Добавить в конфигурацию"
+                        addButton.onclick = function() {
+                            // Обновляем спецификации в списке выбранных компонентов
+                            const specElement = document.getElementById(`${type}-spec`);
+                            if (specElement) {
+                                specElement.textContent = name;
+                            }
+
+                            // Пересчитываем общую стоимость
+                            updatePrice();
+
+                            // Возвращаемся к общему виду
+                            preview.style.display = 'none';
+                            noSelection.style.display = 'block';
+                        };
+                    })
+                    .catch(error => {
+                        console.error('Ошибка при загрузке данных компонента:', error);
+                        preview.style.display = 'none';
+                        noSelection.style.display = 'block';
+                    });
+            }
+
+            // Функция обновления общей стоимости конфигурации
+            function updatePrice() {
+                let total = 0;
+
+                // Суммируем цены всех выбранных компонентов
+                document.querySelectorAll('.component-option.active').forEach(option => {
+                    const priceText = option.querySelector('.component-price').textContent;
+                    const price = parseInt(priceText.replace(/[^\d]/g, ''));
+                    total += price;
+                });
+
+                // Обновляем отображение цены компонентов
+                document.getElementById('components-price').textContent = `${total.toLocaleString('ru-RU')} ₽`;
+
+                // Добавляем стоимость сборки
+                const assemblyPrice = 9990;
+                total += assemblyPrice;
+
+                // Обновляем итоговую цену
+                document.getElementById('total-price').textContent = `${total.toLocaleString('ru-RU')} ₽`;
+            }
+
+            // Инициализация - раскрываем первую категорию (видеокарты)
+            const firstCategory = document.querySelector('.category-content');
+            const firstIcon = document.querySelector('.category-header i');
+            if (firstCategory && firstIcon) {
+                firstCategory.classList.add('expanded');
+                firstIcon.classList.add('rotated');
+                firstCategory.style.maxHeight = firstCategory.scrollHeight + 'px';
+            }
+        });
+    </script>
+</body>
+</html>

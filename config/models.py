@@ -1,4 +1,6 @@
+import re
 from tkinter.constants import CASCADE
+import config.parser.power_calculator as calculator
 
 from django.conf import settings
 from django.db import models
@@ -51,10 +53,9 @@ class ProjectComponent(models.Model):
 
 class BaseComponent(models.Model):
     model = models.CharField(max_length=100)
-    price = models.CharField()
-    picture = models.ImageField(upload_to='components/', blank=True, null=True)
-    created_at = models.DateTimeField(auto_now_add=True)
-    updated_at = models.DateTimeField(auto_now=True)
+    price = models.CharField(max_length=20)
+    picture = models.ImageField(upload_to='component_images/', blank=True, null=True)
+    source_url = models.URLField(max_length=500, blank=True, null=True)
 
     class Meta:
         abstract = True
@@ -64,60 +65,12 @@ class ParsedGPU(BaseComponent):
     memory_amount = models.CharField(max_length=50)
     size = models.CharField(max_length=50)
     consumption = models.CharField(max_length=50)
-    relative_power = models.CharField(max_length=50)  
-
-    def calculatePower(self):
-        base_power = 100
-     
-        if not self.model:
-            self.relative_power = str(base_power)
-            return
-
-        match self.model:
-            case model if "SUPER" in model:
-                self.relative_power = str(int(base_power * 1.07))
-            case model if "Ti" in model:
-                self.relative_power = str(int(base_power * 1.05))
-            case model if "XT" in model:
-                self.relative_power = str(int(base_power * 1.07))
-            case model if "XTX" in model:
-                self.relative_power = str(int(base_power * 1.09))
-            case model if "RX 6700" in model:
-                self.relative_power = str(int(base_power * 0.97))
-            case model if "RTX 2080" in model:
-                self.relative_power = str(int(base_power * 0.95))
-            case model if "RTX 3060" in model:
-                self.relative_power = str(int(base_power * 0.865))
-            case model if "RX 7600" in model:
-                self.relative_power = str(int(base_power * 0.84))
-            case model if "RTX 2070" in model:
-                self.relative_power = str(int(base_power * 0.817))
-            case model if "Arc B580" in model:
-                self.relative_power = str(int(base_power * 0.793))
-            case model if "GTX 1080" in model:
-                self.relative_power = str(int(base_power * 0.79))
-            case model if "RX 6600" in model:
-                self.relative_power = str(int(base_power * 0.765))
-            case model if "RTX 4050" in model:
-                self.relative_power = str(int(base_power * 0.73))
-            case model if "RX 5700" in model:
-                self.relative_power = str(int(base_power * 0.727))
-            case model if "RX 2060" in model:
-                self.relative_power = str(int(base_power * 0.716))
-            case model if "Arc B570" in model:
-                self.relative_power = str(int(base_power * 0.697))
-            case model if "GTX 1070" in model:
-                self.relative_power = str(int(base_power * 0.684))
-            case model if "Arc A770" in model:
-                self.relative_power = str(int(base_power * 0.667))
-            case model if "GTX 1660" in model:
-                self.relative_power = str(int(base_power * 0.59))
-            case _:
-                self.relative_power = str(base_power)
+    relative_power = models.CharField(max_length=50)
 
     def save(self, *args, **kwargs):
-        self.calculatePower()
+        calculator.calculateGPUPower(self)
         super().save(*args, **kwargs)
+
 
 class GPU(models.Model):
     project = models.ForeignKey(
@@ -136,16 +89,18 @@ class GPU(models.Model):
     relative_power = models.CharField()
 
 
-class ParsedCPU(models.Model):
-    model = models.CharField(max_length=15)
+class ParsedCPU(BaseComponent):
     cores_amount = models.CharField(max_length=10)
     frequency = models.CharField(max_length=10)
-    picture = models.ImageField(upload_to='parsed_cpu_images/', blank=True, null=True)
     socket = models.CharField(max_length=9)
     tdp = models.CharField(max_length=10)
-    consumption = models.CharField(max_length=10)
-    price = models.CharField(max_length=10)
+    #consumption = models.CharField(max_length=10)
+
     relative_power = models.CharField(max_length=10)
+
+    def save(self, *args, **kwargs):
+        calculator.calculateCPUPower(self)
+        super().save(*args, **kwargs)
 
     def __str__(self):
         return self.model
@@ -280,3 +235,41 @@ class Case(models.Model):
     backlight = models.CharField(max_length=5, null=True)
 
     price = models.CharField()
+
+class ParsedMotherboard(BaseComponent):
+    form_factor = models.CharField(max_length=50)
+    socket = models.CharField(max_length=50)
+    ram_slots = models.CharField(max_length=50)
+    ram_type = models.CharField(max_length=50)
+    nvme_slot = models.CharField(max_length=50)
+    sata_slot = models.CharField(max_length=50)
+
+
+class ParsedRAM(BaseComponent):
+    modules = models.CharField(max_length=50)
+    amount = models.CharField(max_length=50)
+    typee = models.CharField(max_length=50)
+
+
+class ParsedCooling(BaseComponent):
+    typee = models.CharField(max_length=50)
+    socket = models.CharField(max_length=50)
+    tdp = models.CharField(max_length=50)
+    size = models.CharField(max_length=50)
+    backlight = models.CharField(max_length=50)
+
+
+class ParsedPowerSupply(BaseComponent):
+    power = models.CharField(max_length=50)
+
+
+class ParsedStorage(BaseComponent):
+    capacity = models.CharField(max_length=50)
+    typee = models.CharField(max_length=50)
+
+
+class ParsedCase(BaseComponent):
+    supported_form_factor = models.CharField(max_length=50)
+    size = models.CharField(max_length=50)
+    backlight = models.CharField(max_length=50)
+

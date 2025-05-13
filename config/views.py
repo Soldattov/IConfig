@@ -1,17 +1,21 @@
 from django.shortcuts import render
-from .models import GPU, CPU, Motherboard, RAM, Cooling, PowerSupply, Storage, Case
+from .models import (
+    ParsedGPU, ParsedCPU, ParsedMotherboard, ParsedRAM,
+    ParsedCooling, ParsedPowerSupply, ParsedStorage, ParsedCase
+)
 
-def component_list(request):
-    gpus = GPU.objects.all()
-    cpus = CPU.objects.all()
-    motherboards = Motherboard.objects.all()
-    rams = RAM.objects.all()
-    coolings = Cooling.objects.all()
-    power_supplies = PowerSupply.objects.all()
-    storages = Storage.objects.all()
-    cases = Case.objects.all()
+def configurator(request):
+    # Получаем все компоненты из базы данных
+    gpus = ParsedGPU.objects.all()
+    cpus = ParsedCPU.objects.all()
+    motherboards = ParsedMotherboard.objects.all()
+    rams = ParsedRAM.objects.all()
+    coolings = ParsedCooling.objects.all()
+    power_supplies = ParsedPowerSupply.objects.all()
+    storages = ParsedStorage.objects.all()
+    cases = ParsedCase.objects.all()
 
-    return render(request, 'component_list.html', {
+    context = {
         'gpus': gpus,
         'cpus': cpus,
         'motherboards': motherboards,
@@ -20,4 +24,6 @@ def component_list(request):
         'power_supplies': power_supplies,
         'storages': storages,
         'cases': cases
-    })
+    }
+
+    return render(request, 'config_page.html', context)
