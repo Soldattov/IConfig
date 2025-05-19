@@ -1,241 +1,221 @@
-<!DOCTYPE html>
-{% load static %}
-<html lang="ru">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Snitch PC - Магазин игровых компьютеров</title>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <link rel="stylesheet" href="{% static 'css/styles.css' %}"/>
-</head>
-<body>
-    <header class="header">
-        <div class="container">
-            <div class="header-top">
-    <a href="#" class="logo">
-        <img src="https://www.meme-arsenal.com/memes/a706819c0690421e2fb711ea578742cb.jpg" alt="Snitch PC Logo" width="60">
-    </a>
+{% extends "base.html" %}
 
-    <div class="header-search">
-        <input type="text" placeholder="Поиск игровых ПК, ноутбуков и комплектующих...">
-    </div>
+{% block title %}Snitch PC - Магазин игровых компьютеров{% endblock %}
 
-    <div class="header-actions">
-        <a href="#"><i class="far fa-user"></i></a>
-        <a href="#"><i class="far fa-heart"></i><span>3</span></a>
-        <a href="#"><i class="fas fa-shopping-cart"></i><span>2</span></a>
-    </div>
-</div>
-        </div>
-
-        <nav class="nav">
-            <div class="container">
-                <ul class="nav-list">
-                    <li><a href="#">Главная</a></li>
-                    <li>
-                        <a href="#">Игровые ПК <i class="fas fa-chevron-down"></i></a>
-                        <ul class="submenu">
-                            <li><a href="#">Игровые ПК</a></li>
-                            <li><a href="#">Компактные ПК</a></li>
-                            <li><a href="#">Профессиональные ПК</a></li>
-
-                        </ul>
-                    </li>
-                    <li>
-                        <a href="#">Игровые ноутбуки <i class="fas fa-chevron-down"></i></a>
-                        <ul class="submenu">
-                            <li><a href="#">ASUS</a></li>
-                            <li><a href="#">MSI</a></li>
-                            <li><a href="#">Maibenden</a></li>
-                        </ul>
-                    </li>
-                    <li><a href="#">Периферия</a></li>
-                    <li><a href="#">Комплектующие</a></li>
-                    <li><a href="#">Конфигуратор</a></li>
-                    <li><a href="#">Акции</a></li>
-                    <li><a href="#">Доставка и оплата</a></li>
-                    <li><a href="#">Контакты</a></li>
+{% block content %}
+<nav class="nav">
+    <div class="container">
+        <ul class="nav-list">
+            <li><a href="#">Главная</a></li>
+            <li>
+                <a href="#">Игровые ПК <i class="fas fa-chevron-down"></i></a>
+                <ul class="submenu">
+                    <li><a href="#">Игровые ПК</a></li>
+                    <li><a href="#">Компактные ПК</a></li>
+                    <li><a href="#">Профессиональные ПК</a></li>
                 </ul>
-            </div>
-        </nav>
-    </header>
+            </li>
+            <li>
+                <a href="#">Игровые ноутбуки <i class="fas fa-chevron-down"></i></a>
+                <ul class="submenu">
+                    <li><a href="#">ASUS</a></li>
+                    <li><a href="#">MSI</a></li>
+                    <li><a href="#">Maibenden</a></li>
+                </ul>
+            </li>
+            <li><a href="#">Периферия</a></li>
+            <li><a href="#">Комплектующие</a></li>
+            <li><a href="#">Конфигуратор</a></li>
+            <li><a href="#">Акции</a></li>
+            <li><a href="#">Доставка и оплата</a></li>
+            <li><a href="#">Контакты</a></li>
+        </ul>
+    </div>
+</nav>
 
-    <section class="hero">
-        <div class="container">
-            <div class="hero-content">
-                <h1 class="hero-title">Мощные игровые компьютеры от Snitch PC</h1>
-                <p class="hero-text">Соберите свою идеальную конфигурацию или выберите готовую сборку от наших специалистов. Гарантия качества и бесплатная доставка.</p>
-                <a href="#" class="btn">Перейти в конфигуратор</a>
-            </div>
-        </div>
-    </section>
-
-    <section class="section">
-        <div class="container">
-            <h2 class="section-title">Популярные сборки</h2>
-            <div class="products-grid">
-                <div class="product-card">
-                    <div class="product-image">
-                        <img src="https://hyperpc.ru/images/product/dynamic/evo-rgb/hyperpc-dynamic-evo-rgb-black.jpg" alt="Игровой ПК">
-                    </div>
-                    <div class="product-info">
-                        <h3 class="product-title">Snitch Dynamic Pro</h3>
-                        <p class="product-specs">Intel Core i9-13900K • RTX 4090 • 32GB DDR5 • 2TB SSD</p>
-                        <div class="product-price">279 990 ₽</div>
-                        <a href="#" class="btn">В корзину</a>
-                    </div>
-                </div>
-
-                <div class="product-card">
-                    <div class="product-image">
-                        <img src="https://filearchive.cnews.ru/img/news/2020/08/05/h601.jpg" alt="Игровой ПК">
-                    </div>
-                    <div class="product-info">
-                        <h3 class="product-title">Snitch AMD Extreme</h3>
-                        <p class="product-specs">AMD Ryzen 9 7950X • RX 7900 XTX • 32GB DDR5 • 2TB SSD</p>
-                        <div class="product-price">229 990 ₽</div>
-                        <a href="#" class="btn">В корзину</a>
-                    </div>
-                </div>
-
-                <div class="product-card">
-                    <div class="product-image">
-                        <img src="https://www.goha.ru/s/A:BE/Xm/WxlSF3UmQd.png" alt="Игровой ПК">
-                    </div>
-                    <div class="product-info">
-                        <h3 class="product-title">Snitch Dynamic</h3>
-                        <p class="product-specs">Intel Core i7-13700K • RTX 4080 • 32GB DDR4 • 1TB SSD</p>
-                        <div class="product-price">179 990 ₽</div>
-                        <a href="#" class="btn">В корзину</a>
-                    </div>
-                </div>
-
-                <div class="product-card">
-                    <div class="product-image">
-                        <img src="https://ae01.alicdn.com/kf/S025502d226284852ab02a8730a948f5aH.jpg" alt="Игровой ПК">
-                    </div>
-                    <div class="product-info">
-                        <h3 class="product-title">Snitch Compact</h3>
-                        <p class="product-specs">AMD Ryzen 7 7700X • RTX 4070 • 16GB DDR4 • 1TB SSD</p>
-                        <div class="product-price">129 990 ₽</div>
-                        <a href="#" class="btn">В корзину</a>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </section>
-
-    <section class="section">
-        <div class="container">
-            <h2 class="section-title">Лучшие ноутбуки: выбор Snitch PC</h2>
-            <div class="products-grid">
-                <div class="product-card">
-                    <div class="product-image">
-                        <img src="https://delta-game.ru/wp-content/uploads/2022/08/asus-tuf-gaming-a15-fa507rm-fa507rr-7.webp" alt="Игровой ноутбук">
-                    </div>
-                    <div class="product-info">
-                        <h3 class="product-title">Ноутбук ASUS TUF Gaming A15 FA507NV-LP103</h3>
-                        <p class="product-specs">Intel Core i9-13900FX • RTX 4090 • 32GB DDR5 • 2TB SSD</p>
-                        <div class="product-price">121 300 ₽</div>
-                        <a href="#" class="btn">В корзину</a>
-                    </div>
-                </div>
-
-                <div class="product-card">
-                    <div class="product-image">
-                        <img src="https://delta-game.ru/wp-content/uploads/2023/12/maibenben-x527.webp" alt="Игровой ноутбук">
-                    </div>
-                    <div class="product-info">
-                        <h3 class="product-title">Ноутбук Maibenben X527 (X527FSFNLGRE0)</h3>
-                        <p class="product-specs">AMD Ryzen 9 7945KX • RTX 4080 • 32GB DDR5 • 1TB SSD</p>
-                        <div class="product-price">113 990 ₽</div>
-                        <a href="#" class="btn">В корзину</a>
-                    </div>
-                </div>
-
-                <div class="product-card">
-                    <div class="product-image">
-                        <img src="https://delta-game.ru/wp-content/uploads/2024/02/msi-thin-15-b12u-4.webp" alt="Игровой ноутбук">
-                    </div>
-                    <div class="product-info">
-                        <h3 class="product-title">Ноутбук MSI Thin 15 B12UC-1628XRU</h3>
-                        <p class="product-specs">Intel Core i7-13700H • RTX 3050 • 16GB DDR4 • 1TB SSD</p>
-                        <div class="product-price">99 990 ₽</div>
-                        <a href="#" class="btn">В корзину</a>
-                    </div>
-                </div>
-
-                <div class="product-card">
-                    <div class="product-image">
-                        <img src="https://delta-game.ru/wp-content/uploads/2023/08/asus-tuf-gaming-f15-fx507zv4-lp047-2.webp" alt="Игровой ноутбук">
-                    </div>
-                    <div class="product-info">
-                        <h3 class="product-title">Ноутбук ASUS TUF Gaming F15 FX507ZC4-HN143</h3>
-                        <p class="product-specs">Intel Core i5-12500H • RTX 3050 • 16GB DDR4 • 512GB SSD</p>
-                        <div class="product-price">89 990 ₽</div>
-                        <a href="#" class="btn">В корзину</a>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </section>
-
-    <section class="configurator">
-        <div class="container">
-            <h2 class="configurator-title">Соберите ПК своей мечты</h2>
-            <p class="configurator-text">Наш конфигуратор позволяет выбрать комплектующие под ваш бюджет и задачи. Получите профессиональную консультацию и гарантию на сборку.</p>
+<!-- HERO Section -->
+<section class="hero">
+    <div class="container">
+        <div class="hero-content">
+            <h1 class="hero-title">Мощные игровые компьютеры от Snitch PC</h1>
+            <p class="hero-text">Соберите свою идеальную конфигурацию или выберите готовую сборку от наших
+                специалистов. Гарантия качества и бесплатная доставка.</p>
             <a href="{% url 'config' %}" class="btn">Перейти в конфигуратор</a>
         </div>
-    </section>
+    </div>
+</section>
 
-    <footer class="footer">
-        <div class="container">
-            <div class="footer-grid">
-                <div class="footer-column">
-                    <h3>Snitch PC</h3>
-                    <ul class="footer-links">
-                        <li><a href="#">О компании</a></li>
-                        <li><a href="#">Наши преимущества</a></li>
-                        <li><a href="#">Отзывы</a></li>
-                        <li><a href="#">Вакансии</a></li>
-                    </ul>
+<section class="section">
+    <div class="container">
+        <h2 class="section-title">Популярные сборки</h2>
+        <div class="products-grid">
+            <div class="product-card">
+                <div class="product-image">
+                    <img src="https://hyperpc.ru/images/product/dynamic/evo-rgb/hyperpc-dynamic-evo-rgb-black.jpg"
+                        alt="Игровой ПК">
                 </div>
-
-                <div class="footer-column">
-                    <h3>Каталог</h3>
-                    <ul class="footer-links">
-                        <li><a href="#">Игровые ПК</a></li>
-                        <li><a href="#">Игровые ноутбуки</a></li>
-                        <li><a href="#">Периферия</a></li>
-                        <li><a href="#">Комплектующие</a></li>
-                    </ul>
-                </div>
-
-                <div class="footer-column">
-                    <h3>Помощь</h3>
-                    <ul class="footer-links">
-                        <li><a href="#">Доставка и оплата</a></li>
-                        <li><a href="#">Гарантия</a></li>
-                        <li><a href="#">Возврат и обмен</a></li>
-                        <li><a href="#">FAQ</a></li>
-                    </ul>
-                </div>
-
-                <div class="footer-column">
-                    <h3>Контакты</h3>
-                    <ul class="footer-links">
-                        <li><a href="tel:+74951234567">+7 (950) 124-04-58</a></li>
-                        <li><a href="mailto:info@snitchpc.ru">info@snitchpc.ru</a></li>
-                        <li>Чебоксары, ул. Гиндина, 12</li>
-                        <li>Пн-Пт: 10:00-20:00</li>
-                    </ul>
+                <div class="product-info">
+                    <h3 class="product-title">Snitch Dynamic Pro</h3>
+                    <p class="product-specs">Intel Core i9-13900K • RTX 4090 • 32GB DDR5 • 2TB SSD</p>
+                    <div class="product-price">279 990 ₽</div>
+                    <a href="#" class="btn">В корзину</a>
                 </div>
             </div>
 
-            <div class="footer-bottom">
-                <p>© 2025 Snitch PC. Все права защищены.</p>
+            <div class="product-card">
+                <div class="product-image">
+                    <img src="https://filearchive.cnews.ru/img/news/2020/08/05/h601.jpg" alt="Игровой ПК">
+                </div>
+                <div class="product-info">
+                    <h3 class="product-title">Snitch AMD Extreme</h3>
+                    <p class="product-specs">AMD Ryzen 9 7950X • RX 7900 XTX • 32GB DDR5 • 2TB SSD</p>
+                    <div class="product-price">229 990 ₽</div>
+                    <a href="#" class="btn">В корзину</a>
+                </div>
+            </div>
+
+            <div class="product-card">
+                <div class="product-image">
+                    <img src="https://www.goha.ru/s/A:BE/Xm/WxlSF3UmQd.png" alt="Игровой ПК">
+                </div>
+                <div class="product-info">
+                    <h3 class="product-title">Snitch Dynamic</h3>
+                    <p class="product-specs">Intel Core i7-13700K • RTX 4080 • 32GB DDR4 • 1TB SSD</p>
+                    <div class="product-price">179 990 ₽</div>
+                    <a href="#" class="btn">В корзину</a>
+                </div>
+            </div>
+
+            <div class="product-card">
+                <div class="product-image">
+                    <img src="https://ae01.alicdn.com/kf/S025502d226284852ab02a8730a948f5aH.jpg" alt="Игровой ПК">
+                </div>
+                <div class="product-info">
+                    <h3 class="product-title">Snitch Compact</h3>
+                    <p class="product-specs">AMD Ryzen 7 7700X • RTX 4070 • 16GB DDR4 • 1TB SSD</p>
+                    <div class="product-price">129 990 ₽</div>
+                    <a href="#" class="btn">В корзину</a>
+                </div>
             </div>
         </div>
-    </footer>
-</body>
-</html>
+    </div>
+</section>
+
+<section class="section">
+    <div class="container">
+        <h2 class="section-title">Лучшие ноутбуки: выбор Snitch PC</h2>
+        <div class="products-grid">
+            <div class="product-card">
+                <div class="product-image">
+                    <img src="https://delta-game.ru/wp-content/uploads/2022/08/asus-tuf-gaming-a15-fa507rm-fa507rr-7.webp"
+                        alt="Игровой ноутбук">
+                </div>
+                <div class="product-info">
+                    <h3 class="product-title">Ноутбук ASUS TUF Gaming A15 FA507NV-LP103</h3>
+                    <p class="product-specs">Intel Core i9-13900FX • RTX 4090 • 32GB DDR5 • 2TB SSD</p>
+                    <div class="product-price">121 300 ₽</div>
+                    <a href="#" class="btn">В корзину</a>
+                </div>
+            </div>
+
+            <div class="product-card">
+                <div class="product-image">
+                    <img src="https://delta-game.ru/wp-content/uploads/2023/12/maibenben-x527.webp"
+                        alt="Игровой ноутбук">
+                </div>
+                <div class="product-info">
+                    <h3 class="product-title">Ноутбук Maibenben X527 (X527FSFNLGRE0)</h3>
+                    <p class="product-specs">AMD Ryzen 9 7945KX • RTX 4080 • 32GB DDR5 • 1TB SSD</p>
+                    <div class="product-price">113 990 ₽</div>
+                    <a href="#" class="btn">В корзину</a>
+                </div>
+            </div>
+
+            <div class="product-card">
+                <div class="product-image">
+                    <img src="https://delta-game.ru/wp-content/uploads/2024/02/msi-thin-15-b12u-4.webp"
+                        alt="Игровой ноутбук">
+                </div>
+                <div class="product-info">
+                    <h3 class="product-title">Ноутбук MSI Thin 15 B12UC-1628XRU</h3>
+                    <p class="product-specs">Intel Core i7-13700H • RTX 3050 • 16GB DDR4 • 1TB SSD</p>
+                    <div class="product-price">99 990 ₽</div>
+                    <a href="#" class="btn">В корзину</a>
+                </div>
+            </div>
+
+            <div class="product-card">
+                <div class="product-image">
+                    <img src="https://delta-game.ru/wp-content/uploads/2023/08/asus-tuf-gaming-f15-fx507zv4-lp047-2.webp"
+                        alt="Игровой ноутбук">
+                </div>
+                <div class="product-info">
+                    <h3 class="product-title">Ноутбук ASUS TUF Gaming F15 FX507ZC4-HN143</h3>
+                    <p class="product-specs">Intel Core i5-12500H • RTX 3050 • 16GB DDR4 • 512GB SSD</p>
+                    <div class="product-price">89 990 ₽</div>
+                    <a href="#" class="btn">В корзину</a>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<section class="configurator">
+    <div class="container">
+        <h2 class="configurator-title">Соберите ПК своей мечты</h2>
+        <p class="configurator-text">Наш конфигуратор позволяет выбрать комплектующие под ваш бюджет и задачи.
+            Получите профессиональную консультацию и гарантию на сборку.</p>
+        <a href="{% url 'config' %}" class="btn">Перейти в конфигуратор</a>
+    </div>
+</section>
+
+<footer class="footer">
+    <div class="container">
+        <div class="footer-grid">
+            <div class="footer-column">
+                <h3>Snitch PC</h3>
+                <ul class="footer-links">
+                    <li><a href="#">О компании</a></li>
+                    <li><a href="#">Наши преимущества</a></li>
+                    <li><a href="#">Отзывы</a></li>
+                    <li><a href="#">Вакансии</a></li>
+                </ul>
+            </div>
+
+            <div class="footer-column">
+                <h3>Каталог</h3>
+                <ul class="footer-links">
+                    <li><a href="#">Игровые ПК</a></li>
+                    <li><a href="#">Игровые ноутбуки</a></li>
+                    <li><a href="#">Периферия</a></li>
+                    <li><a href="#">Комплектующие</a></li>
+                </ul>
+            </div>
+
+            <div class="footer-column">
+                <h3>Помощь</h3>
+                <ul class="footer-links">
+                    <li><a href="#">Доставка и оплата</a></li>
+                    <li><a href="#">Гарантия</a></li>
+                    <li><a href="#">Возврат и обмен</a></li>
+                    <li><a href="#">FAQ</a></li>
+                </ul>
+            </div>
+
+            <div class="footer-column">
+                <h3>Контакты</h3>
+                <ul class="footer-links">
+                    <li><a href="tel:+74951234567">+7 (950) 124-04-58</a></li>
+                    <li><a href="mailto:info@snitchpc.ru">info@snitchpc.ru</a></li>
+                    <li>Чебоксары, ул. Гиндина, 12</li>
+                    <li>Пн-Пт: 10:00-20:00</li>
+                </ul>
+            </div>
+        </div>
+
+        <div class="footer-bottom">
+            <p>© 2025 Snitch PC. Все права защищены.</p>
+        </div>
+    </div>
+</footer>
+{% endblock %}

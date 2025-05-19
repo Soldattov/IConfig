@@ -24,8 +24,10 @@
             {% csrf_token %}
             <input type="text" name="first_name" placeholder="Имя" required>
             <input type="email" name="email" placeholder="Электронная почта" required>
-            <input type="password" name="password1" placeholder="Пароль" required>
-            <input type="password" name="password2" placeholder="Повторите пароль" required>
+            <input type="password" name="password1" id="password1" placeholder="Пароль" required>
+            <div id="password1-error" class="error-message" style="display: none; color: red;"></div>
+            <input type="password" name="password2" id="password2" placeholder="Повторите пароль" required>
+            <div id="password2-error" class="error-message" style="display: none; color: red;"></div>
             <button type="submit" class="btn">Зарегистрироваться</button>
         </form>
     </div>
@@ -54,4 +56,29 @@
             <button type="submit" class="btn">Войти</button>
         </form>
     </div>
+</div>
+
+<!-- Модальное окно ввода кода подтверждения email -->
+<div id="verification-modal" class="modal {% if show_verification_modal %}{% else %}hidden{% endif %}">
+    <div class="modal-header">
+        <h3>Подтверждение email</h3>
+        <h5>почта пока что не работвет, смотри в консоль</h5>
+        <div>
+            <!-- Кнопка "Назад" для возврата к регистрации -->
+            <button id="verify-back" type="button">Назад</button>
+            <!-- Крестик (иконка закрытия) -->
+            <span class="modal-close" id="verify-close">&times;</span>
+        </div>
+    </div>
+    <form method="post" action="{% url 'verify_email' %}">
+        {% csrf_token %}
+        <!-- Скрытое поле для передачи email -->
+        <input type="hidden" name="email" value="{{ email }}">
+        <label for="id_verification_code">Введите 6-значный код:</label>
+        <input type="text" name="verification_code" id="id_verification_code" placeholder="Код" required>
+        {% if verify_error %}
+        <p class="error-message">{{ verify_error }}</p>
+        {% endif %}
+        <button type="submit">Подтвердить</button>
+    </form>
 </div>

@@ -1,0 +1,220 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="ru">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <!-- Блок для титула страницы – дочерний шаблон может переопределить его -->
+    <title>{% block title %}Snitch PC - Магазин игровых компьютеров{% endblock %}</title>
+    <!-- Подключение Font Awesome и основного CSS-файла -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="{% static 'css/styles.css' %}" />
+    <!-- Блок для дополнительных стилей, если нужно -->
+    {% block head %}{% endblock %}
+</head>
+
+<body>
+    <!-- ========== HEADER (общая шапка сайта) ========== -->
+
+
+    <header class="header">
+        <div class="container">
+            <div class="header-top">
+                <a href="/" class="logo">
+                    <img src="https://www.meme-arsenal.com/memes/a706819c0690421e2fb711ea578742cb.jpg"
+                        alt="Snitch PC Logo" width="60">
+                    <span>Snitch PC</span>
+                </a>
+
+                <div class="header-search">
+                    <input type="text" placeholder="Поиск игровых ПК, ноутбуков и комплектующих...">
+                </div>
+
+                <div class="header-actions">
+                    <button id="user-icon" class="btn-user"><i class="far fa-user"></i></button>
+                    <a href="#"><i class="far fa-heart"></i><span>3</span></a>
+                    <a href="#"><i class="fas fa-shopping-cart"></i><span>2</span></a>
+                </div>
+            </div>
+        </div>
+    </header>
+    <!--<nav class="nav">
+            <div class="container">
+                <ul class="nav-list">
+                    <li><a href="#">Главная</a></li>
+                    <li>
+                        <a href="#">Игровые ПК <i class="fas fa-chevron-down"></i></a>
+                        <ul class="submenu">
+                            <li><a href="#">Игровые ПК</a></li>
+                            <li><a href="#">Компактные ПК</a></li>
+                            <li><a href="#">Профессиональные ПК</a></li>
+                        </ul>
+                    </li>
+                    <li>
+                        <a href="#">Игровые ноутбуки <i class="fas fa-chevron-down"></i></a>
+                        <ul class="submenu">
+                            <li><a href="#">ASUS</a></li>
+                            <li><a href="#">MSI</a></li>
+                            <li><a href="#">Maibenden</a></li>
+                        </ul>
+                    </li>
+                    <li><a href="#">Периферия</a></li>
+                    <li><a href="#">Комплектующие</a></li>
+                    <li><a href="#">Конфигуратор</a></li>
+                    <li><a href="#">Акции</a></li>
+                    <li><a href="#">Доставка и оплата</a></li>
+                    <li><a href="#">Контакты</a></li>
+                </ul>
+            </div>
+        </nav>
+    </header>-->
+    <!-- ================================================ -->
+
+    <!-- ========== МОДАЛЬНЫЕ ОКНА ========== -->
+    {% include 'users/modals.html' %}
+    <!-- Здесь хранится HTML-код модальных окон (например, вход, регистрация и т.д.)
+         Файл modals.html можно разместить, например, в папке приложения users или в глобальной папке шаблонов -->
+    <!-- ==================================== -->
+
+    <!-- Основной контент страницы -->
+    <main>
+        {% block content %}
+        {% endblock %}
+    </main>
+
+    <!-- ========== ОБЩИЕ СКРИПТЫ (например, для модальных окон) ========== -->
+    <!-- Скрипты, связанные с модальными окнами, меню пользователя, валидацией форм и т.д. -->
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            // Ссылки на модальные окна, кнопки закрытия и т.д.
+            const modals = document.querySelectorAll('.modal');
+            const closeButtons = document.querySelectorAll('.modal-close');
+            const loginBtn = document.getElementById('login-btn');
+            const registerBtn = document.getElementById('register-btn');
+            const loginModal = document.getElementById('login-modal');
+            const registerModal = document.getElementById('register-modal');
+            const verificationModal = document.getElementById('verification-modal');
+            const verifyBack = document.getElementById('verify-back');
+            const verifyClose = document.getElementById('verify-close');
+
+            // Функция очистки всех полей в модальном окне (исключая CSRF-поле)
+            function clearFormInputs(modal) {
+                modal.querySelectorAll('input:not([name="csrfmiddlewaretoken"])').forEach(input => input.value = '');
+                modal.querySelectorAll('.error-message').forEach(error => error.innerText = '');
+            }
+
+            // Открытие окна входа (если есть кнопка login-btn)
+            if (loginBtn) {
+                loginBtn.addEventListener('click', function () {
+                    clearFormInputs(loginModal);
+                    loginModal.classList.remove('hidden');
+                });
+            }
+
+            // Открытие окна регистрации (если есть кнопка register-btn)
+            if (registerBtn) {
+                registerBtn.addEventListener('click', function () {
+                    clearFormInputs(registerModal);
+                    registerModal.classList.remove('hidden');
+                });
+            }
+
+            // Обработка кнопки возврата в модальном окне проверки (verification)
+            if (verifyBack) {
+                verifyBack.addEventListener('click', function () {
+                    verificationModal.classList.add('hidden');
+                    const registerModal = document.getElementById('register-modal');
+                    if (registerModal) {
+                        registerModal.classList.remove('hidden');
+                    }
+                });
+            }
+
+            if (verifyClose) {
+                verifyClose.addEventListener('click', function () {
+                    verificationModal.classList.add('hidden');
+                });
+            }
+
+            // Меню пользователя (при клике на иконку)
+            const userIcon = document.getElementById('user-icon');
+            const userMenu = document.getElementById('user-menu');
+
+            if (userIcon) {
+                userIcon.addEventListener('click', function (e) {
+                    const rect = userIcon.getBoundingClientRect();
+                    userMenu.style.left = rect.left + "px";
+                    userMenu.style.top = (rect.bottom + 5) + "px";
+                    userMenu.classList.toggle('hidden');
+                    modals.forEach(modal => modal.classList.add('hidden'));
+                    e.stopPropagation();
+                });
+            }
+
+            document.addEventListener('click', function (e) {
+                if (userMenu && !userMenu.contains(e.target) && e.target !== userIcon) {
+                    userMenu.classList.add('hidden');
+                }
+            });
+
+            // Закрытие модальных окон по нажатию на кнопки закрытия
+            closeButtons.forEach(button => {
+                button.addEventListener('click', function () {
+                    modals.forEach(modal => modal.classList.add('hidden'));
+                });
+            });
+
+            const registerForm = document.getElementById('register-form');
+            const password1Field = document.getElementById('password1');
+            const password2Field = document.getElementById('password2');
+            const password1Error = document.getElementById('password1-error');
+            const password2Error = document.getElementById('password2-error');
+
+            function validatePasswords() {
+                let valid = true;
+                if (password1Field.value.length < 8) {
+                    password1Error.innerText = "Пароль должен быть не менее 8 символов";
+                    password1Error.style.display = 'block';
+                    password1Field.classList.add('error');
+                    valid = false;
+                } else {
+                    password1Error.innerText = "";
+                    password1Error.style.display = 'none';
+                    password1Field.classList.remove('error');
+                }
+
+                if (password2Field.value && password2Field.value !== password1Field.value) {
+                    password2Error.innerText = "Пароли не совпадают";
+                    password2Error.style.display = 'block';
+                    password2Field.classList.add('error');
+                    valid = false;
+                } else {
+                    password2Error.innerText = "";
+                    password2Error.style.display = 'none';
+                    password2Field.classList.remove('error');
+                }
+                return valid;
+            }
+
+            password1Field.addEventListener('input', validatePasswords);
+            password2Field.addEventListener('input', validatePasswords);
+
+            registerForm.addEventListener('submit', function (e) {
+                if (!validatePasswords()) {
+                    e.preventDefault(); // Не отправляем форму, если есть ошибки
+                }
+            });
+
+            // Если сервер передал переменную login_error – открываем окно входа автоматически
+            if (typeof login_error !== 'undefined' && login_error) {
+                loginModal?.classList.remove('hidden');
+            }
+        });
+    </script>
+    <!-- Блок для дополнительных скриптов, задаваемых дочерними шаблонами -->
+    {% block scripts %}{% endblock %}
+    <!-- ======================================================= -->
+</body>
+
+</html>

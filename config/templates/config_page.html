@@ -1,5 +1,6 @@
-<!DOCTYPE html>
-<html lang="ru">
+{% extends "base.html" %}
+{% block content %}
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -568,27 +569,9 @@
         }
     </style>
 </head>
+
 <body>
-    <header class="header">
-        <div class="container">
-            <div class="header-top">
-                <a href="/" class="logo">
-                    <img src="/static/images/logo.png" alt="Snitch PC Logo" width="60">
-                    <span>Snitch PC</span>
-                </a>
 
-                <div class="header-search">
-                    <input type="text" placeholder="Поиск игровых ПК, ноутбуков и комплектующих...">
-                </div>
-
-                <div class="header-actions">
-                    <a href="#"><i class="far fa-user"></i></a>
-                    <a href="#"><i class="far fa-heart"></i><span>3</span></a>
-                    <a href="#"><i class="fas fa-shopping-cart"></i><span>2</span></a>
-                </div>
-            </div>
-        </div>
-    </header>
 
     <div class="configurator-page">
         <div class="container">
@@ -611,8 +594,10 @@
                         </div>
                         <div class="category-content">
                             {% for gpu in gpus %}
-                            <div class="component-option" data-component="gpu" data-id="{{ gpu.id }}" data-power="{{ gpu.relative_power }}">
-                                <img src="{{ gpu.picture }}" alt="{{ gpu.model }}" class="component-image" onerror="this.src='/static/images/no-image.png'">
+                            <div class="component-option" data-component="gpu" data-id="{{ gpu.id }}"
+                                data-power="{{ gpu.relative_power }}">
+                                <img src="{{ gpu.picture }}" alt="{{ gpu.model }}" class="component-image"
+                                    onerror="this.src='/static/images/no-image.png'">
                                 <div class="component-info">
                                     <span class="component-name">{{ gpu.model }}</span>
                                     <span class="component-price">{{ gpu.price }} ₽</span>
@@ -630,8 +615,10 @@
                         </div>
                         <div class="category-content">
                             {% for cpu in cpus %}
-                            <div class="component-option locked" data-component="cpu" data-id="{{ cpu.id }}" data-power="{{ cpu.relative_power }}">
-                                <img src="{{ cpu.picture }}" alt="{{ cpu.model }}" class="component-image" onerror="this.src='/static/images/no-image.png'">
+                            <div class="component-option locked" data-component="cpu" data-id="{{ cpu.id }}"
+                                data-power="{{ cpu.relative_power }}">
+                                <img src="{{ cpu.picture }}" alt="{{ cpu.model }}" class="component-image"
+                                    onerror="this.src='/static/images/no-image.png'">
                                 <div class="component-info">
                                     <span class="component-name">{{ cpu.model }}</span>
                                     <span class="component-price">{{ cpu.price }} ₽</span>
@@ -650,7 +637,8 @@
                         <div class="category-content">
                             {% for mb in motherboards %}
                             <div class="component-option locked" data-component="motherboard" data-id="{{ mb.id }}">
-                                <img src="{{ mb.picture }}" alt="{{ mb.model }}" class="component-image" onerror="this.src='/static/images/no-image.png'">
+                                <img src="{{ mb.picture }}" alt="{{ mb.model }}" class="component-image"
+                                    onerror="this.src='/static/images/no-image.png'">
                                 <div class="component-info">
                                     <span class="component-name">{{ mb.model }}</span>
                                     <span class="component-price">{{ mb.price }} ₽</span>
@@ -669,7 +657,8 @@
                         <div class="category-content">
                             {% for ram in rams %}
                             <div class="component-option" data-component="ram" data-id="{{ ram.id }}">
-                                <img src="{{ ram.picture }}" alt="{{ ram.model }}" class="component-image" onerror="this.src='/static/images/no-image.png'">
+                                <img src="{{ ram.picture }}" alt="{{ ram.model }}" class="component-image"
+                                    onerror="this.src='/static/images/no-image.png'">
                                 <div class="component-info">
                                     <span class="component-name">{{ ram.model }}</span>
                                     <span class="component-price">{{ ram.price }} ₽</span>
@@ -688,7 +677,8 @@
                         <div class="category-content">
                             {% for cooling in coolings %}
                             <div class="component-option" data-component="cooling" data-id="{{ cooling.id }}">
-                                <img src="{{ cooling.picture }}" alt="{{ cooling.model }}" class="component-image" onerror="this.src='/static/images/no-image.png'">
+                                <img src="{{ cooling.picture }}" alt="{{ cooling.model }}" class="component-image"
+                                    onerror="this.src='/static/images/no-image.png'">
                                 <div class="component-info">
                                     <span class="component-name">{{ cooling.model }}</span>
                                     <span class="component-price">{{ cooling.price }} ₽</span>
@@ -707,7 +697,8 @@
                         <div class="category-content">
                             {% for psu in power_supplies %}
                             <div class="component-option" data-component="psu" data-id="{{ psu.id }}">
-                                <img src="{{ psu.picture }}" alt="{{ psu.model }}" class="component-image" onerror="this.src='/static/images/no-image.png'">
+                                <img src="{{ psu.picture }}" alt="{{ psu.model }}" class="component-image"
+                                    onerror="this.src='/static/images/no-image.png'">
                                 <div class="component-info">
                                     <span class="component-name">{{ psu.model }}</span>
                                     <span class="component-price">{{ psu.price }} ₽</span>
@@ -726,7 +717,8 @@
                         <div class="category-content">
                             {% for storage in storages %}
                             <div class="component-option" data-component="storage" data-id="{{ storage.id }}">
-                                <img src="{{ storage.picture }}" alt="{{ storage.model }}" class="component-image" onerror="this.src='/static/images/no-image.png'">
+                                <img src="{{ storage.picture }}" alt="{{ storage.model }}" class="component-image"
+                                    onerror="this.src='/static/images/no-image.png'">
                                 <div class="component-info">
                                     <span class="component-name">{{ storage.model }}</span>
                                     <span class="component-price">{{ storage.price }} ₽</span>
@@ -745,7 +737,8 @@
                         <div class="category-content">
                             {% for case in cases %}
                             <div class="component-option" data-component="case" data-id="{{ case.id }}">
-                                <img src="{{ case.picture }}" alt="{{ case.model }}" class="component-image" onerror="this.src='/static/images/no-image.png'">
+                                <img src="{{ case.picture }}" alt="{{ case.model }}" class="component-image"
+                                    onerror="this.src='/static/images/no-image.png'">
                                 <div class="component-info">
                                     <span class="component-name">{{ case.model }}</span>
                                     <span class="component-price">{{ case.price }} ₽</span>
@@ -772,7 +765,8 @@
                             </div>
                         </div>
                         <div id="no-component-selected">
-                            <img src="https://hyperpc.ru/images/product/dynamic/evo-rgb/hyperpc-dynamic-evo-rgb-black.jpg" alt="Ваш ПК" class="pc-image">
+                            <img src="https://hyperpc.ru/images/product/dynamic/evo-rgb/hyperpc-dynamic-evo-rgb-black.jpg"
+                                alt="Ваш ПК" class="pc-image">
                             <h3>Выберите компонент для просмотра</h3>
                         </div>
                     </div>
@@ -837,23 +831,23 @@
     </div>
 
     <script>
-        document.addEventListener('DOMContentLoaded', function() {
+        document.addEventListener('DOMContentLoaded', function () {
             // Переменная для хранения выбранной видеокарты и её мощности
             // Используется для фильтрации совместимых процессоров
             let selectedGPU = null;
 
             // Обработчик раскрытия/сворачивания категорий компонентов
             document.querySelectorAll('.category-header').forEach(header => {
-                header.addEventListener('click', function() {
+                header.addEventListener('click', function () {
                     const content = this.nextElementSibling;
                     const icon = this.querySelector('i');
-                    
+
                     // Переключаем класс expanded для анимации
                     content.classList.toggle('expanded');
-                    
+
                     // Анимируем иконку стрелки
                     icon.classList.toggle('rotated');
-                    
+
                     // Устанавливаем max-height для плавной анимации
                     if (content.classList.contains('expanded')) {
                         content.style.maxHeight = content.scrollHeight + 'px';
@@ -865,7 +859,7 @@
 
             // Обработчик выбора компонентов
             document.querySelectorAll('.component-option').forEach(option => {
-                option.addEventListener('click', function() {
+                option.addEventListener('click', function () {
                     // Проверяем, не заблокирован ли компонент
                     if (this.classList.contains('locked') || this.classList.contains('disabled')) {
                         return;
@@ -876,7 +870,7 @@
                     const componentId = this.dataset.id;
                     const componentName = this.querySelector('.component-name').textContent;
                     const componentPrice = parseInt(this.querySelector('.component-price').textContent);
-                    
+
                     // Снимаем выделение с других компонентов в категории
                     this.parentNode.querySelectorAll('.component-option').forEach(el => {
                         el.classList.remove('active');
@@ -899,6 +893,7 @@
                         filterCPUs();
                         // Разблокируем категорию процессоров
                         unlockNextCategory('cpu');
+                        unlockNextCategory('motherboard');
                     }
                 });
             });
@@ -913,7 +908,7 @@
                 cpuOptions.forEach(cpu => {
                     const cpuPower = parseInt(cpu.dataset.power) || 0;
                     const powerDiff = Math.abs(cpuPower - gpuPower);
-                    
+
                     // Отключаем процессоры, мощность которых сильно отличается от GPU
                     // Разница в мощности не должна превышать 50 единиц
                     if (powerDiff <= 50) {
@@ -952,7 +947,7 @@
                     .then(data => {
                         // Устанавливаем изображение компонента
                         if (data.picture) {
-                            if (data.picture.startsWith('http')) {
+                            if (data.picture.startsWith('https')) {
                                 previewImage.src = data.picture;
                             } else {
                                 previewImage.src = `/media/${data.picture}`;
@@ -962,17 +957,17 @@
                         }
 
                         // Обработчик ошибки загрузки изображения
-                        previewImage.onerror = function() {
+                        previewImage.onerror = function () {
                             console.error('Ошибка загрузки изображения:', data.picture);
                             this.src = '/static/images/no-image.png';
                         };
 
                         // Устанавливаем название компонента
                         previewName.textContent = data.model;
-                        
+
                         // Формируем спецификации в зависимости от типа компонента
                         let specs = '';
-                        switch(type) {
+                        switch (type) {
                             case 'cpu':
                                 specs = `${data.cores_amount} ядер, ${data.frequency}, ${data.socket}`;
                                 break;
@@ -1002,7 +997,7 @@
                         previewPrice.textContent = `${price.toLocaleString('ru-RU')} ₽`;
 
                         // Обновляем обработчик кнопки "Добавить в конфигурацию"
-                        addButton.onclick = function() {
+                        addButton.onclick = function () {
                             // Обновляем спецификации в списке выбранных компонентов
                             const specElement = document.getElementById(`${type}-spec`);
                             if (specElement) {
@@ -1057,4 +1052,4 @@
         });
     </script>
 </body>
-</html>
+{% endblock %}

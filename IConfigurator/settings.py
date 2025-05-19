@@ -88,6 +88,7 @@ INSTALLED_APPS = [
     'main',
     'config',
     'corsheaders',
+    'users',
 ]
 
 
@@ -107,7 +108,7 @@ ROOT_URLCONF = 'IConfigurator.urls'
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [],
+        'DIRS': [os.path.join(BASE_DIR, 'templates')],
         'APP_DIRS': True,
         'OPTIONS': {
             'context_processors': [
@@ -142,16 +143,10 @@ DATABASES = {
 
 AUTH_PASSWORD_VALIDATORS = [
     {
-        'NAME': 'django.contrib.auth.password_validation.UserAttributeSimilarityValidator',
-    },
-    {
         'NAME': 'django.contrib.auth.password_validation.MinimumLengthValidator',
-    },
-    {
-        'NAME': 'django.contrib.auth.password_validation.CommonPasswordValidator',
-    },
-    {
-        'NAME': 'django.contrib.auth.password_validation.NumericPasswordValidator',
+        'OPTIONS': {
+            'min_length': 8,
+        }
     },
 ]
 
@@ -171,7 +166,7 @@ USE_TZ = True
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/5.2/howto/static-files/
 
-STATIC_URL = 'static/'
+STATIC_URL = '/static/'
 STATICFILES_DIRS = [
     os.path.join(BASE_DIR, 'static'),
 ]
@@ -181,5 +176,15 @@ STATICFILES_DIRS = [
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
+EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
+#EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
+EMAIL_HOST = 'smtp-relay.brevo.com'
+EMAIL_PORT = 587
+EMAIL_USE_TLS = True
+EMAIL_HOST_USER = '8d4fce001@smtp-brevo.com'
+#EMAIL_HOST_PASSWORD = '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'
+EMAIL_HOST_PASSWORD = 'pXEUNMwZW0rxDBjP'
+DEFAULT_FROM_EMAIL = 'Snitch PC <noreply@snitchpc.linkpc.net>'
 # Добавляем настройки CORS
 CORS_ALLOW_ALL_ORIGINS = True  # Только для разработки! В продакшене настройте конкретные домены
+AUTH_USER_MODEL = 'users.CustomUser'
