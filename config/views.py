@@ -16,6 +16,7 @@ def configurator(request):
     storages = ParsedStorage.objects.all()
     cases = ParsedCase.objects.all()
 
+    # Добавляем дополнительные данные в контекст
     context = {
         'gpus': gpus,
         'cpus': cpus,
@@ -24,7 +25,19 @@ def configurator(request):
         'coolings': coolings,
         'power_supplies': power_supplies,
         'storages': storages,
-        'cases': cases
+        'cases': cases,
+        'assembly_price': 4990,  # Цена сборки
+        'default_image': '/static/images/no-image.png',  # Путь к изображению по умолчанию
+        'component_types': {
+            'gpu': 'Видеокарта',
+            'cpu': 'Процессор',
+            'motherboard': 'Материнская плата',
+            'ram': 'Оперативная память',
+            'cooling': 'Охлаждение',
+            'psu': 'Блок питания',
+            'storage': 'Накопитель',
+            'case': 'Корпус'
+        }
     }
 
     return render(request, 'config_page.html', context)
@@ -38,14 +51,17 @@ def component_detail(request, component_type, component_id):
             component = ParsedGPU.objects.get(pk=component_id)
             data = {
                 'model': component.model,
-                'picture': str(component.picture) if component.picture else '/static/images/no-image.png',                'relative_power': component.relative_power,
+                'picture': str(component.picture) if component.picture else '/static/images/no-image.png',
+                'memory_amount': component.memory_amount,
+                'relative_power': component.relative_power,
                 # Добавьте другие необходимые поля, например: memory_amount, frequency и т.д.
             }
         elif component_type == 'cpu':
             component = ParsedCPU.objects.get(pk=component_id)
             data = {
                 'model': component.model,
-                'picture': str(component.picture) if component.picture else '/static/images/no-image.png',                'cores_amount': component.cores_amount,
+                'picture': str(component.picture) if component.picture else '/static/images/no-image.png',
+                'cores_amount': component.cores_amount,
                 'frequency': component.frequency,
                 'socket': component.socket,
             }

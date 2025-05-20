@@ -1,4 +1,6 @@
 {% extends "base.html" %}
+{% load config_tags %}
+
 {% block content %}
 
 <head>
@@ -6,6 +8,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Snitch PC - Конфигуратор ПК</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="/static/css/configurator.css">
     <style>
         :root {
             --primary: #1e1e2d;
@@ -197,6 +200,16 @@
         .components-sidebar {
             width: 300px;
             flex-shrink: 0;
+            max-height: calc(100vh - 200px);
+            overflow-y: auto;
+            position: sticky;
+            top: 20px;
+            scrollbar-width: none; /* Firefox */
+            -ms-overflow-style: none; /* IE and Edge */
+        }
+
+        .components-sidebar::-webkit-scrollbar {
+            display: none; /* Chrome, Safari, Opera */
         }
 
         .component-category {
@@ -215,6 +228,9 @@
             align-items: center;
             cursor: pointer;
             user-select: none;
+            position: sticky; /* Фиксируем заголовок категории */
+            top: 0;
+            z-index: 1;
         }
 
         .category-header i {
@@ -233,8 +249,15 @@
         }
 
         .category-content.expanded {
-            max-height: 1000px;
+            max-height: 400px;
+            overflow-y: auto;
+            scrollbar-width: none; /* Firefox */
+            -ms-overflow-style: none; /* IE and Edge */
             transition: max-height 0.5s ease-in;
+        }
+
+        .category-content.expanded::-webkit-scrollbar {
+            display: none; /* Chrome, Safari, Opera */
         }
 
         .component-option {
@@ -571,8 +594,6 @@
 </head>
 
 <body>
-
-
     <div class="configurator-page">
         <div class="container">
             <div class="configurator-header">
@@ -586,167 +607,40 @@
 
             <div class="configurator-wrapper">
                 <div class="components-sidebar">
-                    <!-- Видеокарты -->
+                    {% for type, name in component_types.items %}
                     <div class="component-category">
                         <div class="category-header">
-                            <span>Видеокарта</span>
+                            <span>{{ name }}</span>
                             <i class="fas fa-chevron-down"></i>
                         </div>
                         <div class="category-content">
-                            {% for gpu in gpus %}
-                            <div class="component-option" data-component="gpu" data-id="{{ gpu.id }}"
-                                data-power="{{ gpu.relative_power }}">
-                                <img src="{{ gpu.picture }}" alt="{{ gpu.model }}" class="component-image"
-                                    onerror="this.src='/static/images/no-image.png'">
+                            {% get_component_list type as components %}
+                            {% for component in components %}
+                            <div class="component-option" 
+                                 data-component="{{ type }}" 
+                                 data-id="{{ component.id }}"
+                                 {% if type == 'gpu' or type == 'cpu' %}data-power="{{ component.relative_power }}"{% endif %}
+                                 {% if type == 'gpu' %}data-consumption="{{ component.consumption }}" data-size="{{ component.size }}"{% endif %}
+                                 {% if type == 'cpu' %}data-socket="{{ component.socket }}"{% endif %}
+                                 {% if type == 'motherboard' %}data-socket="{{ component.socket }}" data-ram-type="{{ component.ram_type }}" data-form-factor="{{ component.form_factor }}" data-sata-slots="{{ component.sata_slot }}"{% endif %}
+                                 {% if type == 'ram' %}data-type="{{ component.typee }}"{% endif %}
+                                 {% if type == 'cooling' %}data-socket="{{ component.socket }}"{% endif %}
+                                 {% if type == 'psu' %}data-power="{{ component.power }}"{% endif %}
+                                 {% if type == 'storage' %}data-type="{{ component.typee }}"{% endif %}
+                                 {% if type == 'case' %}data-form-factor="{{ component.supported_form_factor }}" data-size="{{ component.size }}"{% endif %}>
+                                <img src="{{ component.picture|default:default_image }}" 
+                                     alt="{{ component.model }}" 
+                                     class="component-image"
+                                     onerror="this.src='{{ default_image }}'">
                                 <div class="component-info">
-                                    <span class="component-name">{{ gpu.model }}</span>
-                                    <span class="component-price">{{ gpu.price }} ₽</span>
+                                    <span class="component-name">{{ component.model }}</span>
+                                    <span class="component-price">{{ component.price }} ₽</span>
                                 </div>
                             </div>
                             {% endfor %}
                         </div>
                     </div>
-
-                    <!-- Процессоры -->
-                    <div class="component-category">
-                        <div class="category-header">
-                            <span>Процессор</span>
-                            <i class="fas fa-chevron-down"></i>
-                        </div>
-                        <div class="category-content">
-                            {% for cpu in cpus %}
-                            <div class="component-option locked" data-component="cpu" data-id="{{ cpu.id }}"
-                                data-power="{{ cpu.relative_power }}">
-                                <img src="{{ cpu.picture }}" alt="{{ cpu.model }}" class="component-image"
-                                    onerror="this.src='/static/images/no-image.png'">
-                                <div class="component-info">
-                                    <span class="component-name">{{ cpu.model }}</span>
-                                    <span class="component-price">{{ cpu.price }} ₽</span>
-                                </div>
-                            </div>
-                            {% endfor %}
-                        </div>
-                    </div>
-
-                    <!-- Материнские платы -->
-                    <div class="component-category">
-                        <div class="category-header">
-                            <span>Материнская плата</span>
-                            <i class="fas fa-chevron-down"></i>
-                        </div>
-                        <div class="category-content">
-                            {% for mb in motherboards %}
-                            <div class="component-option locked" data-component="motherboard" data-id="{{ mb.id }}">
-                                <img src="{{ mb.picture }}" alt="{{ mb.model }}" class="component-image"
-                                    onerror="this.src='/static/images/no-image.png'">
-                                <div class="component-info">
-                                    <span class="component-name">{{ mb.model }}</span>
-                                    <span class="component-price">{{ mb.price }} ₽</span>
-                                </div>
-                            </div>
-                            {% endfor %}
-                        </div>
-                    </div>
-
-                    <!-- Оперативная память -->
-                    <div class="component-category">
-                        <div class="category-header">
-                            <span>Оперативная память</span>
-                            <i class="fas fa-chevron-down"></i>
-                        </div>
-                        <div class="category-content">
-                            {% for ram in rams %}
-                            <div class="component-option" data-component="ram" data-id="{{ ram.id }}">
-                                <img src="{{ ram.picture }}" alt="{{ ram.model }}" class="component-image"
-                                    onerror="this.src='/static/images/no-image.png'">
-                                <div class="component-info">
-                                    <span class="component-name">{{ ram.model }}</span>
-                                    <span class="component-price">{{ ram.price }} ₽</span>
-                                </div>
-                            </div>
-                            {% endfor %}
-                        </div>
-                    </div>
-
-                    <!-- Системы охлаждения -->
-                    <div class="component-category">
-                        <div class="category-header">
-                            <span>Охлаждение</span>
-                            <i class="fas fa-chevron-down"></i>
-                        </div>
-                        <div class="category-content">
-                            {% for cooling in coolings %}
-                            <div class="component-option" data-component="cooling" data-id="{{ cooling.id }}">
-                                <img src="{{ cooling.picture }}" alt="{{ cooling.model }}" class="component-image"
-                                    onerror="this.src='/static/images/no-image.png'">
-                                <div class="component-info">
-                                    <span class="component-name">{{ cooling.model }}</span>
-                                    <span class="component-price">{{ cooling.price }} ₽</span>
-                                </div>
-                            </div>
-                            {% endfor %}
-                        </div>
-                    </div>
-
-                    <!-- Блоки питания -->
-                    <div class="component-category">
-                        <div class="category-header">
-                            <span>Блок питания</span>
-                            <i class="fas fa-chevron-down"></i>
-                        </div>
-                        <div class="category-content">
-                            {% for psu in power_supplies %}
-                            <div class="component-option" data-component="psu" data-id="{{ psu.id }}">
-                                <img src="{{ psu.picture }}" alt="{{ psu.model }}" class="component-image"
-                                    onerror="this.src='/static/images/no-image.png'">
-                                <div class="component-info">
-                                    <span class="component-name">{{ psu.model }}</span>
-                                    <span class="component-price">{{ psu.price }} ₽</span>
-                                </div>
-                            </div>
-                            {% endfor %}
-                        </div>
-                    </div>
-
-                    <!-- Накопители -->
-                    <div class="component-category">
-                        <div class="category-header">
-                            <span>Накопитель</span>
-                            <i class="fas fa-chevron-down"></i>
-                        </div>
-                        <div class="category-content">
-                            {% for storage in storages %}
-                            <div class="component-option" data-component="storage" data-id="{{ storage.id }}">
-                                <img src="{{ storage.picture }}" alt="{{ storage.model }}" class="component-image"
-                                    onerror="this.src='/static/images/no-image.png'">
-                                <div class="component-info">
-                                    <span class="component-name">{{ storage.model }}</span>
-                                    <span class="component-price">{{ storage.price }} ₽</span>
-                                </div>
-                            </div>
-                            {% endfor %}
-                        </div>
-                    </div>
-
-                    <!-- Корпуса -->
-                    <div class="component-category">
-                        <div class="category-header">
-                            <span>Корпус</span>
-                            <i class="fas fa-chevron-down"></i>
-                        </div>
-                        <div class="category-content">
-                            {% for case in cases %}
-                            <div class="component-option" data-component="case" data-id="{{ case.id }}">
-                                <img src="{{ case.picture }}" alt="{{ case.model }}" class="component-image"
-                                    onerror="this.src='/static/images/no-image.png'">
-                                <div class="component-info">
-                                    <span class="component-name">{{ case.model }}</span>
-                                    <span class="component-price">{{ case.price }} ₽</span>
-                                </div>
-                            </div>
-                            {% endfor %}
-                        </div>
-                    </div>
+                    {% endfor %}
                 </div>
 
                 <div class="configurator-main">
@@ -772,38 +666,12 @@
                     </div>
 
                     <div class="pc-specs">
+                        {% for type, name in component_types.items %}
                         <div class="spec-item">
-                            <span class="spec-name">Процессор</span>
-                            <span class="spec-value" id="cpu-spec">Не выбран</span>
+                            <span class="spec-name">{{ name }}</span>
+                            <span class="spec-value" id="{{ type }}-spec">Не выбран</span>
                         </div>
-                        <div class="spec-item">
-                            <span class="spec-name">Видеокарта</span>
-                            <span class="spec-value" id="gpu-spec">Не выбран</span>
-                        </div>
-                        <div class="spec-item">
-                            <span class="spec-name">Охлаждение</span>
-                            <span class="spec-value" id="cooling-spec">Не выбран</span>
-                        </div>
-                        <div class="spec-item">
-                            <span class="spec-name">Материнская плата</span>
-                            <span class="spec-value" id="motherboard-spec">Не выбран</span>
-                        </div>
-                        <div class="spec-item">
-                            <span class="spec-name">Оперативная память</span>
-                            <span class="spec-value" id="ram-spec">Не выбран</span>
-                        </div>
-                        <div class="spec-item">
-                            <span class="spec-name">Накопитель</span>
-                            <span class="spec-value" id="storage-spec">Не выбран</span>
-                        </div>
-                        <div class="spec-item">
-                            <span class="spec-name">Блок питания</span>
-                            <span class="spec-value" id="psu-spec">Не выбран</span>
-                        </div>
-                        <div class="spec-item">
-                            <span class="spec-name">Корпус</span>
-                            <span class="spec-value" id="case-spec">Не выбран</span>
-                        </div>
+                        {% endfor %}
                     </div>
 
                     <div class="total-block">
@@ -813,11 +681,11 @@
                         </div>
                         <div class="total-row">
                             <span class="total-label">Сборка и тестирование:</span>
-                            <span class="total-price">9 990 ₽</span>
+                            <span class="total-price">{{ assembly_price }} ₽</span>
                         </div>
                         <div class="total-row">
                             <span class="total-label">Итого:</span>
-                            <span class="total-price" id="total-price">9 990 ₽</span>
+                            <span class="total-price" id="total-price">{{ assembly_price }} ₽</span>
                         </div>
                     </div>
 
@@ -830,226 +698,6 @@
         </div>
     </div>
 
-    <script>
-        document.addEventListener('DOMContentLoaded', function () {
-            // Переменная для хранения выбранной видеокарты и её мощности
-            // Используется для фильтрации совместимых процессоров
-            let selectedGPU = null;
-
-            // Обработчик раскрытия/сворачивания категорий компонентов
-            document.querySelectorAll('.category-header').forEach(header => {
-                header.addEventListener('click', function () {
-                    const content = this.nextElementSibling;
-                    const icon = this.querySelector('i');
-
-                    // Переключаем класс expanded для анимации
-                    content.classList.toggle('expanded');
-
-                    // Анимируем иконку стрелки
-                    icon.classList.toggle('rotated');
-
-                    // Устанавливаем max-height для плавной анимации
-                    if (content.classList.contains('expanded')) {
-                        content.style.maxHeight = content.scrollHeight + 'px';
-                    } else {
-                        content.style.maxHeight = '0';
-                    }
-                });
-            });
-
-            // Обработчик выбора компонентов
-            document.querySelectorAll('.component-option').forEach(option => {
-                option.addEventListener('click', function () {
-                    // Проверяем, не заблокирован ли компонент
-                    if (this.classList.contains('locked') || this.classList.contains('disabled')) {
-                        return;
-                    }
-
-                    // Получаем данные компонента из data-атрибутов
-                    const componentType = this.dataset.component;
-                    const componentId = this.dataset.id;
-                    const componentName = this.querySelector('.component-name').textContent;
-                    const componentPrice = parseInt(this.querySelector('.component-price').textContent);
-
-                    // Снимаем выделение с других компонентов в категории
-                    this.parentNode.querySelectorAll('.component-option').forEach(el => {
-                        el.classList.remove('active');
-                    });
-
-                    // Выделяем выбранный компонент
-                    this.classList.add('active');
-
-                    // Показываем предварительный просмотр компонента
-                    showComponentPreview(componentType, componentId, componentName, componentPrice);
-
-                    // Специальная обработка для видеокарты
-                    if (componentType === 'gpu') {
-                        // Сохраняем данные выбранной видеокарты
-                        selectedGPU = {
-                            id: componentId,
-                            power: parseInt(this.dataset.power) || 0
-                        };
-                        // Фильтруем процессоры на основе мощности GPU
-                        filterCPUs();
-                        // Разблокируем категорию процессоров
-                        unlockNextCategory('cpu');
-                        unlockNextCategory('motherboard');
-                    }
-                });
-            });
-
-            // Функция фильтрации процессоров на основе мощности GPU
-            function filterCPUs() {
-                if (!selectedGPU) return;
-
-                const cpuOptions = document.querySelectorAll('.component-option[data-component="cpu"]');
-                const gpuPower = selectedGPU.power;
-
-                cpuOptions.forEach(cpu => {
-                    const cpuPower = parseInt(cpu.dataset.power) || 0;
-                    const powerDiff = Math.abs(cpuPower - gpuPower);
-
-                    // Отключаем процессоры, мощность которых сильно отличается от GPU
-                    // Разница в мощности не должна превышать 50 единиц
-                    if (powerDiff <= 50) {
-                        cpu.classList.remove('disabled');
-                    } else {
-                        cpu.classList.add('disabled');
-                    }
-                });
-            }
-
-            // Функция разблокировки следующей категории компонентов
-            function unlockNextCategory(category) {
-                const categoryElement = document.querySelector(`.component-option[data-component="${category}"]`).closest('.component-category');
-                categoryElement.querySelectorAll('.component-option').forEach(option => {
-                    option.classList.remove('locked');
-                });
-            }
-
-            // Функция отображения предварительного просмотра компонента
-            function showComponentPreview(type, id, name, price) {
-                const preview = document.getElementById('component-preview');
-                const noSelection = document.getElementById('no-component-selected');
-                const previewImage = document.getElementById('preview-image');
-                const previewName = document.getElementById('preview-name');
-                const previewSpecs = document.getElementById('preview-specs');
-                const previewPrice = document.getElementById('preview-price');
-                const addButton = document.getElementById('add-to-config');
-
-                // Скрываем сообщение о выборе компонента и показываем предпросмотр
-                noSelection.style.display = 'none';
-                preview.style.display = 'block';
-
-                // Загружаем детальные данные компонента через AJAX
-                fetch(`/api/component/${type}/${id}/`)
-                    .then(response => response.json())
-                    .then(data => {
-                        // Устанавливаем изображение компонента
-                        if (data.picture) {
-                            if (data.picture.startsWith('https')) {
-                                previewImage.src = data.picture;
-                            } else {
-                                previewImage.src = `/media/${data.picture}`;
-                            }
-                        } else {
-                            previewImage.src = '/static/images/no-image.png';
-                        }
-
-                        // Обработчик ошибки загрузки изображения
-                        previewImage.onerror = function () {
-                            console.error('Ошибка загрузки изображения:', data.picture);
-                            this.src = '/static/images/no-image.png';
-                        };
-
-                        // Устанавливаем название компонента
-                        previewName.textContent = data.model;
-
-                        // Формируем спецификации в зависимости от типа компонента
-                        let specs = '';
-                        switch (type) {
-                            case 'cpu':
-                                specs = `${data.cores_amount} ядер, ${data.frequency}, ${data.socket}`;
-                                break;
-                            case 'motherboard':
-                                specs = `${data.socket}, ${data.form_factor}`;
-                                break;
-                            case 'gpu':
-                                specs = `${data.memory_amount} ГБ, ${data.frequency}`;
-                                break;
-                            case 'ram':
-                                specs = `${data.amount}, ${data.typee}`;
-                                break;
-                            case 'cooling':
-                                specs = `${data.typee}, ${data.socket}`;
-                                break;
-                            case 'psu':
-                                specs = `${data.power} Вт`;
-                                break;
-                            case 'storage':
-                                specs = `${data.capacity}, ${data.typee}`;
-                                break;
-                            case 'case':
-                                specs = `${data.supported_form_factor}, ${data.size}`;
-                                break;
-                        }
-                        previewSpecs.textContent = specs;
-                        previewPrice.textContent = `${price.toLocaleString('ru-RU')} ₽`;
-
-                        // Обновляем обработчик кнопки "Добавить в конфигурацию"
-                        addButton.onclick = function () {
-                            // Обновляем спецификации в списке выбранных компонентов
-                            const specElement = document.getElementById(`${type}-spec`);
-                            if (specElement) {
-                                specElement.textContent = name;
-                            }
-
-                            // Пересчитываем общую стоимость
-                            updatePrice();
-
-                            // Возвращаемся к общему виду
-                            preview.style.display = 'none';
-                            noSelection.style.display = 'block';
-                        };
-                    })
-                    .catch(error => {
-                        console.error('Ошибка при загрузке данных компонента:', error);
-                        preview.style.display = 'none';
-                        noSelection.style.display = 'block';
-                    });
-            }
-
-            // Функция обновления общей стоимости конфигурации
-            function updatePrice() {
-                let total = 0;
-
-                // Суммируем цены всех выбранных компонентов
-                document.querySelectorAll('.component-option.active').forEach(option => {
-                    const priceText = option.querySelector('.component-price').textContent;
-                    const price = parseInt(priceText.replace(/[^\d]/g, ''));
-                    total += price;
-                });
-
-                // Обновляем отображение цены компонентов
-                document.getElementById('components-price').textContent = `${total.toLocaleString('ru-RU')} ₽`;
-
-                // Добавляем стоимость сборки
-                const assemblyPrice = 9990;
-                total += assemblyPrice;
-
-                // Обновляем итоговую цену
-                document.getElementById('total-price').textContent = `${total.toLocaleString('ru-RU')} ₽`;
-            }
-
-            // Инициализация - раскрываем первую категорию (видеокарты)
-            const firstCategory = document.querySelector('.category-content');
-            const firstIcon = document.querySelector('.category-header i');
-            if (firstCategory && firstIcon) {
-                firstCategory.classList.add('expanded');
-                firstIcon.classList.add('rotated');
-                firstCategory.style.maxHeight = firstCategory.scrollHeight + 'px';
-            }
-        });
-    </script>
+    <script src="/static/js/configurator.js"></script>
 </body>
 {% endblock %}

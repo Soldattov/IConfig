@@ -1,5 +1,3 @@
-import re
-from tkinter.constants import CASCADE
 import config.parser.power_calculator as calculator
 
 from django.conf import settings

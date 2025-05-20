@@ -347,10 +347,10 @@ def parse_cpu_page2(driver, url):
         if not model:
             logger.warning(f"Модель не найдена на странице: {url}")
         
-        cores_amount = tech_spec.get("Исполнительные блоки", "")         # если ключ отличается, измените его
+        cores_amount = tech_spec.get("Общее количество ядер", "6")         # если ключ отличается, измените его
         frequency = tech_spec.get("Базовая частота процессора", "3.5 ГГц")           # можно применять extract_number, если нужно число
         socket = tech_spec.get("Сокет", "")
-        tdp = tech_spec.get("Тепловыделение (TDP)", "") #такого критерия нет
+        tdp = tech_spec.get("Тепловыделение (TDP)", "60 Вт") #такого критерия нет
         
         # Получаем URL изображения
         image_path = download_image(image_url, model, 'cpu')
@@ -389,7 +389,7 @@ def parse_cpu_page2(driver, url):
             cpu.picture = image_path
         cpu.save()
 
-        logger.info(f"{'Создан' if created else 'Обновлен'} GPU: {model}")
+        logger.info(f"{'Создан' if created else 'Обновлен'} CPU: {model}")
         return cpu
 
     except Exception as e:

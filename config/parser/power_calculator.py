@@ -56,7 +56,7 @@ def calculateGPUPower(gpu):
         # Ограничиваем множитель разумными пределами (пока нет смысла)
         #multiplier = max(0.5, min(multiplier, 1.5))
 
-    gpu.relative_power = str(base_power * multiplier)
+    gpu.relative_power = str(int(base_power * multiplier))
 
 def calculateCPUPower(cpu):
     """Рассчитывает потребляемую мощность процессора."""
@@ -65,16 +65,16 @@ def calculateCPUPower(cpu):
 
     modifiers = {
             # Модификаторы архитектур (базовые множители)
-            "Intel Core i9": 1.3,
+            "Intel Core i9": 1.4,
             "Intel Core i7": 1.2,
-            "Intel Core i5": 1.1,
-            "Intel Core i3": 0.9,
+            "Intel Core i5": 1.05,
+            "Intel Core i3": 0.8,
             "Intel Pentium": 0.6,
             "Intel Celeron": 0.5,
             "Ryzen 9": 1.4,
             "Ryzen 7": 1.2,
-            "Ryzen 5": 1.1,
-            "Ryzen 3": 0.9,
+            "Ryzen 5": 1.05,
+            "Ryzen 3": 0.8,
 
             # Поколения процессоров
             "14th Gen": 1.1,  # Intel
@@ -88,16 +88,17 @@ def calculateCPUPower(cpu):
             "3xxx": 0.8,
 
             # Модификаторы моделей (например, "K", "X", "G")
-            "K": 1.07,  # Разблокированный множитель (Intel)
-            "KF": 1.07,
-            "KS": 1.1,
+            "K": 1.05,  # Разблокированный множитель (Intel)
+            "KF": 1.05,
+            "KS": 1.05,
             "X": 1.1,  # High-end (AMD)
             "X3D": 1.1,  # 3D V-Cache
             "G": 0.9,  # С графикой (менее мощный)
             "T":0.8,
 
             # Дополнительные модификаторы
-            "Core": 1.5,
+            "Core": 1.1,
+            "Ryzen": 1.2,
             "Threadripper": 2,  # AMD Threadripper
             "Xeon": 0.8,  # Intel Xeon
             "Athlon": 0.7,
@@ -109,19 +110,28 @@ def calculateCPUPower(cpu):
         cpu.relative_power = str(base_power)
         return
 
-            # Проверяем поколение AMD и Intel
+        #Проверяем поколение AMD и Intel
     if re.search(r"Ryzen [3579]\s*9\d{3}\w*", cpu.model):  # Примеры: Ryzen 9 7950X, Ryzen 9 5950X, Ryzen 9 3950X
-        multiplier *= 1.8
-    if re.search(r"Ryzen [3579]\s*7\d{3}\w*", cpu.model):  # Примеры: Ryzen 7 7700X, Ryzen 7 5800X, Ryzen 7 3800X
+        multiplier *= 1.7
+    elif re.search(r"Ryzen [3579]\s*8\d{3}\w*", cpu.model):  # Примеры: Ryzen 3 7800X, Ryzen 3 5800X, Ryzen 3 3800
+        multiplier *= 1.6
+    if re.search(r"Ryzen [3579]\s*7\d{3}\w*", cpu.model):  # Примеры: Ryzen 7 7700X, Ryzen 7 5700X, Ryzen 7 3700
+        multiplier *= 1.5
+    elif re.search(r"Ryzen [3579]\s*6\d{3}\w*", cpu.model):  # Примеры: Ryzen 5 7600X, Ryzen 5 5600X, Ryzen 5 3600X
         multiplier *= 1.4
-    elif re.search(r"Ryzen [3579]\s*5\d{3}\w*", cpu.model):  # Примеры: Ryzen 5 7600X, Ryzen 5 5600X, Ryzen 5 3600X
-        multiplier *= 1.1
-    elif re.search(r"Ryzen [3579]\s*3\d{3}\w*", cpu.model):  # Примеры: Ryzen 3 7300X, Ryzen 3 5300X, Ryzen 3 3300X
-        multiplier *= 0.8
-    elif re.search(r"i[3579]-12\d{3}\w*", cpu.model):  # Примеры: i9-12900K, i7-12700K, i5-12600K, i3-12100
+    elif re.search(r"Ryzen [3579]\s*5\d{3}\w*", cpu.model):  # Примеры: Ryzen 3 7500X, Ryzen 3 5500X, Ryzen 3 3500
         multiplier *= 1.3
-    elif re.search(r"i[3579]-11\d{3}\w*", cpu.model):  # Примеры: i9-11900K, i7-11700K, i5-11600K, i3-11100
+    elif re.search(r"Ryzen [3579]\s*3\d{3}\w*", cpu.model):  # Примеры: Ryzen 3 7300X, Ryzen 3 5300X, Ryzen 3 3300X
         multiplier *= 1.2
+        '''процессоры intel'''
+    elif re.search(r"i[3579]-14\d{3}\w*", cpu.model):  # Примеры: i9-14900K, i7-14700K, i5-14600K
+        multiplier *= 1.8
+    elif re.search(r"i[3579]-13\d{3}\w*", cpu.model):  # Примеры: i9-13900K, i7-13700K, i5-13600K, i3-13100
+        multiplier *= 1.7
+    elif re.search(r"i[3579]-12\d{3}\w*", cpu.model):  # Примеры: i9-12900K, i7-12700K, i5-12600K, i3-12100
+        multiplier *= 1.5
+    elif re.search(r"i[3579]-11\d{3}\w*", cpu.model):  # Примеры: i9-11900K, i7-11700K, i5-11600K, i3-11100
+        multiplier *= 1.3
     elif re.search(r"i[3579]-10\d{3}\w*", cpu.model):  # Примеры: i9-10900K, i7-10700K, i5-10600K, i3-10100
         multiplier *= 1.1
     elif re.search(r"i[3579]-9\d{3}\w*", cpu.model):  # Примеры: i9-9900K, i7-9700K, i5-9600K, i3-9100
@@ -143,7 +153,7 @@ def calculateCPUPower(cpu):
             core_multiplier = 1
             multiplier *= core_multiplier
             base_freq = float(cpu.frequency.split()[0])  # "3.5 GHz" → 3.5
-            freq_multiplier = 1 + (base_freq - 3.0) * 0.04  # +5% за каждые 0.1 ГГц выше 3.0
+            freq_multiplier = 1 + (base_freq - 3.0) * 0.05  # +5% за каждые 0.1 ГГц выше 3.0
             multiplier *= freq_multiplier
     except (ValueError, TypeError):
         pass  # Если ядра/потоки не указаны
