@@ -422,6 +422,7 @@ document.addEventListener('DOMContentLoaded', function () {
      * 1. Суммирует цены всех выбранных компонентов
      * 2. Добавляет стоимость сборки
      * 3. Обновляет отображение цен
+     новая строка
      */
     function updatePrice() {
         let total = 0;
