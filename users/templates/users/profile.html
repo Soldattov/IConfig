@@ -1,17 +1,402 @@
-<script>
-    fetch('main/index.html')
-        .then(response => response.text())
-        .then(html => {
-            const parser = new DOMParser();
-            const doc = parser.parseFromString(html, 'text/html');
-            const styles = doc.querySelectorAll('style, link[rel="stylesheet"]');
-            styles.forEach(style => document.head.appendChild(style.cloneNode(true)));
-        });
-</script>
+{% extends "base.html" %}
+{% load static %}
+
+
+
+
+{% block head %}
+<link rel="stylesheet" href="{% static 'css/styles.css' %}">
+
+<style>
+    /* Стили модального окна и затемнения фона */
+    .modal {
+        position: fixed;
+        z-index: 1000;
+        left: 50%;
+        top: 50%;
+        transform: translate(-50%, -50%);
+        background: rgb(8, 21, 41);
+        border-radius: 5px;
+        padding: 20px;
+        box-shadow: 0 0 10px rgba(0, 0, 0, 0.5);
+        width: 400px;
+    }
+
+    .modal-backdrop {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: rgba(0, 0, 0, 0.5);
+        z-index: 900;
+    }
+
+    .form-group {
+        margin-bottom: 15px;
+    }
+
+    .form-group input {
+        width: 100%;
+        padding: 8px;
+        box-sizing: border-box;
+    }
+
+    .form-group input.error {
+        border: 1px solid red;
+    }
+
+    .error-message {
+        font-size: 0.9em;
+        color: red;
+        margin-top: 5px;
+        display: none;
+    }
+
+    .modal-buttons {
+        text-align: right;
+    }
+
+    .modal-buttons button {
+        margin-left: 10px;
+    }
+
+    .saved-configurations {
+        margin: 30px auto;
+        width: 90%;
+        font-family: Arial, sans-serif;
+    }
+
+    .saved-configurations h3 {
+        text-align: center;
+        margin-bottom: 15px;
+    }
+
+    .saved-configurations table {
+        width: 100%;
+        border-collapse: collapse;
+    }
+
+    .saved-configurations th,
+    .saved-configurations td {
+        padding: 10px;
+        border: 1px solid #ddd;
+        /* Отключаем возможность выделения текста по отдельным ячейкам */
+        -webkit-user-select: none;
+        -moz-user-select: none;
+        -ms-user-select: none;
+        user-select: none;
+    }
+
+    /* Заголовок таблицы */
+    .saved-configurations th {
+        background-color: #1407d686;
+        text-align: left;
+    }
+
+    /* Задаём относительные ширины столбцов */
+    .saved-configurations .col-number {
+        width: 10%;
+    }
+
+    .saved-configurations .col-price {
+        width: 20%;
+    }
+
+    .saved-configurations .col-config {
+        width: 70%;
+
+    }
+
+    /* При наведении на строку подсвечиваем её */
+    .saved-configurations tbody tr:hover {
+        background-color: #f9f9f9;
+    }
+
+    /* Класс для выбранной строки */
+    .saved-configurations tbody tr.selected {
+        background-color: #d0eaff;
+    }
+</style>
+{% endblock %}
+
+
 {% block content %}
 <div class="container">
     <h2>Здравствуйте, {{ user.first_name }}</h2>
     <p>Ваш email: {{ user.email }}</p>
+    <button id="change-password-btn" class="btn">Изменить пароль</button>
     <a href="{% url 'logout' %}" class="btn">Выйти</a>
+    <button id="delete-account-btn" class="btn btn-danger">Удалить учетную запись</button>
+
+
+    <div class="saved-configurations">
+        <h3>Сохраненные конфигурации</h3>
+        <table>
+            <thead>
+                <tr>
+
+                    <th class="col-number">Номер</th>
+                    <th class="col-config">Конфигурация</th>
+                    <th class="col-price">Стоимость</th>
+                </tr>
+            </thead>
+            <tbody>
+                <!-- заполнить -->
+            </tbody>
+        </table>
+    </div>
 </div>
+{% endblock %}
+
+{% block scripts %}
+<!-- Скрипт для обработки удаления -->
+<script>
+    document.getElementById('delete-account-btn').addEventListener('click', function () {
+        // Открывается стандартное диалоговое окно подтверждения
+        if (confirm("Вы уверены, что хотите удалить учетную запись?")) {
+            // Если подтверждено, отправляем POST-запрос на сервер для удаления учетной записи
+            fetch("{% url 'delete_account' %}", {
+                method: "POST",
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRFToken': getCookie('csrftoken')  // добавляем CSRF-токен в заголовок
+                },
+                body: JSON.stringify({})  // если нужны дополнительные параметры, можно передать их здесь
+            })
+                .then(response => {
+                    if (response.ok) {
+                        // После успешного удаления, перенаправляем пользователя на главную страницу
+                        window.location.href = '/';
+                    } else {
+                        alert("Ошибка удаления учетной записи.");
+                    }
+                })
+                .catch(error => {
+                    alert("Ошибка: " + error);
+                });
+        }
+    });
+
+    // Функция для получения CSRF-токена из cookies
+    function getCookie(name) {
+        let cookieValue = null;
+        if (document.cookie && document.cookie !== '') {
+            const cookies = document.cookie.split(';');
+            for (let i = 0; i < cookies.length; i++) {
+                const cookie = cookies[i].trim();
+                // Проверка, начинается ли cookie с нужного имени
+                if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                    cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                    break;
+                }
+            }
+        }
+        return cookieValue;
+    }
+</script>
+<!-- Модальное окно смены пароля -->
+<div id="password-modal" class="modal" style="display: none;">
+    <h2>Замена пароля</h2>
+    <form id="password-form">
+        <div class="form-group">
+            <label for="current-password">Текущий пароль</label>
+            <input type="password" id="current-password" placeholder="Введите текущий пароль">
+            <small id="current-error" class="error-message">Пароль неверный</small>
+        </div>
+        <div class="form-group">
+            <label for="new-password">Новый пароль</label>
+            <input type="password" id="new-password" placeholder="Введите новый пароль">
+            <small id="new-error" class="error-message">Пароль должен содержать не менее 8 символов</small>
+        </div>
+        <div class="form-group">
+            <label for="confirm-password">Повторите новый пароль</label>
+            <input type="password" id="confirm-password" placeholder="Повторите новый пароль">
+            <small id="confirm-error" class="error-message">Пароли не совпадают</small>
+        </div>
+        <div class="modal-buttons">
+            <button type="button" id="save-password" disabled>Изменить</button>
+            <button type="button" id="cancel-password">Отмена</button>
+        </div>
+    </form>
+</div>
+<!-- Затемнённый фон -->
+<div id="modal-backdrop" class="modal-backdrop" style="display: none;"></div>
+
+<script>
+    // Функция получения CSRF-токена (если используется Django)
+    function getCookie(name) {
+        let cookieValue = null;
+        if (document.cookie && document.cookie !== "") {
+            const cookies = document.cookie.split(';');
+            for (let i = 0; i < cookies.length; i++) {
+                const cookie = cookies[i].trim();
+                if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                    cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                    break;
+                }
+            }
+        }
+        return cookieValue;
+    }
+
+    // Функция закрытия модального окна и сброса формы
+    function closeModal() {
+        document.getElementById('password-modal').style.display = 'none';
+        document.getElementById('modal-backdrop').style.display = 'none';
+        document.getElementById('password-form').reset();
+        document.querySelectorAll('.error-message').forEach(el => el.style.display = 'none');
+        document.querySelectorAll('.form-group input').forEach(el => el.classList.remove('error'));
+        document.getElementById('save-password').disabled = true;
+    }
+
+    // Функция показа уведомления в виде плашки в верхней части страницы
+    function showToast(message, duration) {
+        const toast = document.createElement('div');
+        toast.innerText = message;
+        // Стили для большой плашки
+        toast.style.position = 'fixed';
+        toast.style.top = '20px';
+        toast.style.left = '50%';
+        toast.style.transform = 'translateX(-50%)';
+        toast.style.width = '80%';
+        toast.style.textAlign = 'center';
+        toast.style.backgroundColor = 'rgba(0, 128, 0, 0.8)';  // можно изменить цвет по вкусу
+        toast.style.color = '#fff';
+        toast.style.padding = '15px';
+        toast.style.fontSize = '1.2em';
+        toast.style.borderRadius = '5px';
+        toast.style.zIndex = 1100;
+        document.body.appendChild(toast);
+        setTimeout(() => {
+            toast.remove();
+        }, duration);
+    }
+
+    // Открытие модального окна смены пароля
+    document.getElementById('change-password-btn').addEventListener('click', function () {
+        document.getElementById('password-modal').style.display = 'block';
+        document.getElementById('modal-backdrop').style.display = 'block';
+    });
+
+    // Закрытие модального окна при нажатии кнопки "Отмена"
+    document.getElementById('cancel-password').addEventListener('click', function () {
+        closeModal();
+    });
+
+    // Динамическая проверка текущего пароля через сервер
+    document.getElementById('current-password').addEventListener('blur', function () {
+        const currentInput = document.getElementById('current-password');
+        if (currentInput.value.trim() === "") {
+            document.getElementById('current-error').innerText = "Введите текущий пароль";
+            document.getElementById('current-error').style.display = "block";
+            currentInput.classList.add('error');
+            checkFormValidity();
+            return;
+        }
+        fetch('/users/verify-current-password/', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRFToken': getCookie('csrftoken')
+            },
+            body: JSON.stringify({ current_password: currentInput.value })
+        })
+            .then(response => response.json())
+            .then(data => {
+                if (!data.valid) {
+                    document.getElementById('current-error').innerText = "Пароль неверный";
+                    document.getElementById('current-error').style.display = "block";
+                    currentInput.classList.add('error');
+                } else {
+                    document.getElementById('current-error').style.display = "none";
+                    currentInput.classList.remove('error');
+                }
+                checkFormValidity();
+            })
+            .catch(error => {
+                console.error("Ошибка проверки текущего пароля:", error);
+                document.getElementById('current-error').innerText = "Ошибка проверки";
+                document.getElementById('current-error').style.display = "block";
+                currentInput.classList.add('error');
+                checkFormValidity();
+            });
+    });
+
+    // Валидация нового пароля: проверка на длину не менее 8 символов
+    document.getElementById('new-password').addEventListener('blur', function () {
+        const newPass = document.getElementById('new-password');
+        if (newPass.value.length < 8) {
+            document.getElementById('new-error').innerText = "Пароль должен содержать не менее 8 символов";
+            document.getElementById('new-error').style.display = "block";
+            newPass.classList.add('error');
+        } else {
+            document.getElementById('new-error').style.display = "none";
+            newPass.classList.remove('error');
+        }
+        checkFormValidity();
+    });
+
+    // Валидация подтверждения нового пароля
+    document.getElementById('confirm-password').addEventListener('blur', function () {
+        const newPassVal = document.getElementById('new-password').value;
+        const confirmPass = document.getElementById('confirm-password');
+        if (confirmPass.value !== newPassVal) {
+            document.getElementById('confirm-error').innerText = "Пароли не совпадают";
+            document.getElementById('confirm-error').style.display = "block";
+            confirmPass.classList.add('error');
+        } else {
+            document.getElementById('confirm-error').style.display = "none";
+            confirmPass.classList.remove('error');
+        }
+        checkFormValidity();
+    });
+
+    // Функция проверки валидности всей формы
+    function checkFormValidity() {
+        const currentVal = document.getElementById('current-password').value.trim();
+        const newVal = document.getElementById('new-password').value.trim();
+        const confirmVal = document.getElementById('confirm-password').value.trim();
+        const currentError = document.getElementById('current-error').style.display !== "none";
+        const newError = document.getElementById('new-error').style.display !== "none";
+        const confirmError = document.getElementById('confirm-error').style.display !== "none";
+
+        if (currentVal && newVal && confirmVal && !currentError && !newError && !confirmError) {
+            document.getElementById('save-password').disabled = false;
+        } else {
+            document.getElementById('save-password').disabled = true;
+        }
+    }
+
+    // Обработка нажатия кнопки "Изменить"
+    document.getElementById('save-password').addEventListener('click', function () {
+        const currentPassword = document.getElementById('current-password').value;
+        const newPassword = document.getElementById('new-password').value;
+
+        fetch('/users/change-password/', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRFToken': getCookie('csrftoken')
+            },
+            body: JSON.stringify({
+                current_password: currentPassword,
+                new_password: newPassword
+            })
+        })
+            .then(response => {
+                if (response.ok) {
+                    // Закрытие модального окна сразу после успешного обновления
+                    closeModal();
+                    // Показ уведомления – длинная плашка вверху
+                    showToast("Пароль изменен", 1000);
+                } else {
+                    alert("Ошибка при изменении пароля");
+                }
+            })
+            .catch(error => {
+                alert("Ошибка: " + error);
+            });
+    });
+</script>
 {% endblock %}

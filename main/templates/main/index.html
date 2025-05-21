@@ -1,836 +1,221 @@
-<!DOCTYPE html>
-<html lang="ru">
-
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Snitch PC - Магазин игровых компьютеров</title>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <style>
-        /* Стили Delta Game с минимальными изменениями */
-        :root {
-            --primary: #1e1e2d;
-            --secondary: #2d2d42;
-            --accent: #ff5e3a;
-            --text: #ffffff;
-            --text-secondary: #b5b5c3;
-        }
-
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-            font-family: 'Roboto', sans-serif;
-        }
-
-        .hidden {
-            display: none !important;
-        }
-
-        .user-menu {
-            position: absolute;
-            background: var(--secondary);
-            padding: 8px 12px;
-            border-radius: 6px;
-            box-shadow: 0 0 12px rgba(0, 0, 0, 0.3);
-            display: flex;
-            flex-direction: column;
-            align-items: stretch;
-            gap: 5px;
-            z-index: 1000;
-        }
-
-        .user-action {
-            background: transparent;
-            color: var(--text);
-            border: none;
-            padding: 6px 10px;
-            text-align: left;
-            cursor: pointer;
-            font-size: 14px;
-            border-radius: 4px;
-        }
-
-        .user-action:hover {
-            background: var(--accent);
-            color: white;
-        }
-
-        .modal {
-            position: fixed;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            background: var(--primary);
-            padding: 30px;
-            border-radius: 8px;
-            z-index: 2000;
-            box-shadow: 0 0 20px rgba(0, 0, 0, 0.6);
-        }
-
-        .modal-content {
-            position: relative;
-        }
-
-        .modal-close {
-            position: absolute;
-            top: 15px;
-            right: 15px;
-            background: none;
-            border: none;
-            font-size: 26px;
-            color: var(--text);
-            cursor: pointer;
-        }
-
-        .modal-content form {
-            display: flex;
-            flex-direction: column;
-            align-items: stretch;
-            gap: 15px;
-            margin-top: 30px;
-        }
-
-        .modal-content input {
-            width: 100%;
-            padding: 14px 16px;
-            font-size: 15px;
-            border: none;
-            border-radius: 6px;
-            background: var(--secondary);
-            color: var(--text);
-        }
-
-        .modal-content button[type="submit"] {
-            align-self: stretch;
-            margin-top: 10px;
-            padding: 14px;
-            background-color: var(--accent);
-            color: white;
-            border: none;
-            border-radius: 6px;
-            font-size: 16px;
-            font-weight: 600;
-            cursor: pointer;
-            transition: all 0.3s ease;
-        }
-
-        .modal-content button[type="submit"]:hover {
-            background-color: #ff4a2a;
-            transform: translateY(-2px);
-        }
-
-        body {
-            background-color: #0f0f19;
-            color: var(--text);
-        }
-
-        .container {
-            width: 100%;
-            max-width: 1200px;
-            margin: 0 auto;
-            padding: 0 15px;
-        }
-
-        /* Header */
-        .header {
-            background-color: var(--primary);
-            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
-            position: sticky;
-            top: 0;
-            z-index: 100;
-        }
-
-        .header-top {
-            display: flex;
-            align-items: center;
-            padding: 15px 0;
-        }
-
-        .logo {
-            display: flex;
-            align-items: center;
-            margin-right: 30px;
-        }
-
-        .logo img {
-            height: 40px;
-            margin-right: 10px;
-        }
-
-        .logo span {
-            font-size: 24px;
-            font-weight: 700;
-            color: var(--text);
-        }
-
-        .header-search {
-            flex-grow: 1;
-            position: relative;
-        }
-
-        .header-search input {
-            width: 100%;
-            padding: 12px 20px;
-            background-color: var(--secondary);
-            border: none;
-            border-radius: 6px;
-            color: var(--text);
-            font-size: 14px;
-        }
-
-        .header-actions {
-            display: flex;
-            margin-left: 30px;
-        }
-
-        .header-actions a {
-            color: var(--text);
-            margin-left: 20px;
-            font-size: 18px;
-            position: relative;
-        }
-
-        .header-actions a span {
-            position: absolute;
-            top: -8px;
-            right: -8px;
-            background-color: var(--accent);
-            color: white;
-            border-radius: 50%;
-            width: 18px;
-            height: 18px;
-            font-size: 10px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-        }
-
-        /* Navigation */
-        .nav {
-            background-color: var(--primary);
-        }
-
-        .nav-list {
-            display: flex;
-            list-style: none;
-        }
-
-        .nav-list li {
-            position: relative;
-        }
-
-        .nav-list li:hover .submenu {
-            display: block;
-        }
-
-        .nav-list li a {
-            display: block;
-            color: var(--text);
-            text-decoration: none;
-            padding: 18px 20px;
-            font-size: 15px;
-            font-weight: 500;
-            transition: all 0.3s;
-        }
-
-        .nav-list li a:hover {
-            color: var(--accent);
-        }
-
-        .submenu {
-            display: none;
-            position: absolute;
-            top: 100%;
-            left: 0;
-            background-color: var(--secondary);
-            min-width: 200px;
-            border-radius: 0 0 6px 6px;
-            z-index: 10;
-        }
-
-        .submenu li a {
-            padding: 12px 20px;
-            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
-        }
-
-        /* Hero */
-        .hero {
-            background: linear-gradient(rgba(0, 0, 0, 0.6), rgba(0, 0, 0, 0.6)), url('https://hyperpc.ru/images/lp/gaming-pc/og-image.jpg') center/cover no-repeat;
-            height: 500px;
-            display: flex;
-            align-items: center;
-        }
-
-        .hero-content {
-            max-width: 600px;
-        }
-
-        .hero-title {
-            font-size: 48px;
-            font-weight: 700;
-            margin-bottom: 20px;
-            line-height: 1.2;
-        }
-
-        .hero-text {
-            font-size: 18px;
-            color: var(--text-secondary);
-            margin-bottom: 30px;
-            line-height: 1.6;
-        }
-
-        .btn {
-            display: inline-block;
-            padding: 14px 30px;
-            background-color: var(--accent);
-            color: white;
-            border-radius: 6px;
-            text-decoration: none;
-            font-weight: 600;
-            font-size: 16px;
-            transition: all 0.3s;
-        }
-
-        .btn:hover {
-            background-color: #ff4a2a;
-            transform: translateY(-2px);
-        }
-
-        /* Products */
-        .section {
-            padding: 80px 0;
-        }
-
-        .section-title {
-            font-size: 32px;
-            font-weight: 700;
-            margin-bottom: 40px;
-            text-align: center;
-        }
-
-        .products-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
-            gap: 30px;
-        }
-
-        .product-card {
-            background-color: var(--primary);
-            border-radius: 8px;
-            overflow: hidden;
-            transition: all 0.3s;
-        }
-
-        .product-card:hover {
-            transform: translateY(-10px);
-            box-shadow: 0 10px 30px rgba(255, 94, 58, 0.2);
-        }
-
-        .product-image {
-            height: 200px;
-            overflow: hidden;
-        }
-
-        .product-image img {
-            width: 100%;
-            height: 100%;
-            object-fit: cover;
-            transition: transform 0.5s;
-        }
-
-        .product-card:hover .product-image img {
-            transform: scale(1.05);
-        }
-
-        .product-info {
-            padding: 20px;
-        }
-
-        .product-title {
-            font-size: 18px;
-            font-weight: 600;
-            margin-bottom: 10px;
-        }
-
-        .product-specs {
-            color: var(--text-secondary);
-            font-size: 14px;
-            margin-bottom: 15px;
-            line-height: 1.5;
-        }
-
-        .product-price {
-            font-size: 22px;
-            font-weight: 700;
-            color: var(--accent);
-            margin-bottom: 15px;
-        }
-
-        /* Configurator */
-        .configurator {
-            background: linear-gradient(rgba(30, 30, 45, 0.9), rgba(30, 30, 45, 0.9)), url('https://hyperpc.ru/images/lp/configurator/og-image.jpg') center/cover no-repeat;
-            padding: 100px 0;
-            text-align: center;
-        }
-
-        .configurator-title {
-            font-size: 36px;
-            font-weight: 700;
-            margin-bottom: 20px;
-        }
-
-        .configurator-text {
-            font-size: 18px;
-            color: var(--text-secondary);
-            max-width: 700px;
-            margin: 0 auto 30px;
-            line-height: 1.6;
-        }
-
-        /* Footer */
-        .footer {
-            background-color: var(--primary);
-            padding: 60px 0 30px;
-        }
-
-        .footer-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-            gap: 40px;
-            margin-bottom: 40px;
-        }
-
-        .footer-column h3 {
-            font-size: 18px;
-            font-weight: 600;
-            margin-bottom: 20px;
-            position: relative;
-            padding-bottom: 10px;
-        }
-
-        .footer-column h3::after {
-            content: '';
-            position: absolute;
-            left: 0;
-            bottom: 0;
-            width: 40px;
-            height: 2px;
-            background-color: var(--accent);
-        }
-
-        .footer-links {
-            list-style: none;
-        }
-
-        .footer-links li {
-            margin-bottom: 12px;
-        }
-
-        .footer-links a {
-            color: var(--text-secondary);
-            text-decoration: none;
-            font-size: 14px;
-            transition: all 0.3s;
-        }
-
-        .footer-links a:hover {
-            color: var(--accent);
-            padding-left: 5px;
-        }
-
-        .footer-bottom {
-            text-align: center;
-            padding-top: 30px;
-            border-top: 1px solid rgba(255, 255, 255, 0.1);
-            color: var(--text-secondary);
-            font-size: 14px;
-        }
-
-        /* Responsive */
-        @media (max-width: 992px) {
-            .header-top {
-                flex-wrap: wrap;
-            }
-
-            .logo {
-                margin-bottom: 15px;
-            }
-
-            .header-search {
-                order: 3;
-                width: 100%;
-                margin-top: 15px;
-            }
-
-            .hero-title {
-                font-size: 36px;
-            }
-        }
-
-        @media (max-width: 768px) {
-            .nav-list {
-                flex-wrap: wrap;
-                justify-content: center;
-            }
-
-            .nav-list li {
-                width: 50%;
-                text-align: center;
-            }
-
-            .hero {
-                height: 400px;
-            }
-
-            .hero-title {
-                font-size: 32px;
-            }
-
-            .section {
-                padding: 60px 0;
-            }
-        }
-    </style>
-</head>
-
-<body>
-    <header class="header">
-        <div class="container">
-            <div class="header-top">
-                <a href="#" class="logo">
-                    <img src="https://www.meme-arsenal.com/memes/a706819c0690421e2fb711ea578742cb.jpg"
-                        alt="Snitch PC Logo" width="60">
-                </a>
-
-                <div class="header-search">
-                    <input type="text" placeholder="Поиск игровых ПК, ноутбуков и комплектующих...">
+{% extends "base.html" %}
+
+{% block title %}Snitch PC - Магазин игровых компьютеров{% endblock %}
+
+{% block content %}
+<nav class="nav">
+    <div class="container">
+        <ul class="nav-list">
+            <li><a href="#">Главная</a></li>
+            <li>
+                <a href="#">Игровые ПК <i class="fas fa-chevron-down"></i></a>
+                <ul class="submenu">
+                    <li><a href="#">Игровые ПК</a></li>
+                    <li><a href="#">Компактные ПК</a></li>
+                    <li><a href="#">Профессиональные ПК</a></li>
+                </ul>
+            </li>
+            <li>
+                <a href="#">Игровые ноутбуки <i class="fas fa-chevron-down"></i></a>
+                <ul class="submenu">
+                    <li><a href="#">ASUS</a></li>
+                    <li><a href="#">MSI</a></li>
+                    <li><a href="#">Maibenden</a></li>
+                </ul>
+            </li>
+            <li><a href="#">Периферия</a></li>
+            <li><a href="#">Комплектующие</a></li>
+            <li><a href="#">Конфигуратор</a></li>
+            <li><a href="#">Акции</a></li>
+            <li><a href="#">Доставка и оплата</a></li>
+            <li><a href="#">Контакты</a></li>
+        </ul>
+    </div>
+</nav>
+
+<!-- HERO Section -->
+<section class="hero">
+    <div class="container">
+        <div class="hero-content">
+            <h1 class="hero-title">Мощные игровые компьютеры от Snitch PC</h1>
+            <p class="hero-text">Соберите свою идеальную конфигурацию или выберите готовую сборку от наших
+                специалистов. Гарантия качества и бесплатная доставка.</p>
+            <a href="{% url 'config' %}" class="btn">Перейти в конфигуратор</a>
+        </div>
+    </div>
+</section>
+
+<section class="section">
+    <div class="container">
+        <h2 class="section-title">Популярные сборки</h2>
+        <div class="products-grid">
+            <div class="product-card">
+                <div class="product-image">
+                    <img src="https://hyperpc.ru/images/product/dynamic/evo-rgb/hyperpc-dynamic-evo-rgb-black.jpg"
+                        alt="Игровой ПК">
                 </div>
+                <div class="product-info">
+                    <h3 class="product-title">Snitch Dynamic Pro</h3>
+                    <p class="product-specs">Intel Core i9-13900K • RTX 4090 • 32GB DDR5 • 2TB SSD</p>
+                    <div class="product-price">279 990 ₽</div>
+                    <a href="#" class="btn">В корзину</a>
+                </div>
+            </div>
 
-                <div class="header-actions">
-                    <button id="user-icon" class="btn-user"><i class="far fa-user"></i></button>
-                    <a href="#"><i class="far fa-heart"></i><span>3</span></a>
-                    <a href="#"><i class="fas fa-shopping-cart"></i><span>2</span></a>
+            <div class="product-card">
+                <div class="product-image">
+                    <img src="https://filearchive.cnews.ru/img/news/2020/08/05/h601.jpg" alt="Игровой ПК">
+                </div>
+                <div class="product-info">
+                    <h3 class="product-title">Snitch AMD Extreme</h3>
+                    <p class="product-specs">AMD Ryzen 9 7950X • RX 7900 XTX • 32GB DDR5 • 2TB SSD</p>
+                    <div class="product-price">229 990 ₽</div>
+                    <a href="#" class="btn">В корзину</a>
+                </div>
+            </div>
+
+            <div class="product-card">
+                <div class="product-image">
+                    <img src="https://www.goha.ru/s/A:BE/Xm/WxlSF3UmQd.png" alt="Игровой ПК">
+                </div>
+                <div class="product-info">
+                    <h3 class="product-title">Snitch Dynamic</h3>
+                    <p class="product-specs">Intel Core i7-13700K • RTX 4080 • 32GB DDR4 • 1TB SSD</p>
+                    <div class="product-price">179 990 ₽</div>
+                    <a href="#" class="btn">В корзину</a>
+                </div>
+            </div>
+
+            <div class="product-card">
+                <div class="product-image">
+                    <img src="https://ae01.alicdn.com/kf/S025502d226284852ab02a8730a948f5aH.jpg" alt="Игровой ПК">
+                </div>
+                <div class="product-info">
+                    <h3 class="product-title">Snitch Compact</h3>
+                    <p class="product-specs">AMD Ryzen 7 7700X • RTX 4070 • 16GB DDR4 • 1TB SSD</p>
+                    <div class="product-price">129 990 ₽</div>
+                    <a href="#" class="btn">В корзину</a>
                 </div>
             </div>
         </div>
+    </div>
+</section>
 
-        <nav class="nav">
-            <div class="container">
-                <ul class="nav-list">
-                    <li><a href="#">Главная</a></li>
-                    <li>
-                        <a href="#">Игровые ПК <i class="fas fa-chevron-down"></i></a>
-                        <ul class="submenu">
-                            <li><a href="#">Игровые ПК</a></li>
-                            <li><a href="#">Компактные ПК</a></li>
-                            <li><a href="#">Профессиональные ПК</a></li>
+<section class="section">
+    <div class="container">
+        <h2 class="section-title">Лучшие ноутбуки: выбор Snitch PC</h2>
+        <div class="products-grid">
+            <div class="product-card">
+                <div class="product-image">
+                    <img src="https://delta-game.ru/wp-content/uploads/2022/08/asus-tuf-gaming-a15-fa507rm-fa507rr-7.webp"
+                        alt="Игровой ноутбук">
+                </div>
+                <div class="product-info">
+                    <h3 class="product-title">Ноутбук ASUS TUF Gaming A15 FA507NV-LP103</h3>
+                    <p class="product-specs">Intel Core i9-13900FX • RTX 4090 • 32GB DDR5 • 2TB SSD</p>
+                    <div class="product-price">121 300 ₽</div>
+                    <a href="#" class="btn">В корзину</a>
+                </div>
+            </div>
 
-                        </ul>
-                    </li>
-                    <li>
-                        <a href="#">Игровые ноутбуки <i class="fas fa-chevron-down"></i></a>
-                        <ul class="submenu">
-                            <li><a href="#">ASUS</a></li>
-                            <li><a href="#">MSI</a></li>
-                            <li><a href="#">Maibenden</a></li>
-                        </ul>
-                    </li>
-                    <li><a href="#">Периферия</a></li>
-                    <li><a href="#">Комплектующие</a></li>
-                    <li><a href="#">Конфигуратор</a></li>
-                    <li><a href="#">Акции</a></li>
-                    <li><a href="#">Доставка и оплата</a></li>
-                    <li><a href="#">Контакты</a></li>
+            <div class="product-card">
+                <div class="product-image">
+                    <img src="https://delta-game.ru/wp-content/uploads/2023/12/maibenben-x527.webp"
+                        alt="Игровой ноутбук">
+                </div>
+                <div class="product-info">
+                    <h3 class="product-title">Ноутбук Maibenben X527 (X527FSFNLGRE0)</h3>
+                    <p class="product-specs">AMD Ryzen 9 7945KX • RTX 4080 • 32GB DDR5 • 1TB SSD</p>
+                    <div class="product-price">113 990 ₽</div>
+                    <a href="#" class="btn">В корзину</a>
+                </div>
+            </div>
+
+            <div class="product-card">
+                <div class="product-image">
+                    <img src="https://delta-game.ru/wp-content/uploads/2024/02/msi-thin-15-b12u-4.webp"
+                        alt="Игровой ноутбук">
+                </div>
+                <div class="product-info">
+                    <h3 class="product-title">Ноутбук MSI Thin 15 B12UC-1628XRU</h3>
+                    <p class="product-specs">Intel Core i7-13700H • RTX 3050 • 16GB DDR4 • 1TB SSD</p>
+                    <div class="product-price">99 990 ₽</div>
+                    <a href="#" class="btn">В корзину</a>
+                </div>
+            </div>
+
+            <div class="product-card">
+                <div class="product-image">
+                    <img src="https://delta-game.ru/wp-content/uploads/2023/08/asus-tuf-gaming-f15-fx507zv4-lp047-2.webp"
+                        alt="Игровой ноутбук">
+                </div>
+                <div class="product-info">
+                    <h3 class="product-title">Ноутбук ASUS TUF Gaming F15 FX507ZC4-HN143</h3>
+                    <p class="product-specs">Intel Core i5-12500H • RTX 3050 • 16GB DDR4 • 512GB SSD</p>
+                    <div class="product-price">89 990 ₽</div>
+                    <a href="#" class="btn">В корзину</a>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<section class="configurator">
+    <div class="container">
+        <h2 class="configurator-title">Соберите ПК своей мечты</h2>
+        <p class="configurator-text">Наш конфигуратор позволяет выбрать комплектующие под ваш бюджет и задачи.
+            Получите профессиональную консультацию и гарантию на сборку.</p>
+        <a href="{% url 'config' %}" class="btn">Перейти в конфигуратор</a>
+    </div>
+</section>
+
+<footer class="footer">
+    <div class="container">
+        <div class="footer-grid">
+            <div class="footer-column">
+                <h3>Snitch PC</h3>
+                <ul class="footer-links">
+                    <li><a href="#">О компании</a></li>
+                    <li><a href="#">Наши преимущества</a></li>
+                    <li><a href="#">Отзывы</a></li>
+                    <li><a href="#">Вакансии</a></li>
                 </ul>
             </div>
-        </nav>
-    </header>
 
-    {% include 'users/modals.html' %}
-    <section class="hero">
-        <div class="container">
-            <div class="hero-content">
-                <h1 class="hero-title">Мощные игровые компьютеры от Snitch PC</h1>
-                <p class="hero-text">Соберите свою идеальную конфигурацию или выберите готовую сборку от наших
-                    специалистов. Гарантия качества и бесплатная доставка.</p>
-                <a href="#" class="btn">Перейти в конфигуратор</a>
-            </div>
-        </div>
-    </section>
-
-    <section class="section">
-        <div class="container">
-            <h2 class="section-title">Популярные сборки</h2>
-            <div class="products-grid">
-                <div class="product-card">
-                    <div class="product-image">
-                        <img src="https://hyperpc.ru/images/product/dynamic/evo-rgb/hyperpc-dynamic-evo-rgb-black.jpg"
-                            alt="Игровой ПК">
-                    </div>
-                    <div class="product-info">
-                        <h3 class="product-title">Snitch Dynamic Pro</h3>
-                        <p class="product-specs">Intel Core i9-13900K • RTX 4090 • 32GB DDR5 • 2TB SSD</p>
-                        <div class="product-price">279 990 ₽</div>
-                        <a href="#" class="btn">В корзину</a>
-                    </div>
-                </div>
-
-                <div class="product-card">
-                    <div class="product-image">
-                        <img src="https://filearchive.cnews.ru/img/news/2020/08/05/h601.jpg" alt="Игровой ПК">
-                    </div>
-                    <div class="product-info">
-                        <h3 class="product-title">Snitch AMD Extreme</h3>
-                        <p class="product-specs">AMD Ryzen 9 7950X • RX 7900 XTX • 32GB DDR5 • 2TB SSD</p>
-                        <div class="product-price">229 990 ₽</div>
-                        <a href="#" class="btn">В корзину</a>
-                    </div>
-                </div>
-
-                <div class="product-card">
-                    <div class="product-image">
-                        <img src="https://www.goha.ru/s/A:BE/Xm/WxlSF3UmQd.png" alt="Игровой ПК">
-                    </div>
-                    <div class="product-info">
-                        <h3 class="product-title">Snitch Dynamic</h3>
-                        <p class="product-specs">Intel Core i7-13700K • RTX 4080 • 32GB DDR4 • 1TB SSD</p>
-                        <div class="product-price">179 990 ₽</div>
-                        <a href="#" class="btn">В корзину</a>
-                    </div>
-                </div>
-
-                <div class="product-card">
-                    <div class="product-image">
-                        <img src="https://ae01.alicdn.com/kf/S025502d226284852ab02a8730a948f5aH.jpg" alt="Игровой ПК">
-                    </div>
-                    <div class="product-info">
-                        <h3 class="product-title">Snitch Compact</h3>
-                        <p class="product-specs">AMD Ryzen 7 7700X • RTX 4070 • 16GB DDR4 • 1TB SSD</p>
-                        <div class="product-price">129 990 ₽</div>
-                        <a href="#" class="btn">В корзину</a>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </section>
-
-    <section class="section">
-        <div class="container">
-            <h2 class="section-title">Лучшие ноутбуки: выбор Snitch PC</h2>
-            <div class="products-grid">
-                <div class="product-card">
-                    <div class="product-image">
-                        <img src="https://delta-game.ru/wp-content/uploads/2022/08/asus-tuf-gaming-a15-fa507rm-fa507rr-7.webp"
-                            alt="Игровой ноутбук">
-                    </div>
-                    <div class="product-info">
-                        <h3 class="product-title">Ноутбук ASUS TUF Gaming A15 FA507NV-LP103</h3>
-                        <p class="product-specs">Intel Core i9-13900FX • RTX 4090 • 32GB DDR5 • 2TB SSD</p>
-                        <div class="product-price">121 300 ₽</div>
-                        <a href="#" class="btn">В корзину</a>
-                    </div>
-                </div>
-
-                <div class="product-card">
-                    <div class="product-image">
-                        <img src="https://delta-game.ru/wp-content/uploads/2023/12/maibenben-x527.webp"
-                            alt="Игровой ноутбук">
-                    </div>
-                    <div class="product-info">
-                        <h3 class="product-title">Ноутбук Maibenben X527 (X527FSFNLGRE0)</h3>
-                        <p class="product-specs">AMD Ryzen 9 7945KX • RTX 4080 • 32GB DDR5 • 1TB SSD</p>
-                        <div class="product-price">113 990 ₽</div>
-                        <a href="#" class="btn">В корзину</a>
-                    </div>
-                </div>
-
-                <div class="product-card">
-                    <div class="product-image">
-                        <img src="https://delta-game.ru/wp-content/uploads/2024/02/msi-thin-15-b12u-4.webp"
-                            alt="Игровой ноутбук">
-                    </div>
-                    <div class="product-info">
-                        <h3 class="product-title">Ноутбук MSI Thin 15 B12UC-1628XRU</h3>
-                        <p class="product-specs">Intel Core i7-13700H • RTX 3050 • 16GB DDR4 • 1TB SSD</p>
-                        <div class="product-price">99 990 ₽</div>
-                        <a href="#" class="btn">В корзину</a>
-                    </div>
-                </div>
-
-                <div class="product-card">
-                    <div class="product-image">
-                        <img src="https://delta-game.ru/wp-content/uploads/2023/08/asus-tuf-gaming-f15-fx507zv4-lp047-2.webp"
-                            alt="Игровой ноутбук">
-                    </div>
-                    <div class="product-info">
-                        <h3 class="product-title">Ноутбук ASUS TUF Gaming F15 FX507ZC4-HN143</h3>
-                        <p class="product-specs">Intel Core i5-12500H • RTX 3050 • 16GB DDR4 • 512GB SSD</p>
-                        <div class="product-price">89 990 ₽</div>
-                        <a href="#" class="btn">В корзину</a>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </section>
-
-    <section class="configurator">
-        <div class="container">
-            <h2 class="configurator-title">Соберите ПК своей мечты</h2>
-            <p class="configurator-text">Наш конфигуратор позволяет выбрать комплектующие под ваш бюджет и задачи.
-                Получите профессиональную консультацию и гарантию на сборку.</p>
-            <a href="#" class="btn">Перейти в конфигуратор</a>
-        </div>
-    </section>
-
-    <footer class="footer">
-        <div class="container">
-            <div class="footer-grid">
-                <div class="footer-column">
-                    <h3>Snitch PC</h3>
-                    <ul class="footer-links">
-                        <li><a href="#">О компании</a></li>
-                        <li><a href="#">Наши преимущества</a></li>
-                        <li><a href="#">Отзывы</a></li>
-                        <li><a href="#">Вакансии</a></li>
-                    </ul>
-                </div>
-
-                <div class="footer-column">
-                    <h3>Каталог</h3>
-                    <ul class="footer-links">
-                        <li><a href="#">Игровые ПК</a></li>
-                        <li><a href="#">Игровые ноутбуки</a></li>
-                        <li><a href="#">Периферия</a></li>
-                        <li><a href="#">Комплектующие</a></li>
-                    </ul>
-                </div>
-
-                <div class="footer-column">
-                    <h3>Помощь</h3>
-                    <ul class="footer-links">
-                        <li><a href="#">Доставка и оплата</a></li>
-                        <li><a href="#">Гарантия</a></li>
-                        <li><a href="#">Возврат и обмен</a></li>
-                        <li><a href="#">FAQ</a></li>
-                    </ul>
-                </div>
-
-                <div class="footer-column">
-                    <h3>Контакты</h3>
-                    <ul class="footer-links">
-                        <li><a href="tel:+74951234567">+7 (950) 124-04-58</a></li>
-                        <li><a href="mailto:info@snitchpc.ru">info@snitchpc.ru</a></li>
-                        <li>Чебоксары, ул. Гиндина, 12</li>
-                        <li>Пн-Пт: 10:00-20:00</li>
-                    </ul>
-                </div>
+            <div class="footer-column">
+                <h3>Каталог</h3>
+                <ul class="footer-links">
+                    <li><a href="#">Игровые ПК</a></li>
+                    <li><a href="#">Игровые ноутбуки</a></li>
+                    <li><a href="#">Периферия</a></li>
+                    <li><a href="#">Комплектующие</a></li>
+                </ul>
             </div>
 
-            <div class="footer-bottom">
-                <p>© 2025 Snitch PC. Все права защищены.</p>
+            <div class="footer-column">
+                <h3>Помощь</h3>
+                <ul class="footer-links">
+                    <li><a href="#">Доставка и оплата</a></li>
+                    <li><a href="#">Гарантия</a></li>
+                    <li><a href="#">Возврат и обмен</a></li>
+                    <li><a href="#">FAQ</a></li>
+                </ul>
+            </div>
+
+            <div class="footer-column">
+                <h3>Контакты</h3>
+                <ul class="footer-links">
+                    <li><a href="tel:+74951234567">+7 (950) 124-04-58</a></li>
+                    <li><a href="mailto:info@snitchpc.ru">info@snitchpc.ru</a></li>
+                    <li>Чебоксары, ул. Гиндина, 12</li>
+                    <li>Пн-Пт: 10:00-20:00</li>
+                </ul>
             </div>
         </div>
-    </footer>
 
-    <script>
-        document.addEventListener('DOMContentLoaded', function () {
-
-            // Модалки
-            const modals = document.querySelectorAll('.modal');
-            const closeButtons = document.querySelectorAll('.modal-close');
-            const loginBtn = document.getElementById('login-btn');
-            const registerBtn = document.getElementById('register-btn');
-            const loginModal = document.getElementById('login-modal');
-            const registerModal = document.getElementById('register-modal');
-
-            // Меню пользователя (иконка и окно под ней)
-            const userIcon = document.getElementById('user-icon');
-            const userMenu = document.getElementById('user-menu');
-
-            // Показываем или скрываем меню пользователя при клике на иконку
-            userIcon?.addEventListener('click', function (e) {
-                const rect = userIcon.getBoundingClientRect();
-                userMenu.style.left = rect.left + "px";
-                userMenu.style.top = (rect.bottom + 5) + "px";
-                userMenu.classList.toggle('hidden');
-                modals.forEach(modal => modal.classList.add('hidden')); // если модалки были открыты — закрываем
-                e.stopPropagation();
-            });
-
-            // Закрываем user-menu при клике вне иконки и меню
-            document.addEventListener('click', function (e) {
-                if (!userMenu.contains(e.target) && e.target !== userIcon) {
-                    userMenu.classList.add('hidden');
-                }
-            });
-
-            // Показываем модалку входа
-            loginBtn?.addEventListener('click', function () {
-                modals.forEach(modal => modal.classList.add('hidden'));
-                loginModal.classList.remove('hidden');
-                userMenu.classList.add('hidden');
-            });
-
-            // Показываем модалку регистрации
-            registerBtn?.addEventListener('click', function () {
-                modals.forEach(modal => modal.classList.add('hidden'));
-                registerModal.classList.remove('hidden');
-                userMenu.classList.add('hidden');
-            });
-
-            // Закрытие модалки только по крестику
-            closeButtons.forEach(button => {
-                button.addEventListener('click', function () {
-                    modals.forEach(modal => modal.classList.add('hidden'));
-                });
-            });
-
-            // Проверка паролей при регистрации перед отправкой
-            const registerForm = document.getElementById('register-form');
-
-            if (registerForm) {
-                registerForm.addEventListener('submit', function (e) {
-                    let valid = true;
-                    const password = registerForm.querySelector('input[name="password1"]');
-                    const confirm = registerForm.querySelector('input[name="password2"]');
-                    let errorContainer = registerForm.querySelector('.form-error');
-
-                    if (!errorContainer) {
-                        errorContainer = document.createElement('div');
-                        errorContainer.classList.add('form-error');
-                        registerForm.prepend(errorContainer);
-                    }
-
-                    errorContainer.innerText = '';  // сбрасываем текст ошибок
-                    [password, confirm].forEach(input => input.style.border = '');
-
-                    if (password.value.length < 8) {
-                        errorContainer.innerText = "Пароль должен быть не короче 8 символов.";
-                        valid = false;
-                        password.style.border = "1px solid red";
-                    } else if (password.value !== confirm.value) {
-                        errorContainer.innerText = "Пароли не совпадают.";
-                        valid = false;
-                        password.style.border = "1px solid red";
-                        confirm.style.border = "1px solid red";
-                    }
-
-                    if (!valid) {
-                        e.preventDefault();  // отменяем отправку формы, если ошибка
-                    }
-                });
-            }
-
-            // Если сервер передал login_error — открыть окно входа автоматически
-            if (typeof login_error !== 'undefined' && login_error) {
-                loginModal?.classList.remove('hidden');
-            }
-
-        });
-    </script>
-
-
-</body>
-
-</html>
+        <div class="footer-bottom">
+            <p>© 2025 Snitch PC. Все права защищены.</p>
+        </div>
+    </div>
+</footer>
+{% endblock %}

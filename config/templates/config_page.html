@@ -1,0 +1,719 @@
+{% extends "base.html" %}
+{% load config_tags %}
+
+{% block content %}
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Snitch PC - Конфигуратор ПК</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="/static/css/configurator.css">
+    <style>
+        :root {
+            --primary: #1e1e2d;
+            --secondary: #2d2d42;
+            --accent: #ff5e3a;
+            --text: #ffffff;
+            --text-secondary: #b5b5c3;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Roboto', sans-serif;
+        }
+
+        body {
+            background-color: #0f0f19;
+            color: var(--text);
+        }
+
+        .container {
+            width: 100%;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 15px;
+        }
+
+        /* Header (полностью идентично главной странице) */
+        .header {
+            background-color: var(--primary);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        .header-top {
+            display: flex;
+            align-items: center;
+            padding: 15px 0;
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            margin-right: 30px;
+        }
+
+        .logo img {
+            height: 40px;
+            margin-right: 10px;
+        }
+
+        .logo span {
+            font-size: 24px;
+            font-weight: 700;
+            color: var(--text);
+        }
+
+        .header-search {
+            flex-grow: 1;
+            position: relative;
+        }
+
+        .header-search input {
+            width: 100%;
+            padding: 12px 20px;
+            background-color: var(--secondary);
+            border: none;
+            border-radius: 6px;
+            color: var(--text);
+            font-size: 14px;
+        }
+
+        .header-actions {
+            display: flex;
+            margin-left: 30px;
+        }
+
+        .header-actions a {
+            color: var(--text);
+            margin-left: 20px;
+            font-size: 18px;
+            position: relative;
+        }
+
+        .header-actions a span {
+            position: absolute;
+            top: -8px;
+            right: -8px;
+            background-color: var(--accent);
+            color: white;
+            border-radius: 50%;
+            width: 18px;
+            height: 18px;
+            font-size: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        /* Navigation (полностью идентично главной странице) */
+        .nav {
+            background-color: var(--primary);
+        }
+
+        .nav-list {
+            display: flex;
+            list-style: none;
+        }
+
+        .nav-list li {
+            position: relative;
+        }
+
+        .nav-list li:hover .submenu {
+            display: block;
+        }
+
+        .nav-list li a {
+            display: block;
+            color: var(--text);
+            text-decoration: none;
+            padding: 18px 20px;
+            font-size: 15px;
+            font-weight: 500;
+            transition: all 0.3s;
+        }
+
+        .nav-list li a:hover {
+            color: var(--accent);
+        }
+
+        .submenu {
+            display: none;
+            position: absolute;
+            top: 100%;
+            left: 0;
+            background-color: var(--secondary);
+            min-width: 200px;
+            border-radius: 0 0 6px 6px;
+            z-index: 10;
+        }
+
+        .submenu li a {
+            padding: 12px 20px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+        }
+
+        /* Конфигуратор (полная версия) */
+        .configurator-page {
+            padding: 30px 0 50px;
+        }
+
+        .configurator-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+
+        .configurator-title {
+            font-size: 28px;
+            font-weight: 700;
+        }
+
+        .configurator-nav {
+            display: flex;
+            gap: 15px;
+        }
+
+        .configurator-nav a {
+            color: var(--text-secondary);
+            text-decoration: none;
+            font-size: 14px;
+        }
+
+        .configurator-nav a.active {
+            color: var(--accent);
+            font-weight: 500;
+        }
+
+        .configurator-wrapper {
+            display: flex;
+            gap: 30px;
+        }
+
+        .components-sidebar {
+            width: 300px;
+            flex-shrink: 0;
+            max-height: calc(100vh - 200px);
+            overflow-y: auto;
+            position: sticky;
+            top: 20px;
+            scrollbar-width: none; /* Firefox */
+            -ms-overflow-style: none; /* IE and Edge */
+        }
+
+        .components-sidebar::-webkit-scrollbar {
+            display: none; /* Chrome, Safari, Opera */
+        }
+
+        .component-category {
+            background: var(--primary);
+            border-radius: 8px;
+            margin-bottom: 20px;
+            overflow: hidden;
+        }
+
+        .category-header {
+            background: var(--secondary);
+            padding: 15px 20px;
+            font-weight: 600;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            cursor: pointer;
+            user-select: none;
+            position: sticky; /* Фиксируем заголовок категории */
+            top: 0;
+            z-index: 1;
+        }
+
+        .category-header i {
+            transition: transform 0.3s ease;
+        }
+
+        .category-header i.rotated {
+            transform: rotate(180deg);
+        }
+
+        .category-content {
+            padding: 15px;
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height 0.3s ease-out;
+        }
+
+        .category-content.expanded {
+            max-height: 400px;
+            overflow-y: auto;
+            scrollbar-width: none; /* Firefox */
+            -ms-overflow-style: none; /* IE and Edge */
+            transition: max-height 0.5s ease-in;
+        }
+
+        .category-content.expanded::-webkit-scrollbar {
+            display: none; /* Chrome, Safari, Opera */
+        }
+
+        .component-option {
+            display: flex;
+            justify-content: space-between;
+            padding: 12px 0;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+            cursor: pointer;
+            align-items: center;
+        }
+
+        .component-option:last-child {
+            border-bottom: none;
+        }
+
+        .component-option.active {
+            color: var(--accent);
+        }
+
+        .component-option.disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+            pointer-events: none;
+        }
+
+        .component-option.locked {
+            position: relative;
+        }
+
+        .component-option.locked::after {
+            content: '🔒';
+            position: absolute;
+            right: 10px;
+            top: 50%;
+            transform: translateY(-50%);
+            font-size: 16px;
+        }
+
+        .component-image {
+            width: 40px;
+            height: 40px;
+            margin-right: 10px;
+            object-fit: contain;
+            background: transparent;
+            filter: brightness(1.1) contrast(1.1) saturate(1.1);
+            image-rendering: -webkit-optimize-contrast;
+            image-rendering: crisp-edges;
+        }
+
+        .component-info {
+            flex-grow: 1;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .component-name {
+            font-weight: 500;
+        }
+
+        .component-price {
+            font-weight: 600;
+        }
+
+        .configurator-main {
+            flex-grow: 1;
+        }
+
+        .pc-preview {
+            background: var(--primary);
+            border-radius: 8px;
+            padding: 30px;
+            margin-bottom: 30px;
+            text-align: center;
+        }
+
+        .pc-image {
+            max-width: 100%;
+            height: 300px;
+            object-fit: contain;
+            margin-bottom: 20px;
+        }
+
+        .pc-specs {
+            background: var(--primary);
+            border-radius: 8px;
+            padding: 25px;
+            margin-bottom: 30px;
+        }
+
+        .spec-item {
+            display: flex;
+            justify-content: space-between;
+            padding: 12px 0;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+        }
+
+        .spec-name {
+            color: var(--text-secondary);
+        }
+
+        .spec-value {
+            font-weight: 500;
+        }
+
+        .total-block {
+            background: var(--primary);
+            border-radius: 8px;
+            padding: 25px;
+            margin-bottom: 30px;
+        }
+
+        .total-row {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 15px;
+
+        }
+
+        .total-label {
+            font-size: 18px;
+        }
+
+        .total-price {
+            font-size: 24px;
+            font-weight: 700;
+            color: var(--accent);
+        }
+
+        .action-buttons {
+            display: flex;
+            gap: 15px;
+        }
+
+        .btn {
+            display: inline-block;
+            padding: 14px 30px;
+            background-color: var(--accent);
+            color: white;
+            border-radius: 6px;
+            text-decoration: none;
+            font-weight: 600;
+            font-size: 16px;
+            transition: all 0.3s;
+            border: none;
+            cursor: pointer;
+            text-align: center;
+        }
+
+        .btn-block {
+            display: block;
+            width: 100%;
+        }
+
+        .btn-outline {
+            background: transparent;
+            border: 1px solid var(--accent);
+            color: var(--accent);
+        }
+
+        .btn:hover {
+            background-color: #ff4a2a;
+            transform: translateY(-2px);
+        }
+
+        .btn-outline:hover {
+            background: rgba(255, 94, 58, 0.1);
+        }
+
+        /* Footer (полностью идентично главной странице) */
+        .footer {
+            background-color: var(--primary);
+            padding: 60px 0 30px;
+        }
+
+        .footer-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 40px;
+            margin-bottom: 40px;
+        }
+
+        .footer-column h3 {
+            font-size: 18px;
+            font-weight: 600;
+            margin-bottom: 20px;
+            position: relative;
+            padding-bottom: 10px;
+        }
+
+        .footer-column h3::after {
+            content: '';
+            position: absolute;
+            left: 0;
+            bottom: 0;
+            width: 40px;
+            height: 2px;
+            background-color: var(--accent);
+        }
+
+        .footer-links {
+            list-style: none;
+        }
+
+        .footer-links li {
+            margin-bottom: 12px;
+        }
+
+        .footer-links a {
+            color: var(--text-secondary);
+            text-decoration: none;
+            font-size: 14px;
+            transition: all 0.3s;
+        }
+
+        .footer-links a:hover {
+            color: var(--accent);
+            padding-left: 5px;
+        }
+
+        .footer-bottom {
+            text-align: center;
+            padding-top: 30px;
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+            color: var(--text-secondary);
+            font-size: 14px;
+        }
+
+        /* Responsive */
+        @media (max-width: 992px) {
+            .configurator-wrapper {
+                flex-direction: column;
+            }
+
+            .components-sidebar {
+                width: 100%;
+            }
+
+            .header-top {
+                flex-wrap: wrap;
+            }
+
+            .logo {
+                margin-bottom: 15px;
+            }
+
+            .header-search {
+                order: 3;
+                width: 100%;
+                margin-top: 15px;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .nav-list {
+                flex-wrap: wrap;
+                justify-content: center;
+            }
+
+            .nav-list li {
+                width: 50%;
+                text-align: center;
+            }
+
+            .action-buttons {
+                flex-direction: column;
+            }
+        }
+
+        .preview-content {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 20px;
+        }
+
+        .preview-image {
+            width: 100%;
+            max-width: 500px;
+            height: 500px;
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: var(--secondary);
+            border-radius: 8px;
+            padding: 20px;
+            overflow: hidden;
+            position: relative;
+        }
+
+        .preview-image img {
+            width: 100%;
+            height: 100%;
+            object-fit: contain;
+            background: transparent;
+            filter: brightness(1.1) contrast(1.1) saturate(1.1);
+            image-rendering: -webkit-optimize-contrast;
+            image-rendering: crisp-edges;
+            backface-visibility: hidden;
+            transform: translateZ(0);
+            -webkit-font-smoothing: subpixel-antialiased;
+        }
+
+        .preview-info {
+            width: 100%;
+            text-align: center;
+        }
+
+        .preview-specs {
+            margin: 15px 0;
+            color: var(--text-secondary);
+            font-size: 16px;
+            line-height: 1.5;
+        }
+
+        .preview-price {
+            font-size: 24px;
+            font-weight: 700;
+            color: var(--accent);
+            margin: 15px 0;
+        }
+
+        #component-preview {
+            background: var(--primary);
+            border-radius: 8px;
+            overflow: hidden;
+        }
+
+        #no-component-selected {
+            text-align: center;
+        }
+
+        #no-component-selected h3 {
+            margin-top: 20px;
+            color: var(--text-secondary);
+        }
+
+        @media (max-width: 768px) {
+            .preview-content {
+                padding: 15px;
+            }
+
+            .preview-image {
+                max-width: 200px;
+                height: 200px;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <div class="configurator-page">
+        <div class="container">
+            <div class="configurator-header">
+                <h1 class="configurator-title">Конфигуратор игрового ПеКа</h1>
+                <div class="configurator-nav">
+                    <a href="#" class="active">Компоненты</a>
+                    <a href="#">Совместимость</a>
+                    <a href="#">Сохранение</a>
+                </div>
+            </div>
+
+            <div class="configurator-wrapper">
+                <div class="components-sidebar">
+                    {% for type, name in component_types.items %}
+                    <div class="component-category">
+                        <div class="category-header">
+                            <span>{{ name }}</span>
+                            <i class="fas fa-chevron-down"></i>
+                        </div>
+                        <div class="category-content">
+                            {% get_component_list type as components %}
+                            {% for component in components %}
+                            <div class="component-option" 
+                                 data-component="{{ type }}" 
+                                 data-id="{{ component.id }}"
+                                 {% if type == 'gpu' or type == 'cpu' %}data-power="{{ component.relative_power }}"{% endif %}
+                                 {% if type == 'gpu' %}data-consumption="{{ component.consumption }}" data-size="{{ component.size }}"{% endif %}
+                                 {% if type == 'cpu' %}data-socket="{{ component.socket }}"{% endif %}
+                                 {% if type == 'motherboard' %}data-socket="{{ component.socket }}" data-ram-type="{{ component.ram_type }}" data-form-factor="{{ component.form_factor }}" data-sata-slots="{{ component.sata_slot }}"{% endif %}
+                                 {% if type == 'ram' %}data-type="{{ component.typee }}"{% endif %}
+                                 {% if type == 'cooling' %}data-socket="{{ component.socket }}"{% endif %}
+                                 {% if type == 'psu' %}data-power="{{ component.power }}"{% endif %}
+                                 {% if type == 'storage' %}data-type="{{ component.typee }}"{% endif %}
+                                 {% if type == 'case' %}data-form-factor="{{ component.supported_form_factor }}" data-size="{{ component.size }}"{% endif %}>
+                                <img src="{{ component.picture|default:default_image }}" 
+                                     alt="{{ component.model }}" 
+                                     class="component-image"
+                                     onerror="this.src='{{ default_image }}'">
+                                <div class="component-info">
+                                    <span class="component-name">{{ component.model }}</span>
+                                    <span class="component-price">{{ component.price }} ₽</span>
+                                </div>
+                            </div>
+                            {% endfor %}
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+
+                <div class="configurator-main">
+                    <div class="pc-preview">
+                        <div id="component-preview" style="display: none;">
+                            <div class="preview-content">
+                                <div class="preview-image">
+                                    <img id="preview-image" src="" alt="Компонент">
+                                </div>
+                                <div class="preview-info">
+                                    <h3 id="preview-name"></h3>
+                                    <div id="preview-specs" class="preview-specs"></div>
+                                    <div class="preview-price" id="preview-price"></div>
+                                    <button class="btn btn-block" id="add-to-config">Добавить в конфигурацию</button>
+                                </div>
+                            </div>
+                        </div>
+                        <div id="no-component-selected">
+                            <img src="https://hyperpc.ru/images/product/dynamic/evo-rgb/hyperpc-dynamic-evo-rgb-black.jpg"
+                                alt="Ваш ПК" class="pc-image">
+                            <h3>Выберите компонент для просмотра</h3>
+                        </div>
+                    </div>
+
+                    <div class="pc-specs">
+                        {% for type, name in component_types.items %}
+                        <div class="spec-item">
+                            <span class="spec-name">{{ name }}</span>
+                            <span class="spec-value" id="{{ type }}-spec">Не выбран</span>
+                        </div>
+                        {% endfor %}
+                    </div>
+
+                    <div class="total-block">
+                        <div class="total-row">
+                            <span class="total-label">Стоимость комплектующих:</span>
+                            <span class="total-price" id="components-price">0 ₽</span>
+                        </div>
+                        <div class="total-row">
+                            <span class="total-label">Сборка и тестирование:</span>
+                            <span class="total-price">{{ assembly_price }} ₽</span>
+                        </div>
+                        <div class="total-row">
+                            <span class="total-label">Итого:</span>
+                            <span class="total-price" id="total-price">{{ assembly_price }} ₽</span>
+                        </div>
+                    </div>
+
+                    <div class="action-buttons">
+                        <button class="btn btn-block">Добавить в корзину</button>
+                        <button class="btn btn-outline btn-block">Сохранить конфигурацию</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="/static/js/configurator.js"></script>
+</body>
+{% endblock %}
