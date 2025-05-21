@@ -25,7 +25,7 @@ def register_view(request):
             send_mail(
                 'Подтверждение регистрации',
                 f'Ваш код подтверждения: {user.verification_code}',
-                'noreply@snitchpc.linkpc.net',  # либо "Имя сервиса <noreply@yourdomain.com>"
+                'snitch_pc@mail.ru',  # либо "Имя сервиса <noreply@yourdomain.com>"
                 [user.email],
                 fail_silently=False,
             )

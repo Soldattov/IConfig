@@ -218,7 +218,7 @@ def parse_gpu_page2(driver, url):
         width = extract_number(tech_spec.get("Ширина видеокарты", "0"))
         thickness = extract_number(tech_spec.get("Толщина видеокарты", "0"))
         consumption = extract_number(tech_spec.get("Рекомендуемый блок питания", "0"))
-        size = f'{length}x{width}x{thickness}'
+        size = f'{length} x {width} x {thickness}'
 
         # Получаем URL изображения
         image_path = download_image(image_url, model, 'gpu')
@@ -732,7 +732,7 @@ def parse_cooling_page(driver, url):
 
         typee = tech_spec.get("Тип конструкции", "башенный")
         socket = tech_spec.get("Сокет", "")
-        tdp = tech_spec.get("Рассеиваемая мощность ", "60")
+        tdp = tech_spec.get("Рассеиваемая мощность", "70")
         length = tech_spec.get("Длина", "70")
         width = tech_spec.get("Ширина", "100")
         height = tech_spec.get("Высота", "140")
