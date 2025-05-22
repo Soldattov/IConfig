@@ -90,6 +90,7 @@ INSTALLED_APPS = [
     'corsheaders',
     'users',
     'django.core.mail',
+    'feedback',
 ]
 
 

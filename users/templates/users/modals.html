@@ -23,7 +23,8 @@
         <form id="register-form" method="post" action="{% url 'register' %}">
             {% csrf_token %}
             <input type="text" name="first_name" placeholder="Имя" required>
-            <input type="email" name="email" placeholder="Электронная почта" required>
+            <input type="email" id="register-email" name="email" placeholder="Электронная почта" required>
+            <div id="email-error" class="error-message" style="display: none; color: red;"></div>
             <input type="password" name="password1" id="password1" placeholder="Пароль" required>
             <div id="password1-error" class="error-message" style="display: none; color: red;"></div>
             <input type="password" name="password2" id="password2" placeholder="Повторите пароль" required>
@@ -32,6 +33,7 @@
         </form>
     </div>
 </div>
+
 
 <!-- Окно Входа -->
 <div id="login-modal" class="modal hidden">
@@ -65,7 +67,7 @@
         <div>
             <!-- Кнопка "Назад" для возврата к регистрации -->
             <button id="verify-back" type="button">Назад</button>
-            <!-- Крестик (иконка закрытия) -->
+            <!-- Крестик -->
             <span class="modal-close" id="verify-close">&times;</span>
         </div>
     </div>

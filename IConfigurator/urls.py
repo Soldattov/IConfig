@@ -10,6 +10,7 @@ urlpatterns = [
     path('config/', include('config.urls')),  # Маршруты для приложения config
     path('users/', include('users.urls')),
     path('api/component/<str:component_type>/<int:component_id>/', component_detail, name='component_detail'),
+    path('feedback/', include('feedback.urls')),
 ]
 
 if settings.DEBUG:

@@ -128,7 +128,7 @@
     <button id="change-password-btn" class="btn">Изменить пароль</button>
     <a href="{% url 'logout' %}" class="btn">Выйти</a>
     <button id="delete-account-btn" class="btn btn-danger">Удалить учетную запись</button>
-
+    <div id="loader" style="display: none;">Удаление учетной записи...</div>
 
     <div class="saved-configurations">
         <h3>Сохраненные конфигурации</h3>
@@ -151,30 +151,51 @@
 
 {% block scripts %}
 <!-- Скрипт для обработки удаления -->
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
 <script>
-    document.getElementById('delete-account-btn').addEventListener('click', function () {
-        // Открывается стандартное диалоговое окно подтверждения
-        if (confirm("Вы уверены, что хотите удалить учетную запись?")) {
-            // Если подтверждено, отправляем POST-запрос на сервер для удаления учетной записи
-            fetch("{% url 'delete_account' %}", {
-                method: "POST",
-                headers: {
-                    'Content-Type': 'application/json',
-                    'X-CSRFToken': getCookie('csrftoken')  // добавляем CSRF-токен в заголовок
-                },
-                body: JSON.stringify({})  // если нужны дополнительные параметры, можно передать их здесь
+    function deleteAccount() {
+        var deferred = $.Deferred();
+        $("#loader").show();
+
+        $.ajax({
+            url: "{% url 'delete_account' %}",
+            method: "POST",
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRFToken': getCookie('csrftoken')
+            },
+            data: JSON.stringify({}),
+            success: function (data) {
+
+            },
+            fail: function (e) { },
+
+        })
+            .done(function (response) {
+                deferred.resolve(response);
             })
-                .then(response => {
-                    if (response.ok) {
-                        // После успешного удаления, перенаправляем пользователя на главную страницу
-                        window.location.href = '/';
-                    } else {
-                        alert("Ошибка удаления учетной записи.");
-                    }
-                })
-                .catch(error => {
-                    alert("Ошибка: " + error);
-                });
+            .fail(function (error) {
+                deferred.reject(error);
+            })
+            .always(function () {
+                $("#loader").hide();
+            });
+
+        return deferred.promise();
+    }
+
+    // Обработчик клика для кнопки "Удалить учетную запись"
+    document.getElementById('delete-account-btn').addEventListener('click', function () {
+        if (confirm("Вы уверены, что хотите удалить учетную запись?")) {
+            deleteAccount().then(function () {
+                // Успешное удаление: перенаправляем на главную страницу
+                setTimeout(function () {
+                    window.location.href = '/';
+                }, 2000);
+            }, function () {
+                // Ошибка при удалении
+                alert("Ошибка удаления учетной записи.");
+            });
         }
     });
 
@@ -224,7 +245,7 @@
 <div id="modal-backdrop" class="modal-backdrop" style="display: none;"></div>
 
 <script>
-    // Функция получения CSRF-токена (если используется Django)
+    // Функция получения CSRF-токена 
     function getCookie(name) {
         let cookieValue = null;
         if (document.cookie && document.cookie !== "") {
@@ -254,14 +275,13 @@
     function showToast(message, duration) {
         const toast = document.createElement('div');
         toast.innerText = message;
-        // Стили для большой плашки
         toast.style.position = 'fixed';
         toast.style.top = '20px';
         toast.style.left = '50%';
         toast.style.transform = 'translateX(-50%)';
         toast.style.width = '80%';
         toast.style.textAlign = 'center';
-        toast.style.backgroundColor = 'rgba(0, 128, 0, 0.8)';  // можно изменить цвет по вкусу
+        toast.style.backgroundColor = 'rgba(0, 128, 0, 0.8)';
         toast.style.color = '#fff';
         toast.style.padding = '15px';
         toast.style.fontSize = '1.2em';
