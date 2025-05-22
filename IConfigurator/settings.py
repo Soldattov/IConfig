@@ -12,6 +12,7 @@ https://docs.djangoproject.com/en/5.2/ref/settings/
 
 from pathlib import Path
 import os
+import privateData
 
 from django.conf.urls.static import static
 
@@ -182,8 +183,7 @@ EMAIL_HOST = 'smtp.mail.ru'
 EMAIL_PORT = 587
 EMAIL_USE_TLS = True
 EMAIL_HOST_USER = 'snitch_pc@mail.ru'
-#EMAIL_HOST_PASSWORD = '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'
-EMAIL_HOST_PASSWORD = 'Fun7kGSRZs72xE5r40ZF'
+EMAIL_HOST_PASSWORD = privateData.host_password
 DEFAULT_FROM_EMAIL = 'Snitch PC <snitch_pc@mail.ru>'
 
 CORS_ALLOW_ALL_ORIGINS = True  # Только для разработки! В продакшене настройте конкретные домены
