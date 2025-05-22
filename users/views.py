@@ -8,7 +8,9 @@ from django.views.decorators.http import require_POST
 from django.http import JsonResponse
 import json
 from django.contrib.auth import update_session_auth_hash
+from django.contrib.auth.views import LoginView
 
+    
 def register_view(request):
     if request.method == 'POST':
         form = UserRegistrationForm(request.POST)
@@ -146,3 +148,6 @@ def change_password(request):
         return JsonResponse({"success": True})
     except Exception as e:
         return JsonResponse({"success": False, "error": str(e)}, status=500)
+    
+
+    

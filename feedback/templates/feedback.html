@@ -1,0 +1,144 @@
+{% extends "base.html" %}
+
+{% block content %}
+<style>
+    /* Стили для кнопки "Наверх" */
+    #back-to-top {
+        position: fixed;
+        top: 80px;
+        left: 50%;
+        padding: 10px 15px;
+        transform: translateX(-50%);
+        padding: 10px 15px;
+        background-color: #ff4a2a;
+        /* Основной цвет */
+        color: #fff;
+        border: none;
+        border-radius: 4px;
+        cursor: pointer;
+        opacity: 0;
+        visibility: hidden;
+        transition: opacity 0.3s ease, visibility 0.3s ease;
+        z-index: 9999;
+    }
+
+    #back-to-top.show {
+        opacity: 0.9;
+        visibility: visible;
+    }
+
+    #back-to-top:hover {
+        opacity: 1;
+    }
+</style>
+<h1>Отзывы и предложения</h1>
+
+<button id="back-button">Назад</button>
+<button id="back-to-top">Наверх</button>
+{% if not show_login_modal %}
+<!-- Форма отправки отзыва -->
+<form method="post" enctype="multipart/form-data">
+    {% csrf_token %}
+    <div>
+        <label for="id_title"><strong>Заголовок отзыва:</strong></label><br>
+        {{ form.title }}
+    </div>
+    <div>
+        <label for="id_content"><strong>Ваш отзыв:</strong></label><br>
+        {{ form.content }}
+    </div>
+    <div>
+        <label for="id_attachment"><strong>Прикрепить изображение:</strong></label><br>
+        {{ form.attachment }}
+    </div>
+    <div>
+        <label for="id_email_visible">
+            {{ form.email_visible }} Показывать мою электронную почту
+        </label>
+    </div>
+    <button type="submit">Отправить</button>
+</form>
+
+<hr>
+
+<!-- Вывод отзывов -->
+<h2>Отзывы пользователей</h2>
+{% for feedback in feedbacks %}
+<div style="margin-bottom: 30px;">
+    <p>
+        <strong>{{ feedback.user.first_name }}</strong> –
+        {{ feedback.created_at|date:"d.m.Y H:i" }}
+    </p>
+    {% if feedback.email_visible %}
+    <p>Email: {{ feedback.user.email }}</p>
+    {% endif %}
+    <h3>{{ feedback.title }}</h3>
+    <p>{{ feedback.content }}</p>
+    {% if feedback.attachments.all %}
+    {% for attachment in feedback.attachments.all %}
+    <div>
+        <img src="{{ attachment.image.url }}" alt="Вложение" style="max-width:300px;">
+    </div>
+    {% endfor %}
+    {% endif %}
+</div>
+<hr>
+{% empty %}
+<p>Пока нет отзывов. Будьте первым!</p>
+{% endfor %}
+
+{% else %}
+
+<p>Для просмотра и публикации отзывов необходимо войти в систему.</p>
+{% endif %}
+{% endblock %}
+
+{% block scripts %}
+{{ block.super }}
+{% if show_login_modal %}
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+
+        var loginBtn = document.getElementById('login-btn');
+        if (loginBtn) {
+            loginBtn.click();
+        }
+    });
+</script>
+{% endif %}
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        const backButton = document.getElementById("back-button");
+
+        if (backButton) {
+            backButton.addEventListener("click", function () {
+                window.history.back();
+            });
+        }
+    });
+
+</script>
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        const backToTopButton = document.getElementById("back-to-top");
+        const scrollThreshold = 300; // Порог в пикселях для появления кнопки
+
+        // Обработчик события скролла
+        window.addEventListener("scroll", function () {
+            if (window.scrollY > scrollThreshold) {
+                backToTopButton.classList.add("show");
+            } else {
+                backToTopButton.classList.remove("show");
+            }
+        });
+
+        // Обработчик клика по кнопке "Наверх"
+        backToTopButton.addEventListener("click", function () {
+            window.scrollTo({
+                top: 0,
+                behavior: "smooth"
+            });
+        });
+    });
+</script>
+{% endblock %}

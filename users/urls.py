@@ -10,5 +10,4 @@ urlpatterns = [
     path('delete_account/', views.delete_account, name='delete_account'),
     path('verify-current-password/', views.verify_current_password, name='verify_current_password'),
     path('change-password/', views.change_password, name='change_password'),
-
 ]
