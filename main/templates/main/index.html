@@ -3,44 +3,13 @@
 {% block title %}Snitch PC - Магазин игровых компьютеров{% endblock %}
 
 {% block content %}
-<nav class="nav">
-    <div class="container">
-        <ul class="nav-list">
-            <li><a href="#">Главная</a></li>
-            <li>
-                <a href="#">Игровые ПК <i class="fas fa-chevron-down"></i></a>
-                <ul class="submenu">
-                    <li><a href="#">Игровые ПК</a></li>
-                    <li><a href="#">Компактные ПК</a></li>
-                    <li><a href="#">Профессиональные ПК</a></li>
-                </ul>
-            </li>
-            <li>
-                <a href="#">Игровые ноутбуки <i class="fas fa-chevron-down"></i></a>
-                <ul class="submenu">
-                    <li><a href="#">ASUS</a></li>
-                    <li><a href="#">MSI</a></li>
-                    <li><a href="#">Maibenden</a></li>
-                </ul>
-            </li>
-            <li><a href="#">Периферия</a></li>
-            <li><a href="#">Комплектующие</a></li>
-            <li><a href="#">Конфигуратор</a></li>
-            <li><a href="#">Акции</a></li>
-            <li><a href="#">Доставка и оплата</a></li>
-            <li><a href="#">Контакты</a></li>
-        </ul>
-    </div>
-</nav>
-
 <!-- HERO Section -->
 <section class="hero">
     <div class="container">
         <div class="hero-content">
-            <h1 class="hero-title">Мощные игровые компьютеры от Snitch PC</h1>
-            <p class="hero-text">Соберите свою идеальную конфигурацию или выберите готовую сборку от наших
-                специалистов. Гарантия качества и бесплатная доставка.</p>
-            <a href="{% url 'config' %}" class="btn">Перейти в конфигуратор</a>
+            <h1 class="hero-title">Игровые компьютеры Snitch PC</h1>
+            <p class="hero-text">Соберите свой идеальный игровой компьютер с помощью нашего конфигуратора. Выбирайте комплектующие, сравнивайте цены и создавайте мощную игровую систему.</p>
+            <a href="{% url 'config' %}" class="btn">Собрать компьютер</a>
         </div>
     </div>
 </section>
@@ -166,6 +135,13 @@
         <p class="configurator-text">Наш конфигуратор позволяет выбрать комплектующие под ваш бюджет и задачи.
             Получите профессиональную консультацию и гарантию на сборку.</p>
         <a href="{% url 'config' %}" class="btn">Перейти в конфигуратор</a>
+    </div>
+</section>
+
+<section class="section">
+    <div class="container">
+        <h2>Почему выбирают нас</h2>
+        <!-- Здесь можно добавить дополнительные секции с преимуществами -->
     </div>
 </section>
 

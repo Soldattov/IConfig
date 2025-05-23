@@ -12,6 +12,7 @@ https://docs.djangoproject.com/en/5.2/ref/settings/
 
 from pathlib import Path
 import os
+from . import privateData
 
 from django.conf.urls.static import static
 
@@ -68,7 +69,7 @@ LOGGING = {
 # See https://docs.djangoproject.com/en/5.2/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = 'django-insecure-+ll0zh64sz&0aj*a0zem0i6!ffoj^&r#%e&6xi_n0f+=x8o6=v'
+SECRET_KEY = privateData.secret_key
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
@@ -90,6 +91,7 @@ INSTALLED_APPS = [
     'corsheaders',
     'users',
     'django.core.mail',
+    'feedback',
 ]
 
 
@@ -182,8 +184,7 @@ EMAIL_HOST = 'smtp.mail.ru'
 EMAIL_PORT = 587
 EMAIL_USE_TLS = True
 EMAIL_HOST_USER = 'snitch_pc@mail.ru'
-#EMAIL_HOST_PASSWORD = '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'
-EMAIL_HOST_PASSWORD = 'Fun7kGSRZs72xE5r40ZF'
+EMAIL_HOST_PASSWORD = privateData.host_password
 DEFAULT_FROM_EMAIL = 'Snitch PC <snitch_pc@mail.ru>'
 
 CORS_ALLOW_ALL_ORIGINS = True  # Только для разработки! В продакшене настройте конкретные домены

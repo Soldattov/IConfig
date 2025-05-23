@@ -1,0 +1,264 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block content %}
+<div class="hero">
+    <div class="container">
+        <div class="hero-content">
+            <h1 class="hero-title">Игровые компьютеры и комплектующие</h1>
+            <p class="hero-text">Соберите свой идеальный игровой ПК или выберите готовую конфигурацию</p>
+            <a href="{% url 'config' %}" class="btn">Собрать ПК</a>
+        </div>
+    </div>
+</div>
+
+<section class="section">
+    <div class="container">
+        <h2 class="section-title">Игровые ПК</h2>
+        <div class="products-grid">
+            <div class="product-card">
+                <div class="product-image">
+                    <img src="https://delta-game.ru/wp-content/uploads/2025/02/pccooler-c3b310-wh-1.webp" alt="Игровой ПК">
+                </div>
+                <div class="product-info">
+                    <h3 class="product-title">Snitch Dynamic Pro</h3>
+                    <p class="product-specs">Intel Core i9-13900K • RTX 4090 • 32GB DDR5 • 2TB SSD</p>
+                    <div class="product-price">279 990 ₽</div>
+                    <a href="#" class="btn">В корзину</a>
+                </div>
+            </div>
+
+            <div class="product-card">
+                <div class="product-image">
+                    <img src="https://delta-game.ru/wp-content/uploads/2023/11/zalman-p30-black-3.webp" alt="Игровой ПК">
+                </div>
+                <div class="product-info">
+                    <h3 class="product-title">Snitch AMD Extreme</h3>
+                    <p class="product-specs">AMD Ryzen 9 7950X • RX 7900 XTX • 32GB DDR5 • 2TB SSD</p>
+                    <div class="product-price">229 990 ₽</div>
+                    <a href="#" class="btn">В корзину</a>
+                </div>
+            </div>
+
+            <div class="product-card">
+                <div class="product-image">
+                    <img src="https://delta-game.ru/wp-content/uploads/2024/04/amarok-1.webp" alt="Игровой ПК">
+                </div>
+                <div class="product-info">
+                    <h3 class="product-title">Snitch Dynamic</h3>
+                    <p class="product-specs">Intel Core i7-13700K • RTX 4080 • 32GB DDR4 • 1TB SSD</p>
+                    <div class="product-price">179 990 ₽</div>
+                    <a href="#" class="btn">В корзину</a>
+                </div>
+            </div>
+
+            <div class="product-card">
+                <div class="product-image">
+                    <img src="https://delta-game.ru/wp-content/uploads/2023/06/helios-compact-3.webp" alt="Игровой ПК">
+                </div>
+                <div class="product-info">
+                    <h3 class="product-title">Snitch Compact</h3>
+                    <p class="product-specs">AMD Ryzen 7 7700X • RTX 4070 • 16GB DDR4 • 1TB SSD</p>
+                    <div class="product-price">129 990 ₽</div>
+                    <a href="#" class="btn">В корзину</a>
+                </div>
+            </div>
+
+            <div class="product-card">
+                <div class="product-image">
+                    <img src="https://delta-game.ru/wp-content/uploads/2023/07/nzxt-h7-flow-rgb-1.webp" alt="Игровой ПК">
+                </div>
+                <div class="product-info">
+                    <h3 class="product-title">Snitch Omen Pro</h3>
+                    <p class="product-specs">Intel Core i7-13700F • RTX 4070 Ti • 32GB DDR5 • 1TB SSD</p>
+                    <div class="product-price">189 990 ₽</div>
+                    <a href="#" class="btn">В корзину</a>
+                </div>
+            </div>
+
+            <div class="product-card">
+                <div class="product-image">
+                    <img src="https://delta-game.ru/wp-content/uploads/2020/09/atlas-6.webp" alt="Игровой ПК">
+                </div>
+                <div class="product-info">
+                    <h3 class="product-title">Snitch Omen 45L</h3>
+                    <p class="product-specs">AMD Ryzen 9 7900X • RTX 4080 • 64GB DDR5 • 2TB SSD</p>
+                    <div class="product-price">259 990 ₽</div>
+                    <a href="#" class="btn">В корзину</a>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<section class="section">
+    <div class="container">
+        <h2 class="section-title">Игровые ноутбуки</h2>
+        <div class="products-grid">
+            <div class="product-card">
+                <div class="product-image">
+                    <img src="https://delta-game.ru/wp-content/uploads/2022/08/asus-tuf-gaming-a15-fa507rm-fa507rr-7.webp" alt="Игровой ноутбук">
+                </div>
+                <div class="product-info">
+                    <h3 class="product-title">Ноутбук ASUS TUF Gaming A15 FA507NV-LP103</h3>
+                    <p class="product-specs">Intel Core i9-13900FX • RTX 4090 • 32GB DDR5 • 2TB SSD</p>
+                    <div class="product-price">121 300 ₽</div>
+                    <a href="#" class="btn">В корзину</a>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+{% endblock %}
+
+{% block head %}
+    <style>
+        .hero {
+            position: relative;
+            overflow: hidden;
+            height: 500px;
+            display: flex;
+            align-items: center;
+        }
+
+        .hero::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: url('https://boiling-machine.ru/wp-content/uploads/3-391.jpg') center/cover no-repeat;
+            z-index: -1;
+            animation: zoomEffect 15s infinite alternate;
+        }
+
+        .hero::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: linear-gradient(rgba(0, 0, 0, 0.7), rgba(0, 0, 0, 0.5));
+            z-index: -1;
+        }
+
+        @keyframes zoomEffect {
+            0% {
+                transform: scale(1);
+            }
+            100% {
+                transform: scale(1.05);
+            }
+        }
+
+        .hero-content {
+            position: relative;
+            z-index: 1;
+        }
+
+        .hero-title {
+            font-size: 48px;
+            font-weight: 700;
+            margin-bottom: 20px;
+            line-height: 1.2;
+        }
+
+        .hero-text {
+            font-size: 18px;
+            color: var(--text-secondary);
+            margin-bottom: 30px;
+            line-height: 1.6;
+        }
+
+        .section {
+            padding: 80px 0;
+        }
+
+        .section-title {
+            font-size: 32px;
+            font-weight: 700;
+            margin-bottom: 40px;
+            text-align: center;
+        }
+
+        .products-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+            gap: 30px;
+        }
+
+        .product-card {
+            background-color: var(--primary);
+            border-radius: 8px;
+            overflow: hidden;
+            transition: all 0.3s;
+        }
+
+        .product-card:hover {
+            transform: translateY(-10px);
+            box-shadow: 0 10px 30px rgba(255, 94, 58, 0.2);
+        }
+
+        .product-image {
+            height: 370px;
+            overflow: hidden;
+        }
+
+        .product-image img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            transition: transform 0.5s;
+        }
+
+        .product-card:hover .product-image img {
+            transform: scale(1.05);
+        }
+
+        .product-info {
+            padding: 20px;
+        }
+
+        .product-title {
+            font-size: 18px;
+            font-weight: 600;
+            margin-bottom: 10px;
+        }
+
+        .product-specs {
+            color: var(--text-secondary);
+            font-size: 14px;
+            margin-bottom: 15px;
+            line-height: 1.5;
+        }
+
+        .product-price {
+            font-size: 22px;
+            font-weight: 700;
+            color: var(--accent);
+            margin-bottom: 15px;
+        }
+
+    @media (max-width: 992px) {
+        .hero-title {
+                font-size: 36px;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .hero {
+                height: 400px;
+            }
+
+            .hero-title {
+                font-size: 32px;
+            }
+
+            .section {
+                padding: 60px 0;
+            }
+        }
+    </style>
+{% endblock %}
