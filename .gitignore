@@ -31,9 +31,5 @@ avtorization.txt
 .DS_Store
 Thumbs.db
 desktop.ini
-db.sqlite3
-db.sqlite3
 db.sqlite3-journal
-db.sqlite3
-db.sqlite3
 IConfigurator/privateData.py

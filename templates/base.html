@@ -1,5 +1,5 @@
-{% load static %}
 <!DOCTYPE html>
+{% load static %}
 <html lang="ru">
 
 <head>
@@ -7,20 +7,355 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>{% block title %}Snitch PC - Магазин игровых компьютеров{% endblock %}</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root {
+            --primary: #1e1e2d;
+            --secondary: #2d2d42;
+            --accent: #ff5e3a;
+            --text: #ffffff;
+            --text-secondary: #b5b5c3;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Roboto', sans-serif;
+        }
+
+        body {
+            background-color: #0f0f19;
+            color: var(--text);
+        }
+
+        .container {
+            width: 100%;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 15px;
+        }
+
+        /* Header */
+        .header {
+            background-color: var(--primary);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        .header-top {
+            display: flex;
+            align-items: center;
+            padding: 15px 0;
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            margin-right: 30px;
+        }
+
+        .logo img {
+            height: 40px;
+            margin-right: 10px;
+        }
+
+        .logo span {
+            font-size: 24px;
+            font-weight: 700;
+            color: var(--text);
+        }
+
+        .header-search {
+            flex-grow: 1;
+            position: relative;
+        }
+
+        .header-search input {
+            width: 100%;
+            padding: 12px 20px;
+            background-color: var(--secondary);
+            border: none;
+            border-radius: 6px;
+            color: var(--text);
+            font-size: 14px;
+        }
+
+        .header-actions {
+            display: flex;
+            margin-left: 30px;
+        }
+
+        .header-actions a {
+            color: var(--text);
+            margin-left: 20px;
+            font-size: 18px;
+            position: relative;
+        }
+
+        .btn-user {
+            background: none;
+            border: none;
+            color: var(--text);
+            font-size: 18px;
+            cursor: pointer;
+            padding: 0;
+            margin-left: 20px;
+            transition: color 0.3s;
+        }
+
+        .btn-user:hover {
+            color: var(--accent);
+        }
+
+        .btn-feedback {
+            display: flex;
+            align-items: center;
+            margin-left: 20px;
+        }
+
+        .btn-feedback img {
+            transition: transform 0.3s;
+        }
+
+        .btn-feedback:hover img {
+            transform: scale(1.1);
+        }
+
+        .header-actions a span {
+            position: absolute;
+            top: -8px;
+            right: -8px;
+            background-color: var(--accent);
+            color: white;
+            border-radius: 50%;
+            width: 18px;
+            height: 18px;
+            font-size: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        /* Navigation */
+        .nav {
+            background-color: var(--primary);
+        }
+
+        .nav-list {
+            display: flex;
+            list-style: none;
+        }
+
+        .nav-list li {
+            position: relative;
+        }
+
+        .nav-list li:hover .submenu {
+            display: block;
+        }
+
+        .nav-list li a {
+            display: block;
+            color: var(--text);
+            text-decoration: none;
+            padding: 18px 20px;
+            font-size: 15px;
+            font-weight: 500;
+            transition: all 0.3s;
+        }
+
+        .nav-list li a:hover {
+            color: var(--accent);
+        }
+
+        .submenu {
+            display: none;
+            position: absolute;
+            top: 100%;
+            left: 0;
+            background-color: var(--secondary);
+            min-width: 200px;
+            border-radius: 0 0 6px 6px;
+            z-index: 10;
+        }
+
+        .submenu li a {
+            padding: 12px 20px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+        }
+
+        /* Responsive */
+        @media (max-width: 992px) {
+            .header-top {
+                flex-wrap: wrap;
+            }
+
+            .logo {
+                margin-bottom: 15px;
+            }
+
+            .header-search {
+                order: 3;
+                width: 100%;
+                margin-top: 15px;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .nav-list {
+                flex-wrap: wrap;
+                justify-content: center;
+            }
+
+            .nav-list li {
+                width: 50%;
+                text-align: center;
+            }
+        }
+
+        /* Modal styles */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.7);
+            z-index: 1000;
+        }
+
+        .modal-content {
+            position: relative;
+            background-color: var(--primary);
+            margin: 15% auto;
+            padding: 20px;
+            width: 90%;
+            max-width: 500px;
+            border-radius: 8px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+
+        .modal-close {
+            position: absolute;
+            right: 20px;
+            top: 20px;
+            font-size: 24px;
+            cursor: pointer;
+            color: var(--text-secondary);
+        }
+
+        .modal-close:hover {
+            color: var(--text);
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            color: var(--text);
+        }
+
+        .form-group input {
+            width: 100%;
+            padding: 12px;
+            background-color: var(--secondary);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 6px;
+            color: var(--text);
+        }
+
+        .error-message {
+            color: var(--accent);
+            font-size: 14px;
+            margin-top: 5px;
+            display: none;
+        }
+
+        .btn {
+            display: inline-block;
+            padding: 14px 30px;
+            background-color: var(--accent);
+            color: white;
+            border: none;
+            border-radius: 6px;
+            text-decoration: none;
+            font-weight: 600;
+            font-size: 16px;
+            transition: all 0.3s;
+            cursor: pointer;
+        }
+
+        .btn:hover {
+            background-color: #ff4a2a;
+            transform: translateY(-2px);
+        }
+
+        .hidden {
+            display: none !important;
+        }
+
+        /* User menu */
+        #user-menu {
+            position: fixed;
+            background-color: var(--primary);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 6px;
+            padding: 10px 0;
+            min-width: 200px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            z-index: 1000;
+        }
+
+        #user-menu a {
+            display: block;
+            padding: 10px 20px;
+            color: var(--text);
+            text-decoration: none;
+            transition: background-color 0.3s;
+        }
+
+        #user-menu a:hover {
+            background-color: var(--secondary);
+        }
+
+        .btn-auth {
+            background: none;
+            border: none;
+            color: var(--text);
+            font-size: 16px;
+            cursor: pointer;
+            padding: 8px 15px;
+            margin-left: 10px;
+            transition: all 0.3s;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+
+        .btn-auth:hover {
+            color: var(--accent);
+        }
+
+        .btn-auth i {
+            font-size: 18px;
+        }
+    </style>
     <link rel="stylesheet" href="{% static 'css/styles.css' %}" />
     {% block head %}{% endblock %}
 </head>
 
 <body>
-
-
     <header class="header">
         <div class="container">
             <div class="header-top">
-                <a href="/" class="logo">
-                    <img src="https://www.meme-arsenal.com/memes/a706819c0690421e2fb711ea578742cb.jpg"
-                        alt="Snitch PC Logo" width="60">
-                    <span>Snitch PC</span>
+                <a href="#" class="logo">
+                    <img src="https://www.pngkey.com/png/full/186-1866241_snitch-special-offer-banner-png.png" alt="Snitch PC Logo">
                 </a>
 
                 <div class="header-search">
@@ -28,18 +363,33 @@
                 </div>
 
                 <div class="header-actions">
-                    <button id="user-icon" class="btn-user"><i class="far fa-user"></i></button>
+                    <button id="user-icon" class="btn-user"><i class = "far fa-user"></i></button>
                     <a href="{% url 'feedback' %}" class="btn-feedback">
-                        <img src="{% get_media_prefix %}reviews.png" alt="Отзывы"
-                            style="height: 24px; width: auto;"></a>
+                        <img src="{% get_media_prefix %}reviews.png" alt="отзывы" style="height: 24px; width: auto;">
+                    </a>
                     <a href="#"><i class="fas fa-shopping-cart"></i><span>2</span></a>
                 </div>
             </div>
         </div>
+
+        <nav class="nav">
+            <div class="container">
+                <ul class="nav-list">
+                    <li><a href="{% url 'main:index' %}">Главная</a></li>
+                    <li><a href="#">Игровые ПК</a></li>
+                    <li><a href="#">Игровые ноутбуки</a></li>
+                    <li><a href="#">Периферия</a></li>
+                    <li><a href="#">Комплектующие</a></li>
+                    <li><a href="{% url 'config' %}">Конфигуратор</a></li>
+                    <li><a href="#">Акции</a></li>
+                    <li><a href="#">Доставка и оплата</a></li>
+                    <li><a href="#">Контакты</a></li>
+                </ul>
+            </div>
+        </nav>
     </header>
 
     {% include 'users/modals.html' %}
-
 
     <!-- Основной контент страницы -->
     <main>
@@ -49,15 +399,13 @@
 
     <!-- Блок для дополнительных скриптов, задаваемых дочерними шаблонами -->
     {% block scripts %}{% endblock %}
-    <!-- ======================================================= -->
 
     <script>
         document.addEventListener('DOMContentLoaded', function () {
             // Ссылки на модальные окна, кнопки закрытия 
             const modals = document.querySelectorAll('.modal');
             const closeButtons = document.querySelectorAll('.modal-close');
-            const loginBtn = document.getElementById('login-btn');
-            const registerBtn = document.getElementById('register-btn');
+            const userIcon = document.getElementById('user-icon');
             const loginModal = document.getElementById('login-modal');
             const registerModal = document.getElementById('register-modal');
             const verificationModal = document.getElementById('verification-modal');
@@ -70,63 +418,64 @@
                 modal.querySelectorAll('.error-message').forEach(error => error.innerText = '');
             }
 
-            // Открытие окна входа 
-            if (loginBtn) {
-                loginBtn.addEventListener('click', function () {
-                    clearFormInputs(loginModal);
-                    loginModal.classList.remove('hidden');
-                });
-            }
-            // Открытие окна регистрации 
-            if (registerBtn) {
-                registerBtn.addEventListener('click', function () {
-                    clearFormInputs(registerModal);
-                    registerModal.classList.remove('hidden');
-                });
-            }
-            // Обработка кнопки возврата в модальном окне проверки 
-            if (verifyBack) {
-                verifyBack.addEventListener('click', function () {
-                    verificationModal.classList.add('hidden');
-                    const registerModal = document.getElementById('register-modal');
-                    if (registerModal) {
-                        registerModal.classList.remove('hidden');
+            // Обработка клика по иконке пользователя
+            if (userIcon) {
+                userIcon.addEventListener('click', function (e) {
+                    e.stopPropagation();
+                    // Если пользователь не авторизован, показываем окно входа
+                    if (!document.body.classList.contains('user-authenticated')) {
+                        clearFormInputs(loginModal);
+                        loginModal.classList.remove('hidden');
+                    } else {
+                        // Если пользователь авторизован, показываем меню пользователя
+                        const userMenu = document.getElementById('user-menu');
+                        if (userMenu) {
+                            const rect = userIcon.getBoundingClientRect();
+                            userMenu.style.position = 'fixed';
+                            userMenu.style.left = rect.left + "px";
+                            userMenu.style.top = (rect.bottom + 5) + "px";
+                            userMenu.classList.toggle('hidden');
+                        }
                     }
                 });
             }
-            if (verifyClose) {
-                verifyClose.addEventListener('click', function () {
-                    verificationModal.classList.add('hidden');
-                });
-            }
-            // Меню пользователя 
-            const userIcon = document.getElementById('user-icon');
-            const userMenu = document.getElementById('user-menu');
-            if (userIcon) {
-                userIcon.addEventListener('click', function (e) {
-                    const rect = userIcon.getBoundingClientRect();
-                    userMenu.style.position = 'fixed';
-                    userMenu.style.left = rect.left + "px";
-                    userMenu.style.top = (rect.bottom + 5) + "px";
-                    userMenu.classList.toggle('hidden');
-                    modals.forEach(modal => modal.classList.add('hidden'));
-                    e.stopPropagation();
-                });
-            }
+
+            // Закрытие модальных окон при клике вне их области
             document.addEventListener('click', function (e) {
-                if (userMenu && !userMenu.contains(e.target) && e.target !== userIcon) {
-                    userMenu.classList.add('hidden');
+                if (!e.target.closest('.modal') && !e.target.closest('#user-icon')) {
+                    modals.forEach(modal => modal.classList.add('hidden'));
+                    const userMenu = document.getElementById('user-menu');
+                    if (userMenu) {
+                        userMenu.classList.add('hidden');
+                    }
                 }
             });
-            // Закрытие модальных окон по нажатию на кнопки закрытия
+
+            // Обработка кнопок закрытия модальных окон
             closeButtons.forEach(button => {
                 button.addEventListener('click', function () {
                     modals.forEach(modal => modal.classList.add('hidden'));
                 });
             });
 
-            const registerForm = document.getElementById('register-form');
+            // Обработка кнопки возврата в модальном окне проверки 
+            if (verifyBack) {
+                verifyBack.addEventListener('click', function () {
+                    verificationModal.classList.add('hidden');
+                    if (registerModal) {
+                        registerModal.classList.remove('hidden');
+                    }
+                });
+            }
 
+            if (verifyClose) {
+                verifyClose.addEventListener('click', function () {
+                    verificationModal.classList.add('hidden');
+                });
+            }
+
+            // Валидация форм
+            const registerForm = document.getElementById('register-form');
             const password1Field = document.getElementById('password1');
             const password2Field = document.getElementById('password2');
             const password1Error = document.getElementById('password1-error');
@@ -157,41 +506,45 @@
                 }
                 return valid;
             }
-            password1Field.addEventListener('input', validatePasswords);
-            password2Field.addEventListener('input', validatePasswords);
-            registerForm.addEventListener('submit', function (e) {
-                if (!validatePasswords()) {
-                    e.preventDefault();
-                }
-            });
 
-            // Валидация email с использованием регулярного выражения
+            if (password1Field && password2Field) {
+                password1Field.addEventListener('input', validatePasswords);
+                password2Field.addEventListener('input', validatePasswords);
+            }
+
+            if (registerForm) {
+                registerForm.addEventListener('submit', function (e) {
+                    if (!validatePasswords()) {
+                        e.preventDefault();
+                    }
+                });
+            }
+
+            // Валидация email
             const emailField = document.getElementById('register-email');
             const emailError = document.getElementById('email-error');
             const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
-            emailField.addEventListener('input', function () {
-                if (!emailRegex.test(emailField.value)) {
-                    emailError.innerText = "Некорректный email";
-                    emailError.style.display = 'block';
-                    emailField.classList.add('error');
-                } else {
-                    emailError.innerText = "";
-                    emailError.style.display = 'none';
-                    emailField.classList.remove('error');
-                }
-            });
+            if (emailField && emailError) {
+                emailField.addEventListener('input', function () {
+                    if (!emailRegex.test(emailField.value)) {
+                        emailError.innerText = "Некорректный email";
+                        emailError.style.display = 'block';
+                        emailField.classList.add('error');
+                    } else {
+                        emailError.innerText = "";
+                        emailError.style.display = 'none';
+                        emailField.classList.remove('error');
+                    }
+                });
+            }
 
-
+            // Показ окна входа при ошибке авторизации
             if (typeof login_error !== 'undefined' && login_error) {
                 loginModal?.classList.remove('hidden');
             }
-
-
         });
     </script>
-
-
 </body>
 
 </html>

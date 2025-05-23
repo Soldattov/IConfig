@@ -12,7 +12,7 @@ https://docs.djangoproject.com/en/5.2/ref/settings/
 
 from pathlib import Path
 import os
-import privateData
+from . import privateData
 
 from django.conf.urls.static import static
 
@@ -69,7 +69,7 @@ LOGGING = {
 # See https://docs.djangoproject.com/en/5.2/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = 'django-insecure-+ll0zh64sz&0aj*a0zem0i6!ffoj^&r#%e&6xi_n0f+=x8o6=v'
+SECRET_KEY = privateData.secret_key
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
