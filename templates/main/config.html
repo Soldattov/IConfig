@@ -201,6 +201,8 @@ document.addEventListener('DOMContentLoaded', function() {
             total_price: calculateTotalPrice() 
         };
 
+        console.log('Отправляемые данные:', formData);
+
         try {
             const response = await fetch('{% url "main:save_configuration" %}', {
                 method: 'POST',
@@ -212,6 +214,7 @@ document.addEventListener('DOMContentLoaded', function() {
             });
 
             const data = await response.json();
+            console.log('Ответ сервера:', data);
 
             if (response.ok) {
                 alert('Конфигурация успешно сохранена');
@@ -219,10 +222,11 @@ document.addEventListener('DOMContentLoaded', function() {
                 document.getElementById('modal-backdrop').classList.add('hidden');
                 window.location.href = '{% url "main:my_configurations" %}';
             } else {
+                console.error('Ошибка при сохранении:', data.message);
                 alert(data.message || 'Ошибка при сохранении конфигурации');
             }
         } catch (error) {
-            console.error('Error:', error);
+            console.error('Ошибка при отправке запроса:', error);
             alert('Произошла ошибка при сохранении конфигурации');
         }
     });
@@ -230,12 +234,15 @@ document.addEventListener('DOMContentLoaded', function() {
     function getCurrentConfiguration() {
         const components = {};
         const selectedComponents = document.querySelectorAll('.component-option.selected');
+        console.log('Выбранные компоненты:', selectedComponents.length);
         
         selectedComponents.forEach(component => {
             const category = component.dataset.category;
             const componentId = component.dataset.id;
             const name = component.querySelector('.component-name').textContent;
             const price = parseFloat(component.dataset.price);
+            
+            console.log(`Компонент ${category}:`, { id: componentId, name, price });
             
             components[category] = {
                 id: componentId,
@@ -244,6 +251,7 @@ document.addEventListener('DOMContentLoaded', function() {
             };
         });
         
+        console.log('Собранная конфигурация:', components);
         return components;
     }
 

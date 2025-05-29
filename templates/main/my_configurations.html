@@ -5,66 +5,77 @@
 
 {% block content %}
 <div class="container">
-    <h1 class="page-title">Мои конфигурации</h1>
+    <h1>Мои конфигурации</h1>
     
-    <div class="configurations-grid">
-        {% for config in configurations %}
-        <div class="configuration-card">
-            <div class="configuration-header">
-                <h3>{{ config.name }}</h3>
-                <div class="configuration-actions">
-                    <button class="btn-toggle-public" data-config-id="{{ config.id }}" 
-                            title="{% if config.is_public %}Сделать приватным{% else %}Сделать публичным{% endif %}">
-                        <i class="fas {% if config.is_public %}fa-globe{% else %}fa-lock{% endif %}"></i>
-                    </button>
-                    <button class="btn-delete" data-config-id="{{ config.id }}" title="Удалить">
-                        <i class="fas fa-trash"></i>
-                    </button>
+    {% if configurations %}
+        <div class="configurations-grid">
+            {% for config in configurations %}
+                <div class="configuration-card">
+                    <div class="configuration-header">
+                        <h3>{{ config.name }}</h3>
+                        <div class="configuration-actions">
+                            <button class="btn btn-icon toggle-public" data-config-id="{{ config.id }}" title="{% if config.is_public %}Сделать приватной{% else %}Сделать публичной{% endif %}">
+                                <i class="fas {% if config.is_public %}fa-eye{% else %}fa-eye-slash{% endif %}"></i>
+                            </button>
+                            <button class="btn btn-icon delete-config" data-config-id="{{ config.id }}" title="Удалить">
+                                <i class="fas fa-trash"></i>
+                            </button>
+                        </div>
+                    </div>
+                    
+                    <div class="configuration-content">
+                        <div class="configuration-price">
+                            <span class="price-label">Общая стоимость:</span>
+                            <span class="price-value">{{ config.total_price }} ₽</span>
+                        </div>
+                        
+                        <div class="configuration-components">
+                            {% for component in config.components.all %}
+                                <div class="component-item">
+                                    <span class="component-type">{{ component.get_component_type_display }}:</span>
+                                    <span class="component-name">{{ component.name }}</span>
+                                    <span class="component-price">{{ component.price }} ₽</span>
+                                </div>
+                            {% endfor %}
+                        </div>
+                    </div>
+                    
+                    <div class="configuration-footer">
+                        <a href="{% url 'main:view_configuration' config.id %}" class="btn btn-primary">Подробнее</a>
+                    </div>
                 </div>
-            </div>
-            <div class="configuration-details">
-                <p class="price">Итого: {{ config.total_price }} ₽</p>
-                <p class="date">Создано: {{ config.created_at|date:"d.m.Y H:i" }}</p>
-            </div>
-            <div class="configuration-footer">
-                <a href="{% url 'main:view_configuration' config.id %}" class="btn btn-primary">Просмотреть</a>
-                <a href="{% url 'main:config' %}?load={{ config.id }}" class="btn btn-secondary">Редактировать</a>
-            </div>
+            {% endfor %}
         </div>
-        {% empty %}
-        <div class="no-configurations">
+    {% else %}
+        <div class="empty-state">
+            <i class="fas fa-desktop"></i>
             <p>У вас пока нет сохраненных конфигураций</p>
             <a href="{% url 'main:config' %}" class="btn btn-primary">Создать конфигурацию</a>
         </div>
-        {% endfor %}
-    </div>
+    {% endif %}
 </div>
 
 <style>
-    .page-title {
-        margin: 2rem 0;
-        color: var(--text);
-    }
-
     .configurations-grid {
         display: grid;
         grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
-        gap: 2rem;
-        margin-bottom: 2rem;
+        gap: 20px;
+        margin-top: 20px;
     }
 
     .configuration-card {
-        background-color: var(--primary);
+        background: var(--primary);
         border-radius: 8px;
-        padding: 1.5rem;
-        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        padding: 20px;
+        display: flex;
+        flex-direction: column;
+        gap: 15px;
     }
 
     .configuration-header {
         display: flex;
         justify-content: space-between;
         align-items: center;
-        margin-bottom: 1rem;
     }
 
     .configuration-header h3 {
@@ -74,93 +85,104 @@
 
     .configuration-actions {
         display: flex;
-        gap: 0.5rem;
+        gap: 10px;
     }
 
-    .configuration-actions button {
+    .btn-icon {
         background: none;
         border: none;
-        color: var(--text-secondary);
+        color: var(--text);
         cursor: pointer;
-        padding: 0.5rem;
-        transition: color 0.3s;
+        padding: 5px;
+        border-radius: 4px;
+        transition: background-color 0.2s;
     }
 
-    .configuration-actions button:hover {
-        color: var(--accent);
+    .btn-icon:hover {
+        background: var(--secondary);
     }
 
-    .configuration-details {
-        margin-bottom: 1rem;
+    .configuration-content {
+        flex-grow: 1;
     }
 
-    .configuration-details p {
-        margin: 0.5rem 0;
+    .configuration-price {
+        margin-bottom: 15px;
+        padding-bottom: 15px;
+        border-bottom: 1px solid var(--secondary);
+    }
+
+    .price-label {
         color: var(--text-secondary);
+        margin-right: 10px;
     }
 
-    .configuration-details .price {
-        font-size: 1.2rem;
-        font-weight: bold;
+    .price-value {
+        font-weight: 600;
         color: var(--text);
     }
 
-    .configuration-footer {
+    .configuration-components {
         display: flex;
-        gap: 1rem;
+        flex-direction: column;
+        gap: 10px;
     }
 
-    .no-configurations {
-        grid-column: 1 / -1;
-        text-align: center;
-        padding: 3rem;
-        background-color: var(--primary);
-        border-radius: 8px;
+    .component-item {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        font-size: 0.9em;
     }
 
-    .no-configurations p {
-        margin-bottom: 1rem;
+    .component-type {
         color: var(--text-secondary);
+        width: 120px;
+    }
+
+    .component-name {
+        flex-grow: 1;
+        margin: 0 10px;
+        color: var(--text);
+    }
+
+    .component-price {
+        color: var(--text-secondary);
+    }
+
+    .configuration-footer {
+        margin-top: auto;
+    }
+
+    .empty-state {
+        text-align: center;
+        padding: 40px;
+        background: var(--primary);
+        border-radius: 8px;
+        margin-top: 20px;
+    }
+
+    .empty-state i {
+        font-size: 48px;
+        color: var(--text-secondary);
+        margin-bottom: 20px;
+    }
+
+    .empty-state p {
+        color: var(--text-secondary);
+        margin-bottom: 20px;
     }
 </style>
 
 {% block scripts %}
 <script>
 document.addEventListener('DOMContentLoaded', function() {
-    // Handle delete configuration
-    document.querySelectorAll('.btn-delete').forEach(button => {
-        button.addEventListener('click', async function() {
-            if (!confirm('Вы уверены, что хотите удалить эту конфигурацию?')) {
-                return;
-            }
-            
-            const configId = this.dataset.configId;
-            try {
-                const response = await fetch(`/config/${configId}/delete/`, {
-                    method: 'POST',
-                    headers: {
-                        'X-CSRFToken': document.querySelector('[name=csrfmiddlewaretoken]').value
-                    }
-                });
-                
-                if (response.ok) {
-                    this.closest('.configuration-card').remove();
-                } else {
-                    alert('Ошибка при удалении конфигурации');
-                }
-            } catch (error) {
-                console.error('Error:', error);
-                alert('Произошла ошибка при удалении конфигурации');
-            }
-        });
-    });
-
-    // Handle toggle public/private
-    document.querySelectorAll('.btn-toggle-public').forEach(button => {
+    // Обработчик переключения публичности
+    document.querySelectorAll('.toggle-public').forEach(button => {
         button.addEventListener('click', async function() {
             const configId = this.dataset.configId;
             try {
-                const response = await fetch(`/config/${configId}/toggle-public/`, {
+                const response = await fetch(`/configurations/${configId}/toggle-public/`, {
                     method: 'POST',
                     headers: {
                         'X-CSRFToken': document.querySelector('[name=csrfmiddlewaretoken]').value
@@ -170,21 +192,39 @@ document.addEventListener('DOMContentLoaded', function() {
                 if (response.ok) {
                     const data = await response.json();
                     const icon = this.querySelector('i');
-                    if (data.is_public) {
-                        icon.classList.remove('fa-lock');
-                        icon.classList.add('fa-globe');
-                        this.title = 'Сделать приватным';
-                    } else {
-                        icon.classList.remove('fa-globe');
-                        icon.classList.add('fa-lock');
-                        this.title = 'Сделать публичным';
-                    }
-                } else {
-                    alert('Ошибка при изменении видимости конфигурации');
+                    icon.classList.toggle('fa-eye');
+                    icon.classList.toggle('fa-eye-slash');
+                    this.title = data.is_public ? 'Сделать приватной' : 'Сделать публичной';
                 }
             } catch (error) {
                 console.error('Error:', error);
-                alert('Произошла ошибка при изменении видимости конфигурации');
+                alert('Произошла ошибка при обновлении статуса конфигурации');
+            }
+        });
+    });
+
+    // Обработчик удаления
+    document.querySelectorAll('.delete-config').forEach(button => {
+        button.addEventListener('click', async function() {
+            if (!confirm('Вы уверены, что хотите удалить эту конфигурацию?')) {
+                return;
+            }
+
+            const configId = this.dataset.configId;
+            try {
+                const response = await fetch(`/configurations/${configId}/delete/`, {
+                    method: 'POST',
+                    headers: {
+                        'X-CSRFToken': document.querySelector('[name=csrfmiddlewaretoken]').value
+                    }
+                });
+                
+                if (response.ok) {
+                    this.closest('.configuration-card').remove();
+                }
+            } catch (error) {
+                console.error('Error:', error);
+                alert('Произошла ошибка при удалении конфигурации');
             }
         });
     });

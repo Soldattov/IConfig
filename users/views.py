@@ -9,6 +9,7 @@ from django.http import JsonResponse
 import json
 from django.contrib.auth import update_session_auth_hash
 from django.contrib.auth.views import LoginView
+from main.models import SavedConfiguration
 
     
 def register_view(request):
@@ -67,7 +68,20 @@ def logout_view(request):
 
 @login_required
 def profile_view(request):
-    return render(request, 'users/profile.html')
+    print('Получение профиля пользователя:', request.user.username)
+    configs = SavedConfiguration.objects.filter(user=request.user).prefetch_related('components')
+    print('Найдено конфигураций:', configs.count())
+    for config in configs:
+        print(f'Конфигурация: {config.name}, ID: {config.id}, Компонентов: {config.components.count()}')
+        for component in config.components.all():
+            print(f'  - {component.component_type}: {component.name} ({component.price} ₽)')
+    
+    context = {
+        'user': request.user,
+        'configurations': configs,
+        'page_title': 'Профиль'
+    }
+    return render(request, 'users/profile.html', context)
 
 def verify_email_view(request):
     if request.method == 'POST':

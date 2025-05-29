@@ -45,7 +45,7 @@ def save_configuration(request):
     if request.method == 'POST':
         try:
             data = json.loads(request.body)
-            print('Полученные данные:', data)  # Добавляем лог
+            print('Полученные данные:', data)
             
             # Создаем конфигурацию
             config = SavedConfiguration.objects.create(
@@ -54,21 +54,30 @@ def save_configuration(request):
                 total_price=data.get('total_price', 0),
                 is_public=data.get('is_public', False)
             )
-            print('Создана конфигурация:', config)  # Добавляем лог
+            print('Создана конфигурация:', config)
             
             # Добавляем компоненты
             components = data.get('components', {})
-            print('Компоненты для добавления:', components)  # Добавляем лог
+            print('Компоненты для добавления:', components)
             
             for component_type, component_data in components.items():
-                component = ConfigurationComponent.objects.create(
-                    configuration=config,
-                    component_type=component_type,
-                    component_id=component_data['id'],
-                    name=component_data['name'],
-                    price=component_data['price']
-                )
-                print('Добавлен компонент:', component)  # Добавляем лог
+                try:
+                    component = ConfigurationComponent.objects.create(
+                        configuration=config,
+                        component_type=component_type,
+                        component_id=component_data['id'],
+                        name=component_data['name'],
+                        price=component_data['price']
+                    )
+                    print(f'Добавлен компонент: {component_type} - {component.name}')
+                except Exception as e:
+                    print(f'Ошибка при добавлении компонента {component_type}:', str(e))
+                    raise
+            
+            # Проверяем, что компоненты действительно добавлены
+            print(f'Всего добавлено компонентов: {config.components.count()}')
+            for comp in config.components.all():
+                print(f'Компонент в БД: {comp.component_type} - {comp.name}')
             
             return JsonResponse({
                 'status': 'success',
@@ -76,7 +85,7 @@ def save_configuration(request):
                 'message': 'Configuration saved successfully'
             })
         except Exception as e:
-            print('Ошибка при сохранении:', str(e))  # Добавляем лог
+            print('Ошибка при сохранении:', str(e))
             return JsonResponse({
                 'status': 'error',
                 'message': str(e)
@@ -85,10 +94,19 @@ def save_configuration(request):
 
 @login_required
 def my_configurations(request):
-    configs = SavedConfiguration.objects.filter(user=request.user)
-    return render(request, 'main/my_configurations.html', {
-        'configurations': configs
-    })
+    print('Получение конфигураций для пользователя:', request.user.username)
+    configs = SavedConfiguration.objects.filter(user=request.user).prefetch_related('components')
+    print('Найдено конфигураций:', configs.count())
+    for config in configs:
+        print(f'Конфигурация: {config.name}, ID: {config.id}, Компонентов: {config.components.count()}')
+        for component in config.components.all():
+            print(f'  - {component.component_type}: {component.name} ({component.price} ₽)')
+    
+    context = {
+        'configurations': configs,
+        'page_title': 'Мои конфигурации'
+    }
+    return render(request, 'main/my_configurations.html', context)
 
 @login_required
 def view_configuration(request, config_id):
