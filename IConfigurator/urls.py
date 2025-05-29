@@ -8,7 +8,7 @@ urlpatterns = [
     path('admin/', admin.site.urls),
     path('', include('main.urls', namespace='main')),  # Маршруты для приложения main
     path('config/', include('config.urls')),  # Маршруты для приложения config
-    path('users/', include('users.urls')),
+    path('users/', include('users.urls', namespace='users')),
     path('api/component/<str:component_type>/<int:component_id>/', component_detail, name='component_detail'),
     path('feedback/', include('feedback.urls')),
 ]

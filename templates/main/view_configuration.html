@@ -1,0 +1,158 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}{{ configuration.name }} - Snitch PC{% endblock %}
+
+{% block content %}
+<div class="container">
+    <div class="configuration-view">
+        <div class="configuration-header">
+            <h1>{{ configuration.name }}</h1>
+            <div class="configuration-meta">
+                <span class="date">Создано: {{ configuration.created_at|date:"d.m.Y H:i" }}</span>
+                <span class="visibility">
+                    <i class="fas {% if configuration.is_public %}fa-globe{% else %}fa-lock{% endif %}"></i>
+                    {% if configuration.is_public %}Публичная{% else %}Приватная{% endif %}
+                </span>
+            </div>
+        </div>
+
+        <div class="configuration-content">
+            <div class="components-list">
+                <h2>Компоненты</h2>
+                {% for category, component in configuration.components.items %}
+                <div class="component-item">
+                    <h3>{{ category }}</h3>
+                    <div class="component-details">
+                        <p class="name">{{ component.name }}</p>
+                        <p class="price">{{ component.price }} ₽</p>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+
+            <div class="configuration-summary">
+                <h2>Итого</h2>
+                <div class="total-price">
+                    <span>{{ configuration.total_price }} ₽</span>
+                </div>
+                <div class="configuration-actions">
+                    <a href="{% url 'main:config' %}?load={{ configuration.id }}" class="btn btn-primary">
+                        Редактировать
+                    </a>
+                    <button class="btn btn-secondary" onclick="window.history.back()">
+                        Назад
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+    .configuration-view {
+        background-color: var(--primary);
+        border-radius: 8px;
+        padding: 2rem;
+        margin: 2rem 0;
+    }
+
+    .configuration-header {
+        margin-bottom: 2rem;
+    }
+
+    .configuration-header h1 {
+        color: var(--text);
+        margin-bottom: 1rem;
+    }
+
+    .configuration-meta {
+        display: flex;
+        gap: 1rem;
+        color: var(--text-secondary);
+    }
+
+    .configuration-content {
+        display: grid;
+        grid-template-columns: 2fr 1fr;
+        gap: 2rem;
+    }
+
+    .components-list {
+        background-color: var(--secondary);
+        border-radius: 8px;
+        padding: 1.5rem;
+    }
+
+    .components-list h2 {
+        color: var(--text);
+        margin-bottom: 1.5rem;
+    }
+
+    .component-item {
+        margin-bottom: 1.5rem;
+        padding-bottom: 1.5rem;
+        border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+    }
+
+    .component-item:last-child {
+        margin-bottom: 0;
+        padding-bottom: 0;
+        border-bottom: none;
+    }
+
+    .component-item h3 {
+        color: var(--text-secondary);
+        font-size: 1rem;
+        margin-bottom: 0.5rem;
+    }
+
+    .component-details {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+    }
+
+    .component-details .name {
+        color: var(--text);
+        margin: 0;
+    }
+
+    .component-details .price {
+        color: var(--accent);
+        margin: 0;
+        font-weight: bold;
+    }
+
+    .configuration-summary {
+        background-color: var(--secondary);
+        border-radius: 8px;
+        padding: 1.5rem;
+        height: fit-content;
+    }
+
+    .configuration-summary h2 {
+        color: var(--text);
+        margin-bottom: 1rem;
+    }
+
+    .total-price {
+        font-size: 2rem;
+        font-weight: bold;
+        color: var(--accent);
+        margin-bottom: 1.5rem;
+    }
+
+    .configuration-actions {
+        display: flex;
+        flex-direction: column;
+        gap: 1rem;
+    }
+
+    @media (max-width: 768px) {
+        .configuration-content {
+            grid-template-columns: 1fr;
+        }
+    }
+</style>
+{% endblock %} 

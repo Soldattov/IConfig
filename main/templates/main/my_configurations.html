@@ -1,0 +1,92 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block content %}
+<link rel="stylesheet" href="{% static 'css/profile.css' %}">
+
+<section class="account-section">
+    <div class="container">
+        <div class="account-header">
+            <div class="account-avatar">
+                <i class="fas fa-user"></i>
+            </div>
+            <div class="account-info">
+                <h2>{{ user.get_full_name|default:user.username }}</h2>
+                <p>{{ user.email }}</p>
+            </div>
+        </div>
+
+        <div class="account-tabs">
+            <div class="account-tab" data-tab="profile">Профиль</div>
+            <div class="account-tab active" data-tab="configurations">Сохранённые конфигурации</div>
+            <div class="account-tab" data-tab="orders">Мои заказы</div>
+        </div>
+
+        <div class="tab-content active" id="configurations">
+            <h3>Мои сборки</h3>
+            <div class="configurations-list">
+                {% for config in configurations %}
+                <div class="configuration-card">
+                    <div class="configuration-header">
+                        <div>
+                            <div class="configuration-title">{{ config.name }}</div>
+                            <div class="configuration-date">Создано: {{ config.created_at|date:"d.m.Y" }}</div>
+                        </div>
+                        <div class="configuration-actions">
+                            <a href="{% url 'main:view_configuration' config.id %}" class="btn btn-outline btn-sm">Открыть в конфигураторе</a>
+                            <button class="btn btn-sm">Добавить в корзину</button>
+                        </div>
+                    </div>
+
+                    <table class="configuration-table">
+                        <thead>
+                            <tr>
+                                <th>Компонент</th>
+                                <th>Модель</th>
+                                <th>Цена</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for component in config.components.all %}
+                            <tr>
+                                <td>{{ component.get_component_type_display }}</td>
+                                <td>{{ component.name }}</td>
+                                <td>{{ component.price }} ₽</td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+
+                    <div class="configuration-total">
+                        Итого: <span>{{ config.total_price }} ₽</span>
+                    </div>
+                </div>
+                {% empty %}
+                <div class="empty-message">
+                    <i class="fas fa-desktop"></i>
+                    <h3>У вас пока нет сохранённых конфигураций</h3>
+                    <p>Создайте свою первую сборку в конфигураторе</p>
+                    <a href="{% url 'main:config' %}" class="btn" style="margin-top: 20px;">Создать конфигурацию</a>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+    </div>
+</section>
+
+<script>
+    // Переключение между вкладками
+    document.querySelectorAll('.account-tab').forEach(tab => {
+        tab.addEventListener('click', () => {
+            // Удаляем активный класс у всех вкладок и контента
+            document.querySelectorAll('.account-tab').forEach(t => t.classList.remove('active'));
+            document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+
+            // Добавляем активный класс к выбранной вкладке и соответствующему контенту
+            tab.classList.add('active');
+            const tabId = tab.getAttribute('data-tab');
+            document.getElementById(tabId).classList.add('active');
+        });
+    });
+</script>
+{% endblock %} 

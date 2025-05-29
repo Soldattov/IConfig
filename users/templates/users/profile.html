@@ -1,407 +1,318 @@
 {% extends "base.html" %}
 {% load static %}
 
-
-
-
 {% block head %}
 <link rel="stylesheet" href="{% static 'css/styles.css' %}">
 
 <style>
-    /* Стили модального окна и затемнения фона */
-    .modal {
-        position: fixed;
-        z-index: 1000;
-        left: 50%;
-        top: 50%;
-        transform: translate(-50%, -50%);
-        background: rgb(8, 21, 41);
-        border-radius: 5px;
-        padding: 20px;
-        box-shadow: 0 0 10px rgba(0, 0, 0, 0.5);
-        width: 400px;
+    :root {
+        --primary: #1e1e2d;
+        --secondary: #2d2d42;
+        --accent: #ff5e3a;
+        --text: #ffffff;
+        --text-secondary: #b5b5c3;
     }
 
-    .modal-backdrop {
-        position: fixed;
-        top: 0;
-        left: 0;
+    .container {
         width: 100%;
-        height: 100%;
-        background: rgba(0, 0, 0, 0.5);
-        z-index: 900;
+        max-width: 1200px;
+        margin: 0 auto;
+        padding: 0 15px;
     }
 
-    .form-group {
+    .btn {
+        display: inline-block;
+        padding: 14px 30px;
+        background-color: var(--accent);
+        color: white;
+        border-radius: 6px;
+        text-decoration: none;
+        font-weight: 600;
+        font-size: 16px;
+        transition: all 0.3s;
+        border: none;
+        cursor: pointer;
+    }
+
+    .btn:hover {
+        background-color: #ff4a2a;
+        transform: translateY(-2px);
+    }
+
+    .btn-outline {
+        background: transparent;
+        border: 1px solid var(--accent);
+        color: var(--accent);
+    }
+
+    .btn-outline:hover {
+        background: var(--accent);
+        color: white;
+    }
+
+    .btn-danger {
+        background-color: #dc3545;
+        border-color: #dc3545;
+    }
+
+    .btn-danger:hover {
+        background-color: #c82333;
+        border-color: #bd2130;
+    }
+
+    .profile-header {
+        background: var(--primary);
+        border-radius: 8px;
+        padding: 20px;
+        margin-bottom: 20px;
+    }
+
+    .profile-header h2 {
+        color: var(--text);
         margin-bottom: 15px;
     }
 
-    .form-group input {
-        width: 100%;
-        padding: 8px;
-        box-sizing: border-box;
+    .user-info {
+        color: var(--text-secondary);
     }
 
-    .form-group input.error {
-        border: 1px solid red;
+    .welcome-message {
+        font-size: 1.2em;
+        margin-bottom: 10px;
+        color: var(--text);
     }
 
-    .error-message {
-        font-size: 0.9em;
-        color: red;
-        margin-top: 5px;
-        display: none;
+    .email-info {
+        font-size: 1em;
     }
 
-    .modal-buttons {
-        text-align: right;
+    .profile-actions {
+        display: flex;
+        gap: 10px;
+        margin-bottom: 20px;
     }
 
-    .modal-buttons button {
-        margin-left: 10px;
+    .profile-actions .btn {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+    }
+
+    .profile-actions .btn i {
+        font-size: 16px;
     }
 
     .saved-configurations {
-        margin: 30px auto;
-        width: 90%;
-        font-family: Arial, sans-serif;
+        margin-top: 30px;
     }
 
-    .saved-configurations h3 {
-        text-align: center;
+    .configurations-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+        gap: 20px;
+        margin-top: 20px;
+    }
+
+    .configuration-card {
+        background: var(--primary);
+        border-radius: 8px;
+        padding: 20px;
+        border-left: 3px solid var(--accent);
+    }
+
+    .configuration-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
         margin-bottom: 15px;
     }
 
-    .saved-configurations table {
-        width: 100%;
-        border-collapse: collapse;
+    .configuration-header h3 {
+        margin: 0;
+        color: var(--text);
     }
 
-    .saved-configurations th,
-    .saved-configurations td {
-        padding: 10px;
-        border: 1px solid #ddd;
-        /* Отключаем возможность выделения текста по отдельным ячейкам */
-        -webkit-user-select: none;
-        -moz-user-select: none;
-        -ms-user-select: none;
-        user-select: none;
+    .configuration-actions {
+        display: flex;
+        gap: 10px;
     }
 
-    /* Заголовок таблицы */
-    .saved-configurations th {
-        background-color: #1407d686;
-        text-align: left;
+    .configuration-actions button {
+        background: none;
+        border: none;
+        color: var(--text-secondary);
+        cursor: pointer;
+        padding: 5px;
+        transition: color 0.3s;
     }
 
-    /* Задаём относительные ширины столбцов */
-    .saved-configurations .col-number {
-        width: 10%;
+    .configuration-actions button:hover {
+        color: var(--accent);
     }
 
-    .saved-configurations .col-price {
-        width: 20%;
+    .configuration-details {
+        margin-bottom: 15px;
     }
 
-    .saved-configurations .col-config {
-        width: 70%;
-
+    .configuration-details p {
+        margin: 5px 0;
+        color: var(--text-secondary);
     }
 
-    /* При наведении на строку подсвечиваем её */
-    .saved-configurations tbody tr:hover {
-        background-color: #f9f9f9;
+    .configuration-footer {
+        display: flex;
+        gap: 10px;
     }
 
-    /* Класс для выбранной строки */
-    .saved-configurations tbody tr.selected {
-        background-color: #d0eaff;
+    .configuration-footer .btn {
+        flex: 1;
+    }
+
+    .no-configurations {
+        text-align: center;
+        padding: 40px;
+        background: var(--primary);
+        border-radius: 8px;
+        color: var(--text-secondary);
+    }
+
+    .no-configurations p {
+        margin-bottom: 20px;
+    }
+
+    @media (max-width: 768px) {
+        .profile-actions {
+            flex-direction: column;
+        }
+
+        .configuration-footer {
+            flex-direction: column;
+        }
     }
 </style>
 {% endblock %}
 
-
 {% block content %}
-<div class="container">
-    <h2>Здравствуйте, {{ user.first_name }}</h2>
-    <p>Ваш email: {{ user.email }}</p>
-    <button id="change-password-btn" class="btn">Изменить пароль</button>
-    <a href="{% url 'logout' %}" class="btn">Выйти</a>
-    <button id="delete-account-btn" class="btn btn-danger">Удалить учетную запись</button>
-    <div id="loader" style="display: none;">Удаление учетной записи...</div>
+<link rel="stylesheet" href="{% static 'css/profile.css' %}">
 
+<section class="account-section">
+    <div class="container">
+        <div class="account-header">
+            <div class="account-avatar">
+                <i class="fas fa-user"></i>
+            </div>
+            <div class="account-info">
+                <h2>{{ user.get_full_name|default:user.username }}</h2>
+                <p>{{ user.email }}</p>
+            </div>
+        </div>
 
-</div>
-{% endblock %}
+        <div class="account-tabs">
+            <div class="account-tab active" data-tab="profile">Профиль</div>
+            <div class="account-tab" data-tab="configurations">Сохранённые конфигурации</div>
+            <div class="account-tab" data-tab="orders">Мои заказы</div>
+        </div>
 
-{% block scripts %}
-<!-- Скрипт для обработки удаления -->
-<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+        <div class="tab-content active" id="profile">
+            <div class="profile-form">
+                <h3>Личные данные</h3>
+
+                <form method="post">
+                    {% csrf_token %}
+                    <div class="form-group">
+                        <label for="id_first_name">Имя</label>
+                        <input type="text" id="id_first_name" name="first_name" value="{{ user.first_name }}">
+                    </div>
+
+                    <div class="form-group">
+                        <label for="id_last_name">Фамилия</label>
+                        <input type="text" id="id_last_name" name="last_name" value="{{ user.last_name }}">
+                    </div>
+
+                    <div class="form-group">
+                        <label for="id_email">Email</label>
+                        <input type="email" id="id_email" name="email" value="{{ user.email }}">
+                    </div>
+
+                    <button type="submit" class="btn">Сохранить изменения</button>
+                </form>
+            </div>
+        </div>
+
+        <div class="tab-content" id="configurations">
+            <h3>Мои сборки</h3>
+            <div class="configurations-list">
+                {% for config in configurations %}
+                <div class="configuration-card">
+                    <div class="configuration-header">
+                        <div>
+                            <div class="configuration-title">{{ config.name }}</div>
+                            <div class="configuration-date">Создано: {{ config.created_at|date:"d.m.Y" }}</div>
+                        </div>
+                        <div class="configuration-actions">
+                            <a href="{% url 'main:view_configuration' config.id %}" class="btn btn-outline btn-sm">Открыть в конфигураторе</a>
+                            <button class="btn btn-sm">Добавить в корзину</button>
+                        </div>
+                    </div>
+
+                    <table class="configuration-table">
+                        <thead>
+                            <tr>
+                                <th>Компонент</th>
+                                <th>Модель</th>
+                                <th>Цена</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for component in config.components.all %}
+                            <tr>
+                                <td>{{ component.get_component_type_display }}</td>
+                                <td>{{ component.name }}</td>
+                                <td>{{ component.price }} ₽</td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+
+                    <div class="configuration-total">
+                        Итого: <span>{{ config.total_price }} ₽</span>
+                    </div>
+                </div>
+                {% empty %}
+                <div class="empty-message">
+                    <i class="fas fa-desktop"></i>
+                    <h3>У вас пока нет сохранённых конфигураций</h3>
+                    <p>Создайте свою первую сборку в конфигураторе</p>
+                    <a href="{% url 'main:config' %}" class="btn" style="margin-top: 20px;">Создать конфигурацию</a>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+
+        <div class="tab-content" id="orders">
+            <div class="empty-message">
+                <i class="fas fa-box-open"></i>
+                <h3>У вас пока нет заказов</h3>
+                <p>После оформления заказа вы сможете отслеживать его статус здесь</p>
+                <a href="{% url 'main:index' %}" class="btn" style="margin-top: 20px;">Перейти в каталог</a>
+            </div>
+        </div>
+    </div>
+</section>
+
 <script>
-    function deleteAccount() {
-        var deferred = $.Deferred();
-        $("#loader").show();
+    // Переключение между вкладками
+    document.querySelectorAll('.account-tab').forEach(tab => {
+        tab.addEventListener('click', () => {
+            // Удаляем активный класс у всех вкладок и контента
+            document.querySelectorAll('.account-tab').forEach(t => t.classList.remove('active'));
+            document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
 
-        $.ajax({
-            url: "{% url 'delete_account' %}",
-            method: "POST",
-            headers: {
-                'Content-Type': 'application/json',
-                'X-CSRFToken': getCookie('csrftoken')
-            },
-            data: JSON.stringify({}),
-            success: function (data) {
-
-            },
-            fail: function (e) { },
-
-        })
-            .done(function (response) {
-                deferred.resolve(response);
-            })
-            .fail(function (error) {
-                deferred.reject(error);
-            })
-            .always(function () {
-                $("#loader").hide();
-            });
-
-        return deferred.promise();
-    }
-
-    // Обработчик клика для кнопки "Удалить учетную запись"
-    document.getElementById('delete-account-btn').addEventListener('click', function () {
-        if (confirm("Вы уверены, что хотите удалить учетную запись?")) {
-            deleteAccount().then(function () {
-                // Успешное удаление: перенаправляем на главную страницу
-                setTimeout(function () {
-                    window.location.href = '/';
-                }, 2000);
-            }, function () {
-                // Ошибка при удалении
-                alert("Ошибка удаления учетной записи.");
-            });
-        }
-    });
-
-    // Функция для получения CSRF-токена из cookies
-    function getCookie(name) {
-        let cookieValue = null;
-        if (document.cookie && document.cookie !== '') {
-            const cookies = document.cookie.split(';');
-            for (let i = 0; i < cookies.length; i++) {
-                const cookie = cookies[i].trim();
-                // Проверка, начинается ли cookie с нужного имени
-                if (cookie.substring(0, name.length + 1) === (name + '=')) {
-                    cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
-                    break;
-                }
-            }
-        }
-        return cookieValue;
-    }
-</script>
-<!-- Модальное окно смены пароля -->
-<div id="password-modal" class="modal" style="display: none;">
-    <h2>Замена пароля</h2>
-    <form id="password-form">
-        <div class="form-group">
-            <label for="current-password">Текущий пароль</label>
-            <input type="password" id="current-password" placeholder="Введите текущий пароль">
-            <small id="current-error" class="error-message">Пароль неверный</small>
-        </div>
-        <div class="form-group">
-            <label for="new-password">Новый пароль</label>
-            <input type="password" id="new-password" placeholder="Введите новый пароль">
-            <small id="new-error" class="error-message">Пароль должен содержать не менее 8 символов</small>
-        </div>
-        <div class="form-group">
-            <label for="confirm-password">Повторите новый пароль</label>
-            <input type="password" id="confirm-password" placeholder="Повторите новый пароль">
-            <small id="confirm-error" class="error-message">Пароли не совпадают</small>
-        </div>
-        <div class="modal-buttons">
-            <button type="button" id="save-password" disabled>Изменить</button>
-            <button type="button" id="cancel-password">Отмена</button>
-        </div>
-    </form>
-</div>
-<!-- Затемнённый фон -->
-<div id="modal-backdrop" class="modal-backdrop" style="display: none;"></div>
-
-<script>
-    // Функция получения CSRF-токена 
-    function getCookie(name) {
-        let cookieValue = null;
-        if (document.cookie && document.cookie !== "") {
-            const cookies = document.cookie.split(';');
-            for (let i = 0; i < cookies.length; i++) {
-                const cookie = cookies[i].trim();
-                if (cookie.substring(0, name.length + 1) === (name + '=')) {
-                    cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
-                    break;
-                }
-            }
-        }
-        return cookieValue;
-    }
-
-    // Функция закрытия модального окна и сброса формы
-    function closeModal() {
-        document.getElementById('password-modal').style.display = 'none';
-        document.getElementById('modal-backdrop').style.display = 'none';
-        document.getElementById('password-form').reset();
-        document.querySelectorAll('.error-message').forEach(el => el.style.display = 'none');
-        document.querySelectorAll('.form-group input').forEach(el => el.classList.remove('error'));
-        document.getElementById('save-password').disabled = true;
-    }
-
-    // Функция показа уведомления в виде плашки в верхней части страницы
-    function showToast(message, duration) {
-        const toast = document.createElement('div');
-        toast.innerText = message;
-        toast.style.position = 'fixed';
-        toast.style.top = '20px';
-        toast.style.left = '50%';
-        toast.style.transform = 'translateX(-50%)';
-        toast.style.width = '80%';
-        toast.style.textAlign = 'center';
-        toast.style.backgroundColor = 'rgba(0, 128, 0, 0.8)';
-        toast.style.color = '#fff';
-        toast.style.padding = '15px';
-        toast.style.fontSize = '1.2em';
-        toast.style.borderRadius = '5px';
-        toast.style.zIndex = 1100;
-        document.body.appendChild(toast);
-        setTimeout(() => {
-            toast.remove();
-        }, duration);
-    }
-
-    // Открытие модального окна смены пароля
-    document.getElementById('change-password-btn').addEventListener('click', function () {
-        document.getElementById('password-modal').style.display = 'block';
-        document.getElementById('modal-backdrop').style.display = 'block';
-    });
-
-    // Закрытие модального окна при нажатии кнопки "Отмена"
-    document.getElementById('cancel-password').addEventListener('click', function () {
-        closeModal();
-    });
-
-    // Динамическая проверка текущего пароля через сервер
-    document.getElementById('current-password').addEventListener('blur', function () {
-        const currentInput = document.getElementById('current-password');
-        if (currentInput.value.trim() === "") {
-            document.getElementById('current-error').innerText = "Введите текущий пароль";
-            document.getElementById('current-error').style.display = "block";
-            currentInput.classList.add('error');
-            checkFormValidity();
-            return;
-        }
-        fetch('/users/verify-current-password/', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-                'X-CSRFToken': getCookie('csrftoken')
-            },
-            body: JSON.stringify({ current_password: currentInput.value })
-        })
-            .then(response => response.json())
-            .then(data => {
-                if (!data.valid) {
-                    document.getElementById('current-error').innerText = "Пароль неверный";
-                    document.getElementById('current-error').style.display = "block";
-                    currentInput.classList.add('error');
-                } else {
-                    document.getElementById('current-error').style.display = "none";
-                    currentInput.classList.remove('error');
-                }
-                checkFormValidity();
-            })
-            .catch(error => {
-                console.error("Ошибка проверки текущего пароля:", error);
-                document.getElementById('current-error').innerText = "Ошибка проверки";
-                document.getElementById('current-error').style.display = "block";
-                currentInput.classList.add('error');
-                checkFormValidity();
-            });
-    });
-
-    // Валидация нового пароля: проверка на длину не менее 8 символов
-    document.getElementById('new-password').addEventListener('blur', function () {
-        const newPass = document.getElementById('new-password');
-        if (newPass.value.length < 8) {
-            document.getElementById('new-error').innerText = "Пароль должен содержать не менее 8 символов";
-            document.getElementById('new-error').style.display = "block";
-            newPass.classList.add('error');
-        } else {
-            document.getElementById('new-error').style.display = "none";
-            newPass.classList.remove('error');
-        }
-        checkFormValidity();
-    });
-
-    // Валидация подтверждения нового пароля
-    document.getElementById('confirm-password').addEventListener('blur', function () {
-        const newPassVal = document.getElementById('new-password').value;
-        const confirmPass = document.getElementById('confirm-password');
-        if (confirmPass.value !== newPassVal) {
-            document.getElementById('confirm-error').innerText = "Пароли не совпадают";
-            document.getElementById('confirm-error').style.display = "block";
-            confirmPass.classList.add('error');
-        } else {
-            document.getElementById('confirm-error').style.display = "none";
-            confirmPass.classList.remove('error');
-        }
-        checkFormValidity();
-    });
-
-    // Функция проверки валидности всей формы
-    function checkFormValidity() {
-        const currentVal = document.getElementById('current-password').value.trim();
-        const newVal = document.getElementById('new-password').value.trim();
-        const confirmVal = document.getElementById('confirm-password').value.trim();
-        const currentError = document.getElementById('current-error').style.display !== "none";
-        const newError = document.getElementById('new-error').style.display !== "none";
-        const confirmError = document.getElementById('confirm-error').style.display !== "none";
-
-        if (currentVal && newVal && confirmVal && !currentError && !newError && !confirmError) {
-            document.getElementById('save-password').disabled = false;
-        } else {
-            document.getElementById('save-password').disabled = true;
-        }
-    }
-
-    // Обработка нажатия кнопки "Изменить"
-    document.getElementById('save-password').addEventListener('click', function () {
-        const currentPassword = document.getElementById('current-password').value;
-        const newPassword = document.getElementById('new-password').value;
-
-        fetch('/users/change-password/', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-                'X-CSRFToken': getCookie('csrftoken')
-            },
-            body: JSON.stringify({
-                current_password: currentPassword,
-                new_password: newPassword
-            })
-        })
-            .then(response => {
-                if (response.ok) {
-                    // Закрытие модального окна сразу после успешного обновления
-                    closeModal();
-                    // Показ уведомления – длинная плашка вверху
-                    showToast("Пароль изменен", 1000);
-                } else {
-                    alert("Ошибка при изменении пароля");
-                }
-            })
-            .catch(error => {
-                alert("Ошибка: " + error);
-            });
+            // Добавляем активный класс к выбранной вкладке и соответствующему контенту
+            tab.classList.add('active');
+            const tabId = tab.getAttribute('data-tab');
+            document.getElementById(tabId).classList.add('active');
+        });
     });
 </script>
 {% endblock %}

@@ -1,0 +1,194 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Мои конфигурации - Snitch PC{% endblock %}
+
+{% block content %}
+<div class="container">
+    <h1 class="page-title">Мои конфигурации</h1>
+    
+    <div class="configurations-grid">
+        {% for config in configurations %}
+        <div class="configuration-card">
+            <div class="configuration-header">
+                <h3>{{ config.name }}</h3>
+                <div class="configuration-actions">
+                    <button class="btn-toggle-public" data-config-id="{{ config.id }}" 
+                            title="{% if config.is_public %}Сделать приватным{% else %}Сделать публичным{% endif %}">
+                        <i class="fas {% if config.is_public %}fa-globe{% else %}fa-lock{% endif %}"></i>
+                    </button>
+                    <button class="btn-delete" data-config-id="{{ config.id }}" title="Удалить">
+                        <i class="fas fa-trash"></i>
+                    </button>
+                </div>
+            </div>
+            <div class="configuration-details">
+                <p class="price">Итого: {{ config.total_price }} ₽</p>
+                <p class="date">Создано: {{ config.created_at|date:"d.m.Y H:i" }}</p>
+            </div>
+            <div class="configuration-footer">
+                <a href="{% url 'main:view_configuration' config.id %}" class="btn btn-primary">Просмотреть</a>
+                <a href="{% url 'main:config' %}?load={{ config.id }}" class="btn btn-secondary">Редактировать</a>
+            </div>
+        </div>
+        {% empty %}
+        <div class="no-configurations">
+            <p>У вас пока нет сохраненных конфигураций</p>
+            <a href="{% url 'main:config' %}" class="btn btn-primary">Создать конфигурацию</a>
+        </div>
+        {% endfor %}
+    </div>
+</div>
+
+<style>
+    .page-title {
+        margin: 2rem 0;
+        color: var(--text);
+    }
+
+    .configurations-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+        gap: 2rem;
+        margin-bottom: 2rem;
+    }
+
+    .configuration-card {
+        background-color: var(--primary);
+        border-radius: 8px;
+        padding: 1.5rem;
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    }
+
+    .configuration-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 1rem;
+    }
+
+    .configuration-header h3 {
+        margin: 0;
+        color: var(--text);
+    }
+
+    .configuration-actions {
+        display: flex;
+        gap: 0.5rem;
+    }
+
+    .configuration-actions button {
+        background: none;
+        border: none;
+        color: var(--text-secondary);
+        cursor: pointer;
+        padding: 0.5rem;
+        transition: color 0.3s;
+    }
+
+    .configuration-actions button:hover {
+        color: var(--accent);
+    }
+
+    .configuration-details {
+        margin-bottom: 1rem;
+    }
+
+    .configuration-details p {
+        margin: 0.5rem 0;
+        color: var(--text-secondary);
+    }
+
+    .configuration-details .price {
+        font-size: 1.2rem;
+        font-weight: bold;
+        color: var(--text);
+    }
+
+    .configuration-footer {
+        display: flex;
+        gap: 1rem;
+    }
+
+    .no-configurations {
+        grid-column: 1 / -1;
+        text-align: center;
+        padding: 3rem;
+        background-color: var(--primary);
+        border-radius: 8px;
+    }
+
+    .no-configurations p {
+        margin-bottom: 1rem;
+        color: var(--text-secondary);
+    }
+</style>
+
+{% block scripts %}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Handle delete configuration
+    document.querySelectorAll('.btn-delete').forEach(button => {
+        button.addEventListener('click', async function() {
+            if (!confirm('Вы уверены, что хотите удалить эту конфигурацию?')) {
+                return;
+            }
+            
+            const configId = this.dataset.configId;
+            try {
+                const response = await fetch(`/config/${configId}/delete/`, {
+                    method: 'POST',
+                    headers: {
+                        'X-CSRFToken': document.querySelector('[name=csrfmiddlewaretoken]').value
+                    }
+                });
+                
+                if (response.ok) {
+                    this.closest('.configuration-card').remove();
+                } else {
+                    alert('Ошибка при удалении конфигурации');
+                }
+            } catch (error) {
+                console.error('Error:', error);
+                alert('Произошла ошибка при удалении конфигурации');
+            }
+        });
+    });
+
+    // Handle toggle public/private
+    document.querySelectorAll('.btn-toggle-public').forEach(button => {
+        button.addEventListener('click', async function() {
+            const configId = this.dataset.configId;
+            try {
+                const response = await fetch(`/config/${configId}/toggle-public/`, {
+                    method: 'POST',
+                    headers: {
+                        'X-CSRFToken': document.querySelector('[name=csrfmiddlewaretoken]').value
+                    }
+                });
+                
+                if (response.ok) {
+                    const data = await response.json();
+                    const icon = this.querySelector('i');
+                    if (data.is_public) {
+                        icon.classList.remove('fa-lock');
+                        icon.classList.add('fa-globe');
+                        this.title = 'Сделать приватным';
+                    } else {
+                        icon.classList.remove('fa-globe');
+                        icon.classList.add('fa-lock');
+                        this.title = 'Сделать публичным';
+                    }
+                } else {
+                    alert('Ошибка при изменении видимости конфигурации');
+                }
+            } catch (error) {
+                console.error('Error:', error);
+                alert('Произошла ошибка при изменении видимости конфигурации');
+            }
+        });
+    });
+});
+</script>
+{% endblock %}
+{% endblock %} 

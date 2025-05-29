@@ -1,0 +1,284 @@
+{% extends 'base.html' %}
+{% load static %}
+{% load config_tags %}
+
+{% block title %}Конфигуратор ПК - Snitch PC{% endblock %}
+
+{% block content %}
+<div class="container">
+    <div class="configurator">
+        <div class="configurator-header">
+            <h1>Конфигуратор ПК</h1>
+            <button id="save-config" class="btn btn-primary" style="display: none;">
+                <i class="fas fa-save"></i> Сохранить конфигурацию
+            </button>
+        </div>
+
+        <div class="configurator-content">
+            <div class="components-sidebar">
+                {% for type, name in component_types.items %}
+                <div class="component-category">
+                    <div class="category-header">
+                        <span>{{ name }}</span>
+                        <i class="fas fa-chevron-down"></i>
+                    </div>
+                    <div class="category-content">
+                        {% get_component_list type as components %}
+                        {% for component in components %}
+                        <div class="component-option" 
+                             data-category="{{ type }}"
+                             data-id="{{ component.id }}"
+                             data-price="{{ component.price }}"
+                             {% if type == 'gpu' or type == 'cpu' %}data-power="{{ component.relative_power }}"{% endif %}
+                             {% if type == 'gpu' %}data-consumption="{{ component.consumption }}" data-size="{{ component.size }}"{% endif %}
+                             {% if type == 'cpu' %}data-socket="{{ component.socket }}"{% endif %}
+                             {% if type == 'motherboard' %}data-socket="{{ component.socket }}" data-ram-type="{{ component.ram_type }}" data-form-factor="{{ component.form_factor }}" data-sata-slots="{{ component.sata_slot }}"{% endif %}
+                             {% if type == 'ram' %}data-type="{{ component.typee }}"{% endif %}
+                             {% if type == 'cooling' %}data-socket="{{ component.socket }}"{% endif %}
+                             {% if type == 'psu' %}data-power="{{ component.power }}"{% endif %}
+                             {% if type == 'storage' %}data-type="{{ component.typee }}"{% endif %}
+                             {% if type == 'case' %}data-form-factor="{{ component.supported_form_factor }}" data-size="{{ component.size }}"{% endif %}>
+                            <img src="{{ component.picture|default:default_image }}" 
+                                 alt="{{ component.model }}" 
+                                 class="component-image"
+                                 onerror="this.src='{{ default_image }}'">
+                            <div class="component-info">
+                                <span class="component-name">{{ component.model }}</span>
+                                <span class="component-price">{{ component.price }} ₽</span>
+                            </div>
+                        </div>
+                        {% endfor %}
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+    </div>
+</div>
+
+<div id="save-config-modal" class="modal hidden">
+    <div class="modal-content">
+        <span class="modal-close">&times;</span>
+        <h2>Сохранить конфигурацию</h2>
+        <form id="save-config-form">
+            {% csrf_token %}
+            <div class="form-group">
+                <label for="config-name">Название конфигурации</label>
+                <input type="text" id="config-name" name="name" required>
+            </div>
+            <div class="form-group">
+                <label class="checkbox-label">
+                    <input type="checkbox" id="config-public" name="is_public">
+                    Сделать публичной
+                </label>
+            </div>
+            <button type="submit" class="btn btn-primary">Сохранить</button>
+        </form>
+    </div>
+</div>
+
+<style>
+    .configurator-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 2rem;
+    }
+
+    .configurator-header h1 {
+        color: var(--text);
+        margin: 0;
+    }
+
+    .checkbox-label {
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+        color: var(--text);
+        cursor: pointer;
+    }
+
+    .checkbox-label input[type="checkbox"] {
+        width: auto;
+    }
+
+    .components-sidebar {
+        width: 300px;
+        flex-shrink: 0;
+    }
+
+    .component-category {
+        background: var(--primary);
+        border-radius: 8px;
+        margin-bottom: 20px;
+        overflow: hidden;
+    }
+
+    .category-header {
+        background: var(--secondary);
+        padding: 15px 20px;
+        font-weight: 600;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        cursor: pointer;
+    }
+
+    .category-content {
+        padding: 15px;
+    }
+
+    .component-option {
+        display: flex;
+        justify-content: space-between;
+        padding: 12px 0;
+        border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+        cursor: pointer;
+    }
+
+    .component-option:last-child {
+        border-bottom: none;
+    }
+
+    .component-option.active {
+        color: var(--accent);
+    }
+
+    .component-image {
+        width: 40px;
+        height: 40px;
+        margin-right: 10px;
+        object-fit: contain;
+    }
+
+    .component-info {
+        flex-grow: 1;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+    }
+
+    .component-name {
+        font-weight: 500;
+    }
+
+    .component-price {
+        font-weight: 600;
+    }
+</style>
+
+{% block scripts %}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const saveConfigBtn = document.getElementById('save-config');
+    const saveConfigModal = document.getElementById('save-config-modal');
+    const saveConfigForm = document.getElementById('save-config-form');
+    const modalClose = saveConfigModal.querySelector('.modal-close');
+
+    function updateSaveButton() {
+        const selectedComponents = document.querySelectorAll('.component-option.selected');
+        const hasComponents = selectedComponents.length > 0;
+        saveConfigBtn.style.display = hasComponents ? 'block' : 'none';
+    }
+
+    saveConfigBtn.addEventListener('click', function() {
+        saveConfigModal.classList.remove('hidden');
+        document.getElementById('modal-backdrop').classList.remove('hidden');
+    });
+
+    modalClose.addEventListener('click', function() {
+        saveConfigModal.classList.add('hidden');
+        document.getElementById('modal-backdrop').classList.add('hidden');
+    });
+
+    saveConfigForm.addEventListener('submit', async function(e) {
+        e.preventDefault();
+
+        const formData = {
+            name: document.getElementById('config-name').value,
+            is_public: document.getElementById('config-public').checked,
+            components: getCurrentConfiguration(), 
+            total_price: calculateTotalPrice() 
+        };
+
+        try {
+            const response = await fetch('{% url "main:save_configuration" %}', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRFToken': document.querySelector('[name=csrfmiddlewaretoken]').value
+                },
+                body: JSON.stringify(formData)
+            });
+
+            const data = await response.json();
+
+            if (response.ok) {
+                alert('Конфигурация успешно сохранена');
+                saveConfigModal.classList.add('hidden');
+                document.getElementById('modal-backdrop').classList.add('hidden');
+                window.location.href = '{% url "main:my_configurations" %}';
+            } else {
+                alert(data.message || 'Ошибка при сохранении конфигурации');
+            }
+        } catch (error) {
+            console.error('Error:', error);
+            alert('Произошла ошибка при сохранении конфигурации');
+        }
+    });
+
+    function getCurrentConfiguration() {
+        const components = {};
+        const selectedComponents = document.querySelectorAll('.component-option.selected');
+        
+        selectedComponents.forEach(component => {
+            const category = component.dataset.category;
+            const componentId = component.dataset.id;
+            const name = component.querySelector('.component-name').textContent;
+            const price = parseFloat(component.dataset.price);
+            
+            components[category] = {
+                id: componentId,
+                name: name,
+                price: price
+            };
+        });
+        
+        return components;
+    }
+
+    function calculateTotalPrice() {
+        const selectedComponents = document.querySelectorAll('.component-option.selected');
+        let total = 0;
+        
+        selectedComponents.forEach(component => {
+            total += parseFloat(component.dataset.price);
+        });
+        
+        return total;
+    }
+
+    // Обработчик клика по компоненту
+    document.querySelectorAll('.component-option').forEach(option => {
+        option.addEventListener('click', function() {
+            const category = this.dataset.category;
+            
+            // Убираем выделение у других компонентов той же категории
+            document.querySelectorAll(`.component-option[data-category="${category}"]`).forEach(opt => {
+                opt.classList.remove('selected');
+            });
+            
+            // Добавляем выделение выбранному компоненту
+            this.classList.add('selected');
+            
+            // Обновляем отображение кнопки сохранения
+            updateSaveButton();
+        });
+    });
+
+    // Начальное обновление кнопки
+    updateSaveButton();
+});
+</script>
+{% endblock %}
+{% endblock %} 

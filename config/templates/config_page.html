@@ -28,6 +28,8 @@
         body {
             background-color: #0f0f19;
             color: var(--text);
+            align-items: center;
+            justify-content: center;
         }
 
         .container {
@@ -390,6 +392,19 @@
         .action-buttons {
             display: flex;
             gap: 15px;
+            margin-top: 20px;
+        }
+
+        .action-buttons .btn {
+            flex: 1;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+        }
+
+        .action-buttons .btn i {
+            font-size: 16px;
         }
 
         .btn {
@@ -536,8 +551,8 @@
 
         .preview-image {
             width: 100%;
-            max-width: 500px;
-            height: 500px;
+            max-width: 350px;
+            height: 350px;
             margin-bottom: 20px;
             display: flex;
             align-items: center;
@@ -605,6 +620,162 @@
                 max-width: 200px;
                 height: 200px;
             }
+        }
+
+        .save-config-container {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            z-index: 1000;
+        }
+
+        .modal {
+            display: none;
+            position: relative;
+            align-items: center;
+            align-self: center;
+            z-index: 1000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.5);
+        }
+
+        .modal.show {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .modal-content {
+            background-color: var(--primary);
+            padding: 30px;
+            border-radius: 8px;
+            width: 90%;
+            max-width: 500px;
+            position: relative;
+            margin: 0;
+        }
+
+        .modal-close {
+            position: absolute;
+            right: 20px;
+            top: 15px;
+            font-size: 24px;
+            cursor: pointer;
+            color: var(--text);
+            transition: color 0.3s;
+        }
+
+        .modal-close:hover {
+            color: var(--accent);
+        }
+
+        .modal h2 {
+            margin-bottom: 20px;
+            color: var(--text);
+            font-size: 24px;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            color: var(--text);
+            font-weight: 500;
+        }
+
+        .form-group input[type="text"] {
+            width: 100%;
+            padding: 12px;
+            border: 1px solid var(--border);
+            border-radius: 6px;
+            background: var(--secondary);
+            color: var(--text);
+            font-size: 16px;
+            transition: border-color 0.3s;
+        }
+
+        .form-group input[type="text"]:focus {
+            border-color: var(--accent);
+            outline: none;
+        }
+
+        .checkbox-label {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            color: var(--text);
+            cursor: pointer;
+        }
+
+        .checkbox-label input[type="checkbox"] {
+            width: 18px;
+            height: 18px;
+            cursor: pointer;
+        }
+
+        .modal .btn {
+            width: 100%;
+            margin-top: 10px;
+        }
+
+        .btn.disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+            pointer-events: none;
+        }
+
+        /* Стили для списка выбранных компонентов */
+        .selected-components-list {
+            background: var(--secondary);
+            border-radius: 8px;
+            padding: 15px;
+            margin-bottom: 20px;
+        }
+
+        .selected-components-list h3 {
+            color: var(--text);
+            font-size: 16px;
+            margin-bottom: 10px;
+        }
+
+        #selected-components-container {
+            max-height: 200px;
+            overflow-y: auto;
+        }
+
+        .selected-component-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 8px 0;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .selected-component-item:last-child {
+            border-bottom: none;
+        }
+
+        .component-type {
+            color: var(--text-secondary);
+            font-size: 14px;
+            min-width: 100px;
+        }
+
+        .component-name {
+            color: var(--text);
+            flex-grow: 1;
+            margin: 0 10px;
+        }
+
+        .component-price {
+            color: var(--accent);
+            font-weight: 500;
         }
     </style>
 </head>
@@ -707,13 +878,280 @@
 
                     <div class="action-buttons">
                         <button class="btn btn-block">Добавить в корзину</button>
-                        <button class="btn btn-outline btn-block">Сохранить конфигурацию</button>
+                        <button id="save-config-btn" class="btn btn-outline btn-block">
+                            <i class="fas fa-save"></i> Сохранить конфигурацию
+                        </button>
                     </div>
                 </div>
             </div>
         </div>
     </div>
 
+    <!-- Модальное окно сохранения конфигурации -->
+    <div id="save-config-modal" class="modal">
+        <div class="modal-content">
+            <span class="modal-close">&times;</span>
+            <h2>Сохранить конфигурацию</h2>
+            
+            <!-- Список выбранных компонентов -->
+            <div class="selected-components-list">
+                <h3>Выбранные компоненты:</h3>
+                <div id="selected-components-container"></div>
+            </div>
+
+            <form id="save-config-form">
+                {% csrf_token %}
+                <div class="form-group">
+                    <label for="config-name">Название конфигурации</label>
+                    <input type="text" id="config-name" name="name" required>
+                </div>
+                <div class="form-group">
+                    <label class="checkbox-label">
+                        <input type="checkbox" id="config-public" name="is_public">
+                        Сделать публичной
+                    </label>
+                </div>
+                <button type="submit" class="btn btn-primary">Сохранить</button>
+            </form>
+        </div>
+    </div>
+
+    <!-- Затемнённый фон -->
+    <div id="modal-backdrop" class="modal-backdrop"></div>
+
     <script src="/static/js/configurator.js"></script>
+    <script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const saveConfigBtn = document.getElementById('save-config-btn');
+        const saveConfigModal = document.getElementById('save-config-modal');
+        const modalBackdrop = document.getElementById('modal-backdrop');
+        const saveConfigForm = document.getElementById('save-config-form');
+        const modalClose = saveConfigModal.querySelector('.modal-close');
+        const addToConfigBtn = document.getElementById('add-to-config');
+        let selectedComponent = null;
+
+        // Обработчик клика по компоненту в списке
+        document.querySelectorAll('.component-option').forEach(option => {
+            option.addEventListener('click', function() {
+                // Убираем выделение у всех компонентов
+                document.querySelectorAll('.component-option').forEach(opt => {
+                    opt.classList.remove('active');
+                });
+                
+                // Выделяем выбранный компонент
+                this.classList.add('active');
+                
+                // Сохраняем выбранный компонент
+                selectedComponent = this;
+                
+                // Показываем превью компонента
+                document.getElementById('component-preview').style.display = 'block';
+                document.getElementById('no-component-selected').style.display = 'none';
+                
+                // Заполняем информацию о компоненте
+                const image = this.querySelector('.component-image').src;
+                const name = this.querySelector('.component-name').textContent;
+                const price = this.querySelector('.component-price').textContent;
+                
+                document.getElementById('preview-image').src = image;
+                document.getElementById('preview-name').textContent = name;
+                document.getElementById('preview-price').textContent = price;
+                
+                // Обновляем спецификации
+                const type = this.dataset.component;
+                document.getElementById(`${type}-spec`).textContent = name;
+            });
+        });
+
+        // Обработчик кнопки "Добавить в конфигурацию"
+        addToConfigBtn.addEventListener('click', function() {
+            if (selectedComponent) {
+                // Убираем выделение у всех компонентов того же типа
+                const type = selectedComponent.dataset.component;
+                document.querySelectorAll(`.component-option[data-component="${type}"]`).forEach(opt => {
+                    opt.classList.remove('selected');
+                });
+                
+                // Добавляем выделение выбранному компоненту
+                selectedComponent.classList.add('selected');
+                
+                // Обновляем отображение кнопок сохранения
+                updateSaveButton();
+                
+                // Обновляем общую стоимость
+                updateTotalPrice();
+            }
+        });
+
+        // Функция обновления общей стоимости
+        function updateTotalPrice() {
+            let total = 0;
+            document.querySelectorAll('.component-option.selected').forEach(option => {
+                const priceText = option.querySelector('.component-price').textContent;
+                const price = parseFloat(priceText.replace(/[^\d]/g, ''));
+                total += price;
+            });
+            
+            document.getElementById('components-price').textContent = `${total} ₽`;
+            document.getElementById('total-price').textContent = `${total + parseInt('{{ assembly_price }}')} ₽`;
+        }
+
+        // Показываем кнопку сохранения, когда есть хотя бы один выбранный компонент
+        function updateSaveButton() {
+            const selectedComponents = document.querySelectorAll('.component-option.selected');
+            const hasComponents = selectedComponents.length > 0;
+            saveConfigBtn.style.display = hasComponents ? 'block' : 'none';
+        }
+
+        // Функция обновления списка выбранных компонентов
+        function updateSelectedComponentsList() {
+            const container = document.getElementById('selected-components-container');
+            container.innerHTML = '';
+            
+            const selectedComponents = document.querySelectorAll('.component-option.selected');
+            if (selectedComponents.length === 0) {
+                container.innerHTML = '<p style="color: var(--text-secondary);">Нет выбранных компонентов</p>';
+                return;
+            }
+
+            selectedComponents.forEach(option => {
+                const type = option.dataset.component;
+                const name = option.querySelector('.component-name').textContent;
+                const price = option.querySelector('.component-price').textContent;
+                
+                const componentItem = document.createElement('div');
+                componentItem.className = 'selected-component-item';
+                componentItem.innerHTML = `
+                    <span class="component-type">${getComponentTypeName(type)}</span>
+                    <span class="component-name">${name}</span>
+                    <span class="component-price">${price}</span>
+                `;
+                container.appendChild(componentItem);
+            });
+        }
+
+        // Функция получения названия типа компонента
+        function getComponentTypeName(type) {
+            const typeNames = {
+                'cpu': 'Процессор',
+                'gpu': 'Видеокарта',
+                'motherboard': 'Материнская плата',
+                'ram': 'Оперативная память',
+                'cooling': 'Охлаждение',
+                'psu': 'Блок питания',
+                'storage': 'Накопитель',
+                'case': 'Корпус'
+            };
+            return typeNames[type] || type;
+        }
+
+        // Показываем модальное окно
+        function showSaveModal() {
+            const selectedComponents = document.querySelectorAll('.component-option.selected');
+            
+            if (selectedComponents.length === 0) {
+                alert('Выберите хотя бы один компонент для сохранения конфигурации');
+                return;
+            }
+
+            updateSelectedComponentsList();
+            saveConfigModal.classList.add('show');
+            modalBackdrop.style.display = 'block';
+        }
+
+        // Закрываем модальное окно
+        function closeModal() {
+            saveConfigModal.classList.remove('show');
+            modalBackdrop.style.display = 'none';
+            saveConfigForm.reset();
+        }
+
+        // Обработчики событий
+        saveConfigBtn.addEventListener('click', showSaveModal);
+        modalClose.addEventListener('click', closeModal);
+        modalBackdrop.addEventListener('click', closeModal);
+
+        // Обработка отправки формы
+        saveConfigForm.addEventListener('submit', async function(e) {
+            e.preventDefault();
+
+            const selectedComponents = document.querySelectorAll('.component-option.selected');
+            
+            if (selectedComponents.length === 0) {
+                alert('Выберите хотя бы один компонент для сохранения конфигурации');
+                return;
+            }
+
+            const formData = {
+                name: document.getElementById('config-name').value,
+                is_public: document.getElementById('config-public').checked,
+                components: getCurrentConfiguration(),
+                total_price: calculateTotalPrice()
+            };
+
+            console.log('Отправляемые данные:', formData);
+
+            try {
+                const response = await fetch('{% url "main:save_configuration" %}', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-CSRFToken': document.querySelector('[name=csrfmiddlewaretoken]').value
+                    },
+                    body: JSON.stringify(formData)
+                });
+
+                const data = await response.json();
+                console.log('Ответ сервера:', data);
+
+                if (response.ok) {
+                    alert('Конфигурация успешно сохранена');
+                    closeModal();
+                    window.location.href = '{% url "main:my_configurations" %}';
+                } else {
+                    alert(data.message || 'Ошибка при сохранении конфигурации');
+                }
+            } catch (error) {
+                console.error('Ошибка при сохранении:', error);
+                alert('Произошла ошибка при сохранении конфигурации');
+            }
+        });
+
+        // Функция получения текущей конфигурации
+        function getCurrentConfiguration() {
+            const components = {};
+            document.querySelectorAll('.component-option.selected').forEach(option => {
+                const type = option.dataset.component;
+                const id = option.dataset.id;
+                const name = option.querySelector('.component-name').textContent;
+                const priceText = option.querySelector('.component-price').textContent;
+                const price = parseFloat(priceText.replace(/[^\d]/g, ''));
+                
+                components[type] = {
+                    id: id,
+                    name: name,
+                    price: price
+                };
+            });
+            console.log('Собранные компоненты:', components);
+            return components;
+        }
+
+        // Функция подсчета общей стоимости
+        function calculateTotalPrice() {
+            let total = 0;
+            document.querySelectorAll('.component-option.selected').forEach(option => {
+                const priceText = option.querySelector('.component-price').textContent;
+                const price = parseFloat(priceText.replace(/[^\d]/g, ''));
+                total += price;
+            });
+            console.log('Общая стоимость:', total);
+            return total;
+        }
+
+        // Начальное обновление кнопки
+        updateSaveButton();
+    });
+    </script>
 </body>
 {% endblock %}

@@ -11,7 +11,7 @@ class Project(models.Model):
     )
     title = models.CharField(max_length=20)
     time_creation = models.DateTimeField(auto_now_add=True)
-    budget = models.CharField()
+    budget = models.CharField(max_length=20)
     description = models.CharField(max_length=500)
 
     def add_component(self, component):
@@ -21,6 +21,18 @@ class Project(models.Model):
             component_type = 'gpu'
         elif isinstance(component, ParsedCPU):
             component_type = 'cpu'
+        elif isinstance(component, ParsedMotherboard):
+            component_type = 'motherboard'
+        elif isinstance(component, ParsedRAM):
+            component_type = 'ram'
+        elif isinstance(component, ParsedCooling):
+            component_type = 'cooling'
+        elif isinstance(component, ParsedPowerSupply):
+            component_type = 'psu'
+        elif isinstance(component, ParsedStorage):
+            component_type = 'storage'
+        elif isinstance(component, ParsedCase):
+            component_type = 'case'
 
         ProjectComponent.objects.get_or_create(
             project=self,
@@ -36,7 +48,18 @@ class Project(models.Model):
                 components.append(ParsedGPU.objects.get(id=pc.component_id))
             elif pc.component_type == 'cpu':
                 components.append(ParsedCPU.objects.get(id=pc.component_id))
-            # ... другие типы ...
+            elif pc.component_type == 'motherboard':
+                components.append(ParsedMotherboard.objects.get(id=pc.component_id))
+            elif pc.component_type == 'ram':
+                components.append(ParsedRAM.objects.get(id=pc.component_id))
+            elif pc.component_type == 'cooling':
+                components.append(ParsedCooling.objects.get(id=pc.component_id))
+            elif pc.component_type == 'psu':
+                components.append(ParsedPowerSupply.objects.get(id=pc.component_id))
+            elif pc.component_type == 'storage':
+                components.append(ParsedStorage.objects.get(id=pc.component_id))
+            elif pc.component_type == 'case':
+                components.append(ParsedCase.objects.get(id=pc.component_id))
         return components
 
 
@@ -58,6 +81,7 @@ class BaseComponent(models.Model):
     class Meta:
         abstract = True
 
+
 class ParsedGPU(BaseComponent):
     frequency = models.CharField(max_length=50)
     memory_amount = models.CharField(max_length=50)
@@ -70,30 +94,11 @@ class ParsedGPU(BaseComponent):
         super().save(*args, **kwargs)
 
 
-class GPU(models.Model):
-    project = models.ForeignKey(
-        Project,
-        on_delete=models.CASCADE
-    )
-    model = models.CharField(max_length=30)
-    frequency = models.CharField()
-    memory_amount = models.CharField()
-    picture = models.ImageField(upload_to='gpu_images/', blank=True, null=True)
-
-    size = models.CharField()
-    consumption = models.CharField()
-
-    price = models.CharField()
-    relative_power = models.CharField()
-
-
 class ParsedCPU(BaseComponent):
     cores_amount = models.CharField(max_length=10)
     frequency = models.CharField(max_length=10)
     socket = models.CharField(max_length=9)
     tdp = models.CharField(max_length=10)
-    #consumption = models.CharField(max_length=10)
-
     relative_power = models.CharField(max_length=10)
 
     def save(self, *args, **kwargs):
@@ -103,136 +108,6 @@ class ParsedCPU(BaseComponent):
     def __str__(self):
         return self.model
 
-
-class CPU(models.Model):
-    project = models.ForeignKey(
-        Project,
-        on_delete=models.CASCADE
-    )
-    model = models.CharField(max_length=15)
-    cores_amount = models.CharField(max_length=10)
-    frequency = models.CharField(max_length=10)
-    picture = models.ImageField(upload_to='cpu_images/', blank=True, null=True)
-    socket = models.CharField(max_length=9)
-    tdp = models.CharField(max_length=10)
-    consumption = models.CharField(max_length=10)
-    price = models.CharField(max_length=10)
-    relative_power = models.CharField(max_length=10)
-
-    def calculatePower(self):
-        """
-        Вычисляет relative_power на основе модели CPU.
-        """
-        base_power = 100
-        model_lower = self.model.lower()
-        if "i9" in model_lower:
-            self.relative_power = str(int(base_power * 1.5))
-        elif "i7" in model_lower:
-            self.relative_power = str(int(base_power * 1.2))
-        elif "i5" in model_lower:
-            self.relative_power = str(int(base_power * 1.1))
-        else:
-            self.relative_power = str(base_power)
-
-    def save(self, *args, **kwargs):
-        self.calculatePower()
-        super().save(*args, **kwargs)
-
-    def __str__(self):
-        return self.model
-
-class Motherboard(models.Model):
-    project = models.ForeignKey(
-        Project,
-        on_delete=models.CASCADE
-    )
-    model = models.CharField(max_length=20)
-    chipset = models.CharField(max_length=10)
-    picture = models.ImageField(upload_to='motherboard_images/', blank=True, null=True)
-
-    form_factor = models.CharField(max_length=10)
-    socket = models.CharField(max_length=9)
-    ram_slots = models.CharField()
-    ram_type = models.CharField(max_length=9)
-    nvme_slot = models.CharField(blank=True,null=True)
-    sata_slot = models.CharField(blank=True,null=True)
-    consumption = models.CharField()
-
-    price = models.CharField()
-    relative_power = models.CharField()
-
-class RAM(models.Model):
-    project = models.ForeignKey(
-        Project,
-        on_delete=models.CASCADE
-    )
-    model = models.CharField(max_length=20)
-    picture = models.ImageField(upload_to='ram_images/', blank=True, null=True)
-
-    modules = models.CharField(blank=True,null=True)
-    amount = models.CharField()
-    typee = models.CharField(max_length=9)
-
-    price = models.CharField()
-    relative_power = models.CharField()
-
-class Cooling(models.Model):
-    project = models.ForeignKey(
-        Project,
-        on_delete=models.CASCADE
-    )
-    typee = models.CharField(max_length=20)
-    model = models.CharField(max_length=20)
-    picture = models.ImageField(upload_to='cooling_images/', blank=True, null=True)
-
-    socket = models.CharField(max_length=9)
-    tdp = models.CharField()
-    consumption = models.CharField()
-    size = models.CharField()
-    backlight = models.CharField(max_length=5, null=True)
-
-    price = models.CharField()
-    relative_power = models.CharField()
-
-class PowerSupply(models.Model):
-    project = models.ForeignKey(
-        Project,
-        on_delete=models.CASCADE
-    )
-    model = models.CharField(max_length=20)
-    picture = models.ImageField(upload_to='powersupply_images/', blank=True, null=True)
-
-    power = models.CharField()
-
-    price = models.CharField()
-    relative_power = models.CharField()
-
-class Storage(models.Model):
-    project = models.ForeignKey(
-        Project,
-        on_delete=models.CASCADE
-    )
-    model = models.CharField(max_length=20)
-    picture = models.ImageField(upload_to='storage_images/', blank=True, null=True)
-
-    capacity = models.CharField()
-    typee = models.CharField(max_length=4)
-
-    price = models.CharField()
-
-class Case(models.Model):
-    project = models.ForeignKey(
-        Project,
-        on_delete=models.CASCADE
-    )
-    model = models.CharField(max_length=20)
-    picture = models.ImageField(upload_to='case_images/', blank=True, null=True)
-
-    supported_form_factor = models.CharField(max_length=10)
-    size = models.CharField()
-    backlight = models.CharField(max_length=5, null=True)
-
-    price = models.CharField()
 
 class ParsedMotherboard(BaseComponent):
     form_factor = models.CharField(max_length=50)

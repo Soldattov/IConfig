@@ -1,0 +1,212 @@
+/* Стили для личного кабинета */
+.account-section {
+    padding: 60px 0;
+}
+
+.account-header {
+    display: flex;
+    align-items: center;
+    margin-bottom: 40px;
+}
+
+.account-avatar {
+    width: 80px;
+    height: 80px;
+    border-radius: 50%;
+    background-color: var(--secondary);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-right: 20px;
+    font-size: 32px;
+    color: var(--accent);
+}
+
+.account-info h2 {
+    font-size: 28px;
+    margin-bottom: 5px;
+}
+
+.account-info p {
+    color: var(--text-secondary);
+}
+
+.account-tabs {
+    display: flex;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+    margin-bottom: 30px;
+}
+
+.account-tab {
+    padding: 15px 25px;
+    cursor: pointer;
+    font-weight: 500;
+    color: var(--text-secondary);
+    position: relative;
+}
+
+.account-tab.active {
+    color: var(--accent);
+}
+
+.account-tab.active::after {
+    content: '';
+    position: absolute;
+    bottom: -1px;
+    left: 0;
+    width: 100%;
+    height: 2px;
+    background-color: var(--accent);
+}
+
+.account-tab:hover:not(.active) {
+    color: var(--text);
+}
+
+.tab-content {
+    display: none;
+}
+
+.tab-content.active {
+    display: block;
+}
+
+/* Стили для списка конфигураций */
+.configurations-list {
+    margin-bottom: 40px;
+}
+
+.configuration-card {
+    background-color: var(--primary);
+    border-radius: 8px;
+    padding: 20px;
+    margin-bottom: 20px;
+    border-left: 3px solid var(--accent);
+}
+
+.configuration-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 15px;
+}
+
+.configuration-title {
+    font-size: 20px;
+    font-weight: 600;
+}
+
+.configuration-date {
+    color: var(--text-secondary);
+    font-size: 14px;
+}
+
+.configuration-actions {
+    display: flex;
+    gap: 10px;
+}
+
+.configuration-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-bottom: 15px;
+}
+
+.configuration-table th {
+    text-align: left;
+    padding: 12px 15px;
+    background-color: var(--secondary);
+    color: var(--text-secondary);
+    font-weight: 500;
+    font-size: 14px;
+}
+
+.configuration-table td {
+    padding: 12px 15px;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+.configuration-table tr:last-child td {
+    border-bottom: none;
+}
+
+.configuration-total {
+    display: flex;
+    justify-content: flex-end;
+    font-size: 18px;
+    font-weight: 600;
+    padding: 15px;
+    background-color: rgba(255, 94, 58, 0.1);
+    border-radius: 6px;
+}
+
+.configuration-total span {
+    color: var(--accent);
+    margin-left: 20px;
+}
+
+.empty-message {
+    text-align: center;
+    padding: 50px;
+    color: var(--text-secondary);
+}
+
+.empty-message i {
+    font-size: 50px;
+    margin-bottom: 20px;
+    color: var(--secondary);
+}
+
+/* Стили для формы профиля */
+.profile-form {
+    max-width: 600px;
+    margin: 0 auto;
+}
+
+.form-group {
+    margin-bottom: 20px;
+}
+
+.form-group label {
+    display: block;
+    margin-bottom: 8px;
+    color: var(--text-secondary);
+}
+
+.form-group input {
+    width: 100%;
+    padding: 12px;
+    background-color: var(--secondary);
+    border: none;
+    border-radius: 6px;
+    color: var(--text);
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+    .account-header {
+        flex-direction: column;
+        text-align: center;
+    }
+
+    .account-avatar {
+        margin-right: 0;
+        margin-bottom: 15px;
+    }
+
+    .configuration-header {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 10px;
+    }
+
+    .configuration-actions {
+        width: 100%;
+        justify-content: flex-end;
+    }
+
+    .configuration-table {
+        display: block;
+        overflow-x: auto;
+    }
+} 

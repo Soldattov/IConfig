@@ -65,6 +65,18 @@
     <!-- Блок для дополнительных скриптов, задаваемых дочерними шаблонами -->
     {% block scripts %}{% endblock %}
 
+    <div id="user-menu" class="hidden">
+        <a href="{% url 'main:my_configurations' %}">
+            <i class="fas fa-desktop"></i> Мои конфигурации
+        </a>
+        <a href="{% url 'users:profile' %}">
+            <i class="fas fa-user"></i> Профиль
+        </a>
+        <a href="{% url 'users:logout' %}">
+            <i class="fas fa-sign-out-alt"></i> Выйти
+        </a>
+    </div>
+
     <script>
 
         document.addEventListener('DOMContentLoaded', function () {

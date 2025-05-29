@@ -2,8 +2,8 @@
 <div id="user-menu" class="user-menu hidden">
     {% if user.is_authenticated %}
     <div class="user-greeting">Здравствуйте, {{ user.first_name }}!</div>
-    <a href="{% url 'profile' %}" class="user-action">Личный кабинет</a>
-    <a href="{% url 'logout' %}" class="user-action">Выйти</a>
+    <a href="{% url 'users:profile' %}" class="user-action">Личный кабинет</a>
+    <a href="{% url 'users:logout' %}" class="user-action">Выйти</a>
     {% else %}
     <button id="login-btn" class="user-action">Вход</button>
     <button id="register-btn" class="user-action">Регистрация</button>
@@ -20,7 +20,7 @@
         <div class="form-error">{{ register_error }}</div>
         {% endif %}
 
-        <form id="register-form" method="post" action="{% url 'register' %}">
+        <form id="register-form" method="post" action="{% url 'users:register' %}">
             {% csrf_token %}
             <input type="text" name="first_name" placeholder="Имя" required>
             <input type="email" id="register-email" name="email" placeholder="Электронная почта" required>
@@ -51,7 +51,7 @@
         </script>
         {% endif %}
 
-        <form method="post" action="{% url 'login' %}">
+        <form method="post" action="{% url 'users:login' %}">
             {% csrf_token %}
             <input type="email" name="username" placeholder="Электронная почта" required>
             <input type="password" name="password" placeholder="Пароль" required>
@@ -71,7 +71,7 @@
             <span class="modal-close" id="verify-close">&times;</span>
         </div>
     </div>
-    <form method="post" action="{% url 'verify_email' %}">
+    <form method="post" action="{% url 'users:verify_email' %}">
         {% csrf_token %}
         <!-- Скрытое поле для передачи email -->
         <input type="hidden" name="email" value="{{ email }}">
