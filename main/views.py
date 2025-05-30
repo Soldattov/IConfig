@@ -143,3 +143,18 @@ def toggle_public(request, config_id):
         'is_public': config.is_public,
         'message': 'Configuration visibility updated'
     })
+
+@require_POST
+def check_auth(request):
+    """Проверяет, авторизован ли пользователь"""
+    try:
+        return JsonResponse({
+            'is_authenticated': request.user.is_authenticated,
+            'status': 'success'
+        })
+    except Exception as e:
+        return JsonResponse({
+            'is_authenticated': False,
+            'status': 'error',
+            'message': str(e)
+        }, status=500)

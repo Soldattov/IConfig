@@ -11,4 +11,5 @@ urlpatterns = [
     path('config/<int:config_id>/', views.view_configuration, name='view_configuration'),
     path('config/<int:config_id>/delete/', views.delete_configuration, name='delete_configuration'),
     path('config/<int:config_id>/toggle-public/', views.toggle_public, name='toggle_public'),
+    path('check-auth/', views.check_auth, name='check_auth'),
 ]

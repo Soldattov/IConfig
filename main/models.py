@@ -50,8 +50,19 @@ class SavedConfiguration(models.Model):
         return f'/config/{self.id}/'
 
 class ConfigurationComponent(models.Model):
+    COMPONENT_TYPES = (
+        ('gpu', 'Видеокарта'),
+        ('cpu', 'Процессор'),
+        ('motherboard', 'Материнская плата'),
+        ('ram', 'Оперативная память'),
+        ('cooling', 'Охлаждение'),
+        ('psu', 'Блок питания'),
+        ('storage', 'Накопитель'),
+        ('case', 'Корпус')
+    )
+    
     configuration = models.ForeignKey(SavedConfiguration, on_delete=models.CASCADE, related_name='components')
-    component_type = models.CharField(max_length=50)  # 'gpu', 'cpu', etc.
+    component_type = models.CharField(max_length=50, choices=COMPONENT_TYPES)  # 'gpu', 'cpu', etc.
     component_id = models.PositiveIntegerField()
     name = models.CharField(max_length=200)
     price = models.DecimalField(max_digits=10, decimal_places=2)
@@ -62,4 +73,4 @@ class ConfigurationComponent(models.Model):
         ordering = ['created_at']
 
     def __str__(self):
-        return f"{self.component_type}: {self.name}"
+        return f"{self.get_component_type_display()}: {self.name}"

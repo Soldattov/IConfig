@@ -74,6 +74,7 @@
 /* Стили для списка конфигураций */
 .configurations-list {
     margin-bottom: 40px;
+    margin-top: 10px;
 }
 
 .configuration-card {

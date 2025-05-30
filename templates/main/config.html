@@ -77,6 +77,19 @@
     </div>
 </div>
 
+<!-- Модальное окно для уведомления о необходимости входа -->
+<div id="login-notification-modal" class="modal hidden">
+    <div class="modal-content">
+        <span class="modal-close">&times;</span>
+        <h2>Войдите в аккаунт</h2>
+        <p>Чтобы сохранить вашу конфигурацию и получить доступ ко всем возможностям, пожалуйста, войдите в аккаунт или зарегистрируйтесь.</p>
+        <div class="modal-buttons">
+            <a href="{% url 'login' %}" class="btn btn-primary">Войти</a>
+            <a href="{% url 'register' %}" class="btn btn-secondary">Зарегистрироваться</a>
+        </div>
+    </div>
+</div>
+
 <style>
     .configurator-header {
         display: flex;
@@ -165,6 +178,26 @@
     .component-price {
         font-weight: 600;
     }
+
+    .modal-buttons {
+        display: flex;
+        gap: 10px;
+        justify-content: center;
+        margin-top: 20px;
+    }
+
+    .modal-buttons .btn {
+        min-width: 150px;
+    }
+
+    #login-notification-modal .modal-content {
+        text-align: center;
+    }
+
+    #login-notification-modal p {
+        margin: 20px 0;
+        color: var(--text-secondary);
+    }
 </style>
 
 {% block scripts %}
@@ -172,8 +205,9 @@
 document.addEventListener('DOMContentLoaded', function() {
     const saveConfigBtn = document.getElementById('save-config');
     const saveConfigModal = document.getElementById('save-config-modal');
+    const loginNotificationModal = document.getElementById('login-notification-modal');
     const saveConfigForm = document.getElementById('save-config-form');
-    const modalClose = saveConfigModal.querySelector('.modal-close');
+    const modalClose = document.querySelectorAll('.modal-close');
 
     function updateSaveButton() {
         const selectedComponents = document.querySelectorAll('.component-option.selected');
@@ -182,13 +216,39 @@ document.addEventListener('DOMContentLoaded', function() {
     }
 
     saveConfigBtn.addEventListener('click', function() {
-        saveConfigModal.classList.remove('hidden');
-        document.getElementById('modal-backdrop').classList.remove('hidden');
+        // Проверяем, авторизован ли пользователь
+        fetch('{% url "main:check_auth" %}', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRFToken': document.querySelector('[name=csrfmiddlewaretoken]').value
+            }
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.is_authenticated) {
+                saveConfigModal.classList.remove('hidden');
+                document.getElementById('modal-backdrop').classList.remove('hidden');
+            } else {
+                loginNotificationModal.classList.remove('hidden');
+                document.getElementById('modal-backdrop').classList.remove('hidden');
+            }
+        })
+        .catch(error => {
+            console.error('Ошибка при проверке авторизации:', error);
+            // В случае ошибки показываем окно входа
+            loginNotificationModal.classList.remove('hidden');
+            document.getElementById('modal-backdrop').classList.remove('hidden');
+        });
     });
 
-    modalClose.addEventListener('click', function() {
-        saveConfigModal.classList.add('hidden');
-        document.getElementById('modal-backdrop').classList.add('hidden');
+    // Закрытие модальных окон
+    modalClose.forEach(closeBtn => {
+        closeBtn.addEventListener('click', function() {
+            const modal = this.closest('.modal');
+            modal.classList.add('hidden');
+            document.getElementById('modal-backdrop').classList.add('hidden');
+        });
     });
 
     saveConfigForm.addEventListener('submit', async function(e) {
@@ -221,13 +281,19 @@ document.addEventListener('DOMContentLoaded', function() {
                 saveConfigModal.classList.add('hidden');
                 document.getElementById('modal-backdrop').classList.add('hidden');
                 window.location.href = '{% url "main:my_configurations" %}';
+            } else if (response.status === 403) {
+                // Если пользователь не авторизован, показываем окно входа
+                saveConfigModal.classList.add('hidden');
+                loginNotificationModal.classList.remove('hidden');
             } else {
                 console.error('Ошибка при сохранении:', data.message);
                 alert(data.message || 'Ошибка при сохранении конфигурации');
             }
         } catch (error) {
             console.error('Ошибка при отправке запроса:', error);
-            alert('Произошла ошибка при сохранении конфигурации');
+            // В случае ошибки показываем окно входа
+            saveConfigModal.classList.add('hidden');
+            loginNotificationModal.classList.remove('hidden');
         }
     });
 
