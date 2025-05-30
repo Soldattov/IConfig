@@ -13,6 +13,60 @@
         --text-secondary: #b5b5c3;
     }
 
+    .modal {
+        position: fixed;
+        z-index: 1000;
+        left: 50%;
+        top: 50%;
+        transform: translate(-50%, -50%);
+        background: rgb(8, 21, 41);
+        border-radius: 5px;
+        padding: 20px;
+        box-shadow: 0 0 10px rgba(0, 0, 0, 0.5);
+        width: 400px;
+    }
+
+    .modal-backdrop {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: rgba(0, 0, 0, 0.5);
+        z-index: 900;
+    }
+
+    .form-group {
+        margin-bottom: 15px;
+    }
+
+    .form-group input {
+        width: 100%;
+        padding: 8px;
+        box-sizing: border-box;
+    }
+
+    .form-group input.error {
+        border: 1px solid red;
+    }
+
+    .error-message {
+        font-size: 0.9em;
+        color: red;
+        margin-top: 5px;
+        display: none;
+    }
+
+    .modal-buttons {
+        text-align: right;
+    }
+
+    .modal-buttons button {
+        margin-left: 10px;
+    }
+
+
+
     .container {
         width: 100%;
         max-width: 1200px;
@@ -27,12 +81,20 @@
         color: white;
         border-radius: 6px;
         text-decoration: none;
-        font-weight: 600;
-        font-size: 16px;
+        font-weight: max-content;
+        font-size: max-content;
         transition: all 0.3s;
         border: none;
         cursor: pointer;
+        width: max-content;
+
     }
+    .profile-form form {
+        display: flex;
+        flex-direction: column;
+        gap: 10px; /* Регулирует интервал между кнопками */
+    }
+    
 
     .btn:hover {
         background-color: #ff4a2a;
@@ -196,7 +258,7 @@
 <link rel="stylesheet" href="{% static 'css/profile.css' %}">
 
 <section class="account-section">
-<div class="container">
+    <div class="container">
         <div class="account-header">
             <div class="account-avatar">
                 <i class="fas fa-user"></i>
@@ -205,7 +267,10 @@
                 <h2>{{ user.get_full_name|default:user.username }}</h2>
                 <p>{{ user.email }}</p>
             </div>
-</div>
+            <h3>&nbsp;&nbsp;&nbsp;</h3>
+            <a href="{% url 'logout' %}" class="btn">Выйти</a>
+            
+        </div>
 
         <div class="account-tabs">
             <div class="account-tab active" data-tab="profile">Профиль</div>
@@ -224,17 +289,11 @@
                         <input type="text" id="id_first_name" name="first_name" value="{{ user.first_name }}">
                     </div>
 
-                    <div class="form-group">
-                        <label for="id_last_name">Фамилия</label>
-                        <input type="text" id="id_last_name" name="last_name" value="{{ user.last_name }}">
-                    </div>
 
-        <div class="form-group">
-                        <label for="id_email">Email</label>
-                        <input type="email" id="id_email" name="email" value="{{ user.email }}">
-                    </div>
-
-                    <button type="submit" class="btn">Сохранить изменения</button>
+                    <button type="submit" class="btn">Сохранить новое Имя</button>
+                    <button type="button" id="change-password-btn" class="btn">Изменить пароль</button>
+                    
+                    <button id="delete-account-btn" class="btn btn-danger">Удалить учетную запись</button>
                 </form>
             </div>
         </div>
@@ -250,7 +309,8 @@
                             <div class="configuration-date">Создано: {{ config.created_at|date:"d.m.Y" }}</div>
                         </div>
                         <div class="configuration-actions">
-                            <a href="{% url 'main:view_configuration' config.id %}" class="btn btn-outline btn-sm">Открыть в конфигураторе</a>
+                            <a href="{% url 'main:view_configuration' config.id %}"
+                                class="btn btn-outline btn-sm">Открыть в конфигураторе</a>
                             <button class="btn btn-sm">Добавить в корзину</button>
                         </div>
                     </div>
@@ -283,9 +343,9 @@
                     <i class="fas fa-desktop"></i>
                     <h3>У вас пока нет сохранённых конфигураций</h3>
                     <p>Создайте свою первую сборку в конфигураторее</p>
-                    <a href="{% url 'main:config' %}" class="btn" style="margin-top: 20px;">Создать конфигурацию</a>
+                    <a href="{% url 'config' %}" class="btn" style="margin-top: 20px;">Создать конфигурацию</a>
                 </div>
-                {% endfor %}                
+                {% endfor %}
             </div>
         </div>
 
@@ -297,9 +357,273 @@
                 <a href="{% url 'main:index' %}" class="btn" style="margin-top: 20px;">Перейти в каталог</a>
             </div>
         </div>
-</div>
+    </div>
 </section>
+<!-- Скрипт для обработки удаления -->
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+<script>
+    function deleteAccount() {
+        var deferred = $.Deferred();
+        $("#loader").show();
 
+        $.ajax({
+            url: "{% url 'delete_account' %}",
+            method: "POST",
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRFToken': getCookie('csrftoken')
+            },
+            data: JSON.stringify({}),
+            success: function (data) {
+
+            },
+            fail: function (e) { },
+
+        })
+            .done(function (response) {
+                deferred.resolve(response);
+            })
+            .fail(function (error) {
+                deferred.reject(error);
+            })
+            .always(function () {
+                $("#loader").hide();
+            });
+
+        return deferred.promise();
+    }
+
+    // Обработчик клика для кнопки "Удалить учетную запись"
+    document.getElementById('delete-account-btn').addEventListener('click', function () {
+    if (confirm("Вы уверены, что хотите удалить учетную запись?")) {
+        deleteAccount().then(function () {
+            // Успешное удаление: перенаправляем на главную страницу сразу
+            window.location.href = '/';
+        }, function () {
+            // Ошибка при удалении
+            alert("Ошибка удаления учетной записи.");
+        });
+    }
+});
+    // Функция для получения CSRF-токена из cookies
+    function getCookie(name) {
+        let cookieValue = null;
+        if (document.cookie && document.cookie !== '') {
+            const cookies = document.cookie.split(';');
+            for (let i = 0; i < cookies.length; i++) {
+                const cookie = cookies[i].trim();
+                // Проверка, начинается ли cookie с нужного имени
+                if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                    cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                    break;
+                }
+            }
+        }
+        return cookieValue;
+    }
+</script>
+<!-- Модальное окно смены пароля -->
+<div id="password-modal" class="modal" style="display: none;">
+    <h2>Замена пароля</h2>
+    <form id="password-form">
+        <div class="form-group">
+            <label for="current-password">Текущий пароль</label>
+            <input type="password" id="current-password" placeholder="Введите текущий пароль">
+            <small id="current-error" class="error-message">Пароль неверный</small>
+        </div>
+        <div class="form-group">
+            <label for="new-password">Новый пароль</label>
+            <input type="password" id="new-password" placeholder="Введите новый пароль">
+            <small id="new-error" class="error-message">Пароль должен содержать не менее 8 символов</small>
+        </div>
+        <div class="form-group">
+            <label for="confirm-password">Повторите новый пароль</label>
+            <input type="password" id="confirm-password" placeholder="Повторите новый пароль">
+            <small id="confirm-error" class="error-message">Пароли не совпадают</small>
+        </div>
+        <div class="modal-buttons">
+            <button type="button" id="save-password" disabled>Изменить</button>
+            <button type="button" id="cancel-password">Отмена</button>
+        </div>
+    </form>
+</div>
+<!-- Затемнённый фон -->
+<div id="modal-backdrop" class="modal-backdrop" style="display: none;"></div>
+<script>
+    // Функция получения CSRF-токена 
+    function getCookie(name) {
+        let cookieValue = null;
+        if (document.cookie && document.cookie !== "") {
+            const cookies = document.cookie.split(';');
+            for (let i = 0; i < cookies.length; i++) {
+                const cookie = cookies[i].trim();
+                if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                    cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                    break;
+                }
+            }
+        }
+        return cookieValue;
+    }
+
+    // Функция закрытия модального окна и сброса формы
+    function closeModal() {
+        document.getElementById('password-modal').style.display = 'none';
+        document.getElementById('modal-backdrop').style.display = 'none';
+        document.getElementById('password-form').reset();
+        document.querySelectorAll('.error-message').forEach(el => el.style.display = 'none');
+        document.querySelectorAll('.form-group input').forEach(el => el.classList.remove('error'));
+        document.getElementById('save-password').disabled = true;
+    }
+
+    // Функция показа уведомления в виде плашки в верхней части страницы
+    function showToast(message, duration) {
+        const toast = document.createElement('div');
+        toast.innerText = message;
+        toast.style.position = 'fixed';
+        toast.style.top = '20px';
+        toast.style.left = '50%';
+        toast.style.transform = 'translateX(-50%)';
+        toast.style.width = '80%';
+        toast.style.textAlign = 'center';
+        toast.style.backgroundColor = 'rgba(0, 128, 0, 0.8)';
+        toast.style.color = '#fff';
+        toast.style.padding = '15px';
+        toast.style.fontSize = '1.2em';
+        toast.style.borderRadius = '5px';
+        toast.style.zIndex = 1100;
+        document.body.appendChild(toast);
+        setTimeout(() => {
+            toast.remove();
+        }, duration);
+    }
+
+    // Открытие модального окна смены пароля
+    document.getElementById('change-password-btn').addEventListener('click', function () {
+        document.getElementById('password-modal').style.display = 'block';
+        document.getElementById('modal-backdrop').style.display = 'block';
+    });
+
+    // Закрытие модального окна при нажатии кнопки "Отмена"
+    document.getElementById('cancel-password').addEventListener('click', function () {
+        closeModal();
+    });
+
+    // Динамическая проверка текущего пароля через сервер
+    document.getElementById('current-password').addEventListener('blur', function () {
+        const currentInput = document.getElementById('current-password');
+        if (currentInput.value.trim() === "") {
+            document.getElementById('current-error').innerText = "Введите текущий пароль";
+            document.getElementById('current-error').style.display = "block";
+            currentInput.classList.add('error');
+            checkFormValidity();
+            return;
+        }
+        fetch('/users/verify-current-password/', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRFToken': getCookie('csrftoken')
+            },
+            body: JSON.stringify({ current_password: currentInput.value })
+        })
+            .then(response => response.json())
+            .then(data => {
+                if (!data.valid) {
+                    document.getElementById('current-error').innerText = "Пароль неверный";
+                    document.getElementById('current-error').style.display = "block";
+                    currentInput.classList.add('error');
+                } else {
+                    document.getElementById('current-error').style.display = "none";
+                    currentInput.classList.remove('error');
+                }
+                checkFormValidity();
+            })
+            .catch(error => {
+                console.error("Ошибка проверки текущего пароля:", error);
+                document.getElementById('current-error').innerText = "Ошибка проверки";
+                document.getElementById('current-error').style.display = "block";
+                currentInput.classList.add('error');
+                checkFormValidity();
+            });
+    });
+
+    // Валидация нового пароля: проверка на длину не менее 8 символов
+    document.getElementById('new-password').addEventListener('blur', function () {
+        const newPass = document.getElementById('new-password');
+        if (newPass.value.length < 8) {
+            document.getElementById('new-error').innerText = "Пароль должен содержать не менее 8 символов";
+            document.getElementById('new-error').style.display = "block";
+            newPass.classList.add('error');
+        } else {
+            document.getElementById('new-error').style.display = "none";
+            newPass.classList.remove('error');
+        }
+        checkFormValidity();
+    });
+
+    // Валидация подтверждения нового пароля
+    document.getElementById('confirm-password').addEventListener('blur', function () {
+        const newPassVal = document.getElementById('new-password').value;
+        const confirmPass = document.getElementById('confirm-password');
+        if (confirmPass.value !== newPassVal) {
+            document.getElementById('confirm-error').innerText = "Пароли не совпадают";
+            document.getElementById('confirm-error').style.display = "block";
+            confirmPass.classList.add('error');
+        } else {
+            document.getElementById('confirm-error').style.display = "none";
+            confirmPass.classList.remove('error');
+        }
+        checkFormValidity();
+    });
+
+    // Функция проверки валидности всей формы
+    function checkFormValidity() {
+        const currentVal = document.getElementById('current-password').value.trim();
+        const newVal = document.getElementById('new-password').value.trim();
+        const confirmVal = document.getElementById('confirm-password').value.trim();
+        const currentError = document.getElementById('current-error').style.display !== "none";
+        const newError = document.getElementById('new-error').style.display !== "none";
+        const confirmError = document.getElementById('confirm-error').style.display !== "none";
+
+        if (currentVal && newVal && confirmVal && !currentError && !newError && !confirmError) {
+            document.getElementById('save-password').disabled = false;
+        } else {
+            document.getElementById('save-password').disabled = true;
+        }
+    }
+
+    // Обработка нажатия кнопки "Изменить"
+    document.getElementById('save-password').addEventListener('click', function () {
+        const currentPassword = document.getElementById('current-password').value;
+        const newPassword = document.getElementById('new-password').value;
+
+        fetch('/users/change-password/', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRFToken': getCookie('csrftoken')
+            },
+            body: JSON.stringify({
+                current_password: currentPassword,
+                new_password: newPassword
+            })
+        })
+            .then(response => {
+                if (response.ok) {
+                    // Закрытие модального окна сразу после успешного обновления
+                    closeModal();
+                    // Показ уведомления – длинная плашка вверху
+                    showToast("Пароль изменен", 1000);
+                } else {
+                    alert("Ошибка при изменении пароля");
+                }
+            })
+            .catch(error => {
+                alert("Ошибка: " + error);
+            });
+    });
+</script>
 <script>
     // Переключение между вкладками
     document.querySelectorAll('.account-tab').forEach(tab => {
@@ -312,7 +636,7 @@
             tab.classList.add('active');
             const tabId = tab.getAttribute('data-tab');
             document.getElementById(tabId).classList.add('active');
-            });
+        });
     });
 </script>
 {% endblock %}

@@ -3,6 +3,20 @@
 {% block title %}Snitch PC - Магазин игровых компьютеров{% endblock %}
 
 {% block content %}
+<nav class="nav">
+  <div class="container">
+    <ul class="nav-list">
+      <li><a href="{% url 'main:index' %}">Главная</a></li>
+      <!-- Пусть кнопка "Игровые ПК" прокручивает страницу до секции "Популярные сборки" -->
+      <li><a href="#popular-builds">Игровые ПК</a></li>
+      <!-- "Игровые ноутбуки" прокручивает до секции "Лучшие ноутбуки: выбор Snitch PC" -->
+      <li><a href="#laptops">Игровые ноутбуки</a></li>
+      <li><a href="{% url 'config' %}">Конфигуратор</a></li>
+      <!-- "Контакты" прокручивает к футеру -->
+      <li><a href="#contacts">Контакты</a></li>
+    </ul>
+  </div>
+</nav>
 <!-- HERO Section -->
 <section class="hero">
     <div class="container">
@@ -14,7 +28,7 @@
     </div>
 </section>
 
-<section class="section">
+<section class="section" id="popular-builds">
     <div class="container">
         <h2 class="section-title">Популярные сборки</h2>
         <div class="products-grid">
@@ -70,7 +84,7 @@
     </div>
 </section>
 
-<section class="section">
+<section class="section" id="laptops">
     <div class="container">
         <h2 class="section-title">Лучшие ноутбуки: выбор Snitch PC</h2>
         <div class="products-grid">
@@ -145,7 +159,7 @@
     </div>
 </section>
 
-<footer class="footer">
+<footer class="footer" id="contacts">
     <div class="container">
         <div class="footer-grid">
             <div class="footer-column">

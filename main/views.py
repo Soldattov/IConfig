@@ -111,8 +111,18 @@ def my_configurations(request):
 @login_required
 def view_configuration(request, config_id):
     config = get_object_or_404(SavedConfiguration, id=config_id, user=request.user)
+
+    # Группировка компонентов по типу (component_type)
+    grouped_components = {}
+    for config_component in config.components.all():
+        comp_type = config_component.component_type  # Используем component_type вместо category
+        if comp_type not in grouped_components:
+            grouped_components[comp_type] = []
+        grouped_components[comp_type].append(config_component)
+    
     return render(request, 'main/view_configuration.html', {
-        'configuration': config
+        'configuration': config,
+        'grouped_components': grouped_components,
     })
 
 @login_required

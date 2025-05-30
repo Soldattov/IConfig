@@ -611,7 +611,7 @@ body {
     background: var(--primary);
     padding: 30px;
     border-radius: 8px;
-    z-index: 2000;
+    z-index: 100000000;
     box-shadow: 0 0 20px rgba(0, 0, 0, 0.6);
 }
 
@@ -753,18 +753,33 @@ body {
     justify-content: center;
 }
 
+html {
+  scroll-behavior: smooth;
+}
+#popular-builds,
+#laptops {
+  scroll-margin-top: 80px; /* или немного больше, если нужно дополнительное пространство */
+}
 /* Navigation */
 .nav {
     background-color: var(--primary);
+    position: fixed; /* Фиксированное позиционирование */
+    top: 20;          /* Прикрепляем к верхней части экрана */
+    left: 0;
+    width: 100%;     /* Панель занимает всю ширину */
+    z-index: 100;   /
 }
 
 .nav-list {
     display: flex;
     list-style: none;
+    margin: 0;
+    padding: 0;
 }
 
 .nav-list li {
-    position: relative;
+    flex: 1;            /* Каждый <li> занимает равномерно доступное пространство */
+    text-align: center; /* Выравнивание текста по центру */
 }
 
 .nav-list li:hover .submenu {

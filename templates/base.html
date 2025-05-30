@@ -18,7 +18,7 @@
     <header class="header">
         <div class="container">
             <div class="header-top">
-                <a href="#" class="logo">
+                <a href="/" class="logo">
                     <img src="https://www.pngkey.com/png/full/186-1866241_snitch-special-offer-banner-png.png"
                         alt="Snitch PC Logo">
                 </a>
@@ -32,26 +32,12 @@
                     <a href="{% url 'feedback' %}" class="btn-feedback">
                         <img src="{% get_media_prefix %}reviews.png" alt="отзывы" style="height: 24px; width: auto;">
                     </a>
-                    <a href="#"><i class="fas fa-shopping-cart"></i><span>2</span></a>
+                    <a href="#"><i class="fas fa-shopping-cart"></i></a>
                 </div>
             </div>
         </div>
 
-        <nav class="nav">
-            <div class="container">
-                <ul class="nav-list">
-                    <li><a href="{% url 'main:index' %}">Главная</a></li>
-                    <li><a href="#">Игровые ПК</a></li>
-                    <li><a href="#">Игровые ноутбуки</a></li>
-                    <li><a href="#">Периферия</a></li>
-                    <li><a href="#">Комплектующие</a></li>
-                    <li><a href="{% url 'config' %}">Конфигуратор</a></li>
-                    <li><a href="#">Акции</a></li>
-                    <li><a href="#">Доставка и оплата</a></li>
-                    <li><a href="#">Контакты</a></li>
-                </ul>
-            </div>
-        </nav>
+        
     </header>
 
     {% include 'users/modals.html' %}
@@ -69,14 +55,14 @@
         <a href="{% url 'main:my_configurations' %}">
             <i class="fas fa-desktop"></i> Мои конфигурации
         </a>
-        <a href="{% url 'users:profile' %}">
+        <a href="{% url 'profile' %}">
             <i class="fas fa-user"></i> Профиль
         </a>
-        <a href="{% url 'users:logout' %}">
+        <a href="{% url 'logout' %}">
             <i class="fas fa-sign-out-alt"></i> Выйти
         </a>
     </div>
-
+    <div id="register-error" style="color: red; display: none;"></div>
     <script>
 
         document.addEventListener('DOMContentLoaded', function () {
@@ -236,6 +222,30 @@
             }
         });
     </script>
+    {% if show_register_modal %}
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            // Открываем модальное окно регистрации
+            var registerModal = document.getElementById('register-modal');
+            if(registerModal) {
+                registerModal.classList.remove('hidden');
+                // Если у вас используется backdrop, также его можно показать:
+                var modalBackdrop = document.getElementById('modal-backdrop');
+                if(modalBackdrop) {
+                    modalBackdrop.classList.remove('hidden');
+                    modalBackdrop.classList.add('visible');
+                }
+            }
+            // Если есть контейнер для ошибки, выводим сообщение
+            var errorElem = document.getElementById('register-error');
+            if(errorElem) {
+                errorElem.innerText = "{{ register_error }}";
+                errorElem.style.display = 'block';
+            }
+        });
+    </script>
+    {% endif %}
+
 </body>
 
 </html>

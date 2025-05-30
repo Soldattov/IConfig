@@ -20,13 +20,15 @@
         <div class="configuration-content">
             <div class="components-list">
                 <h2>Компоненты</h2>
-                {% for category, component in configuration.components.items %}
+                {% for comp_type, components in grouped_components.items %}
                 <div class="component-item">
-                    <h3>{{ category }}</h3>
+                    <h3>{{ comp_type|upper }}</h3>
+                    {% for component in components %}
                     <div class="component-details">
                         <p class="name">{{ component.name }}</p>
                         <p class="price">{{ component.price }} ₽</p>
                     </div>
+                    {% endfor %}
                 </div>
                 {% endfor %}
             </div>

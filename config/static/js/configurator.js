@@ -427,7 +427,7 @@ document.addEventListener('DOMContentLoaded', function () {
     function updatePrice() {
         let total = 0;
 
-        document.querySelectorAll('.component-option.active').forEach(option => {
+        document.querySelectorAll('.component-option.selected').forEach(option => {
             const priceText = option.querySelector('.component-price').textContent;
             const price = parseInt(priceText.replace(/[^\d]/g, ''));
             total += price;
