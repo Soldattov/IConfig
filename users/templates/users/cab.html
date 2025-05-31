@@ -1,0 +1,775 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Личный кабинет | Snitch PC</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        /* Основные стили из вашего шаблона */
+        :root {
+            --primary: #1e1e2d;
+            --secondary: #2d2d42;
+            --accent: #ff5e3a;
+            --text: #ffffff;
+            --text-secondary: #b5b5c3;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Roboto', sans-serif;
+        }
+
+        body {
+            background-color: #0f0f19;
+            color: var(--text);
+        }
+
+        .container {
+            width: 100%;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 15px;
+        }
+
+        /* Header */
+        .header {
+            background-color: var(--primary);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        .header-top {
+            display: flex;
+            align-items: center;
+            padding: 15px 0;
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            margin-right: 30px;
+        }
+
+        .logo img {
+            height: 40px;
+            margin-right: 10px;
+        }
+
+        .logo span {
+            font-size: 24px;
+            font-weight: 700;
+            color: var(--text);
+        }
+
+        .header-search {
+            flex-grow: 1;
+            position: relative;
+        }
+
+        .header-search input {
+            width: 100%;
+            padding: 12px 20px;
+            background-color: var(--secondary);
+            border: none;
+            border-radius: 6px;
+            color: var(--text);
+            font-size: 14px;
+        }
+
+        .header-actions {
+            display: flex;
+            margin-left: 30px;
+        }
+
+        .header-actions a {
+            color: var(--text);
+            margin-left: 20px;
+            font-size: 18px;
+            position: relative;
+        }
+
+        .header-actions a span {
+            position: absolute;
+            top: -8px;
+            right: -8px;
+            background-color: var(--accent);
+            color: white;
+            border-radius: 50%;
+            width: 18px;
+            height: 18px;
+            font-size: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        /* Navigation */
+        .nav {
+            background-color: var(--primary);
+        }
+
+        .nav-list {
+            display: flex;
+            list-style: none;
+        }
+
+        .nav-list li {
+            position: relative;
+        }
+
+        .nav-list li:hover .submenu {
+            display: block;
+        }
+
+        .nav-list li a {
+            display: block;
+            color: var(--text);
+            text-decoration: none;
+            padding: 18px 20px;
+            font-size: 15px;
+            font-weight: 500;
+            transition: all 0.3s;
+        }
+
+        .nav-list li a:hover {
+            color: var(--accent);
+        }
+
+        .submenu {
+            display: none;
+            position: absolute;
+            top: 100%;
+            left: 0;
+            background-color: var(--secondary);
+            min-width: 200px;
+            border-radius: 0 0 6px 6px;
+            z-index: 10;
+        }
+
+        .submenu li a {
+            padding: 12px 20px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+        }
+
+        .btn {
+            display: inline-block;
+            padding: 14px 30px;
+            background-color: var(--accent);
+            color: white;
+            border-radius: 6px;
+            text-decoration: none;
+            font-weight: 600;
+            font-size: 16px;
+            transition: all 0.3s;
+            border: none;
+            cursor: pointer;
+        }
+
+        .btn:hover {
+            background-color: #ff4a2a;
+            transform: translateY(-2px);
+        }
+
+        .btn-outline {
+            background: transparent;
+            border: 1px solid var(--accent);
+            color: var(--accent);
+        }
+
+        .btn-outline:hover {
+            background: var(--accent);
+            color: white;
+        }
+
+        .btn-sm {
+            padding: 8px 16px;
+            font-size: 14px;
+        }
+
+        /* Footer */
+        .footer {
+            background-color: var(--primary);
+            padding: 60px 0 30px;
+        }
+
+        .footer-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 40px;
+            margin-bottom: 40px;
+        }
+
+        .footer-column h3 {
+            font-size: 18px;
+            font-weight: 600;
+            margin-bottom: 20px;
+            position: relative;
+            padding-bottom: 10px;
+        }
+
+        .footer-column h3::after {
+            content: '';
+            position: absolute;
+            left: 0;
+            bottom: 0;
+            width: 40px;
+            height: 2px;
+            background-color: var(--accent);
+        }
+
+        .footer-links {
+            list-style: none;
+        }
+
+        .footer-links li {
+            margin-bottom: 12px;
+        }
+
+        .footer-links a {
+            color: var(--text-secondary);
+            text-decoration: none;
+            font-size: 14px;
+            transition: all 0.3s;
+        }
+
+        .footer-links a:hover {
+            color: var(--accent);
+            padding-left: 5px;
+        }
+
+        .footer-bottom {
+            text-align: center;
+            padding-top: 30px;
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+            color: var(--text-secondary);
+            font-size: 14px;
+        }
+
+        /* Стили для личного кабинета */
+        .account-section {
+            padding: 60px 0;
+        }
+
+        .account-header {
+            display: flex;
+            align-items: center;
+            margin-bottom: 40px;
+        }
+
+        .account-avatar {
+            width: 80px;
+            height: 80px;
+            border-radius: 50%;
+            background-color: var(--secondary);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-right: 20px;
+            font-size: 32px;
+            color: var(--accent);
+        }
+
+        .account-info h2 {
+            font-size: 28px;
+            margin-bottom: 5px;
+        }
+
+        .account-info p {
+            color: var(--text-secondary);
+        }
+
+        .account-tabs {
+            display: flex;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            margin-bottom: 30px;
+        }
+
+        .account-tab {
+            padding: 15px 25px;
+            cursor: pointer;
+            font-weight: 500;
+            color: var(--text-secondary);
+            position: relative;
+        }
+
+        .account-tab.active {
+            color: var(--accent);
+        }
+
+        .account-tab.active::after {
+            content: '';
+            position: absolute;
+            bottom: -1px;
+            left: 0;
+            width: 100%;
+            height: 2px;
+            background-color: var(--accent);
+        }
+
+        .account-tab:hover:not(.active) {
+            color: var(--text);
+        }
+
+        .tab-content {
+            display: none;
+        }
+
+        .tab-content.active {
+            display: block;
+        }
+
+        .configurations-list {
+            margin-bottom: 40px;
+        }
+
+        .configuration-card {
+            background-color: var(--primary);
+            border-radius: 8px;
+            padding: 20px;
+            margin-bottom: 20px;
+            border-left: 3px solid var(--accent);
+        }
+
+        .configuration-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+        }
+
+        .configuration-title {
+            font-size: 20px;
+            font-weight: 600;
+        }
+
+        .configuration-date {
+            color: var(--text-secondary);
+            font-size: 14px;
+        }
+
+        .configuration-actions {
+            display: flex;
+            gap: 10px;
+        }
+
+        .configuration-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 15px;
+        }
+
+        .configuration-table th {
+            text-align: left;
+            padding: 12px 15px;
+            background-color: var(--secondary);
+            color: var(--text-secondary);
+            font-weight: 500;
+            font-size: 14px;
+        }
+
+        .configuration-table td {
+            padding: 12px 15px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+        }
+
+        .configuration-table tr:last-child td {
+            border-bottom: none;
+        }
+
+        .configuration-total {
+            display: flex;
+            justify-content: flex-end;
+            font-size: 18px;
+            font-weight: 600;
+            padding: 15px;
+            background-color: rgba(255, 94, 58, 0.1);
+            border-radius: 6px;
+        }
+
+        .configuration-total span {
+            color: var(--accent);
+            margin-left: 20px;
+        }
+
+        .empty-message {
+            text-align: center;
+            padding: 50px;
+            color: var(--text-secondary);
+        }
+
+        .empty-message i {
+            font-size: 50px;
+            margin-bottom: 20px;
+            color: var(--secondary);
+        }
+
+        /* Responsive */
+        @media (max-width: 992px) {
+            .header-top {
+                flex-wrap: wrap;
+            }
+
+            .logo {
+                margin-bottom: 15px;
+            }
+
+            .header-search {
+                order: 3;
+                width: 100%;
+                margin-top: 15px;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .nav-list {
+                flex-wrap: wrap;
+                justify-content: center;
+            }
+
+            .nav-list li {
+                width: 50%;
+                text-align: center;
+            }
+
+            .account-header {
+                flex-direction: column;
+                text-align: center;
+            }
+
+            .account-avatar {
+                margin-right: 0;
+                margin-bottom: 15px;
+            }
+
+            .configuration-header {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 10px;
+            }
+
+            .configuration-actions {
+                width: 100%;
+                justify-content: flex-end;
+            }
+
+            .configuration-table {
+                display: block;
+                overflow-x: auto;
+            }
+        }
+    </style>
+</head>
+<body>
+    <header class="header">
+        <div class="container">
+            <div class="header-top">
+                <a href="#" class="logo">
+                    <img src="https://www.pngkey.com/png/full/186-1866241_snitch-special-offer-banner-png.png" alt="Snitch PC Logo">
+                </a>
+
+                <div class="header-search">
+                    <input type="text" placeholder="Поиск игровых ПК, ноутбуков и комплектующих...">
+                </div>
+
+                <div class="header-actions">
+                    <a href="#"><i class="far fa-user"></i></a>
+                    <a href="#"><i class="fas fa-shopping-cart"></i></a>
+                </div>
+            </div>
+        </div>
+
+        <nav class="nav">
+            <div class="container">
+                <ul class="nav-list">
+                    <li><a href="#">Главная</a></li>
+                    <li><a href="#">Игровые ПК</a></li>
+                    <li><a href="#">Игровые ноутбуки</a></li>
+                    <li><a href="#">Периферия</a></li>
+                    <li><a href="#">Комплектующие</a></li>
+                    <li><a href="#">Конфигуратор</a></li>
+                    <li><a href="#">Акции</a></li>
+                    <li><a href="#">Доставка и оплата</a></li>
+                    <li><a href="#">Контакты</a></li>
+                </ul>
+            </div>
+        </nav>
+    </header>
+
+    <section class="account-section">
+        <div class="container">
+            <div class="account-header">
+                <div class="account-avatar">
+                    <i class="fas fa-user"></i>
+                </div>
+                <div class="account-info">
+                    <h2>Иван Петров</h2>
+                    <p>ivan.petrov@example.com</p>
+                </div>
+            </div>
+
+            <div class="account-tabs">
+                <div class="account-tab active" data-tab="configurations">Сохранённые конфигурации</div>
+                <div class="account-tab" data-tab="orders">Мои заказы</div>
+                <div class="account-tab" data-tab="profile">Профиль</div>
+            </div>
+
+            <div class="tab-content active" id="configurations">
+                <h3>Мои сборки</h3>
+
+                <div class="configurations-list">
+                    <div class="configuration-card">
+                        <div class="configuration-header">
+                            <div>
+                                <div class="configuration-title">Игровой ПК для стриминга</div>
+                                <div class="configuration-date">Создано: 15.05.2025</div>
+                            </div>
+                            <div class="configuration-actions">
+                                <button class="btn btn-outline btn-sm">Открыть в конфигураторе</button>
+                                <button class="btn btn-sm">Добавить в корзину</button>
+                            </div>
+                        </div>
+
+                        <table class="configuration-table">
+                            <thead>
+                                <tr>
+                                    <th>Компонент</th>
+                                    <th>Модель</th>
+                                    <th>Цена</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td>Процессор</td>
+                                    <td>AMD Ryzen 9 7950X3D</td>
+                                    <td>69 990 ₽</td>
+                                </tr>
+                                <tr>
+                                    <td>Видеокарта</td>
+                                    <td>ASUS TUF RTX 5080</td>
+                                    <td>249 990 ₽</td>
+                                </tr>
+                                <tr>
+                                    <td>Материнская плата</td>
+                                    <td>ASUS ROG Crosshair X670E Hero</td>
+                                    <td>49 990 ₽</td>
+                                </tr>
+                                <tr>
+                                    <td>Оперативная память</td>
+                                    <td>Kingston Fury 32GB DDR5 6000MHz</td>
+                                    <td>14 990 ₽</td>
+                                </tr>
+                                <tr>
+                                    <td>SSD накопитель</td>
+                                    <td>Samsung 990 PRO 2TB</td>
+                                    <td>24 990 ₽</td>
+                                </tr>
+                                <tr>
+                                    <td>Блок питания</td>
+                                    <td>MSI MPG A1000G</td>
+                                    <td>19 990 ₽</td>
+                                </tr>
+                                <tr>
+                                    <td>Корпус</td>
+                                    <td>Lian Li PC-O11 Dynamic</td>
+                                    <td>14 990 ₽</td>
+                                </tr>
+                                <tr>
+                                    <td>Охлаждение</td>
+                                    <td>NZXT Kraken 360 RGB</td>
+                                    <td>24 990 ₽</td>
+                                </tr>
+                            </tbody>
+                        </table>
+
+                        <div class="configuration-total">
+                            Итого: <span>469 920 ₽</span>
+                        </div>
+                    </div>
+
+                    <div class="configuration-card">
+                        <div class="configuration-header">
+                            <div>
+                                <div class="configuration-title">Бюджетный игровой ПК</div>
+                                <div class="configuration-date">Создано: 10.05.2025</div>
+                            </div>
+                            <div class="configuration-actions">
+                                <button class="btn btn-outline btn-sm">Открыть в конфигураторе</button>
+                                <button class="btn btn-sm">Добавить в корзину</button>
+                            </div>
+                        </div>
+
+                        <table class="configuration-table">
+                            <thead>
+                                <tr>
+                                    <th>Компонент</th>
+                                    <th>Модель</th>
+                                    <th>Цена</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td>Процессор</td>
+                                    <td>AMD Ryzen 5 7600X</td>
+                                    <td>24 990 ₽</td>
+                                </tr>
+                                <tr>
+                                    <td>Видеокарта</td>
+                                    <td>ASUS TUF RTX 4070</td>
+                                    <td>79 990 ₽</td>
+                                </tr>
+                                <tr>
+                                    <td>Материнская плата</td>
+                                    <td>MSI PRO B650-P WIFI</td>
+                                    <td>19 990 ₽</td>
+                                </tr>
+                                <tr>
+                                    <td>Оперативная память</td>
+                                    <td>Kingston Fury 16GB DDR5 5200MHz</td>
+                                    <td>8 990 ₽</td>
+                                </tr>
+                                <tr>
+                                    <td>SSD накопитель</td>
+                                    <td>Samsung 980 PRO 1TB</td>
+                                    <td>12 990 ₽</td>
+                                </tr>
+                                <tr>
+                                    <td>Блок питания</td>
+                                    <td>Cooler Master MWE 750W</td>
+                                    <td>9 990 ₽</td>
+                                </tr>
+                                <tr>
+                                    <td>Корпус</td>
+                                    <td>Zalman S2</td>
+                                    <td>4 990 ₽</td>
+                                </tr>
+                                <tr>
+                                    <td>Охлаждение</td>
+                                    <td>Deepcool AK400</td>
+                                    <td>3 990 ₽</td>
+                                </tr>
+                            </tbody>
+                        </table>
+
+                        <div class="configuration-total">
+                            Итого: <span>165 920 ₽</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div style="text-align: center; margin-top: 30px;">
+                    <a href="#" class="btn">Создать новую конфигурацию</a>
+                </div>
+            </div>
+
+            <div class="tab-content" id="orders">
+                <div class="empty-message">
+                    <i class="fas fa-box-open"></i>
+                    <h3>У вас пока нет заказов</h3>
+                    <p>После оформления заказа вы сможете отслеживать его статус здесь</p>
+                    <a href="#" class="btn" style="margin-top: 20px;">Перейти в каталог</a>
+                </div>
+            </div>
+
+            <div class="tab-content" id="profile">
+                <div style="max-width: 600px; margin: 0 auto;">
+                    <h3 style="margin-bottom: 20px;">Личные данные</h3>
+
+                    <form>
+                        <div style="margin-bottom: 20px;">
+                            <label style="display: block; margin-bottom: 8px; color: var(--text-secondary);">Имя</label>
+                            <input type="text" value="Иван" style="width: 100%; padding: 12px; background-color: var(--secondary); border: none; border-radius: 6px; color: var(--text);">
+                        </div>
+
+                        <div style="margin-bottom: 20px;">
+                            <label style="display: block; margin-bottom: 8px; color: var(--text-secondary);">Фамилия</label>
+                            <input type="text" value="Петров" style="width: 100%; padding: 12px; background-color: var(--secondary); border: none; border-radius: 6px; color: var(--text);">
+                        </div>
+
+                        <div style="margin-bottom: 20px;">
+                            <label style="display: block; margin-bottom: 8px; color: var(--text-secondary);">Email</label>
+                            <input type="email" value="ivan.petrov@example.com" style="width: 100%; padding: 12px; background-color: var(--secondary); border: none; border-radius: 6px; color: var(--text);">
+                        </div>
+
+                        <div style="margin-bottom: 20px;">
+                            <label style="display: block; margin-bottom: 8px; color: var(--text-secondary);">Телефон</label>
+                            <input type="tel" value="+7 (900) 123-45-67" style="width: 100%; padding: 12px; background-color: var(--secondary); border: none; border-radius: 6px; color: var(--text);">
+                        </div>
+
+                        <button type="submit" class="btn">Сохранить изменения</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <footer class="footer">
+        <div class="container">
+            <div class="footer-grid">
+                <div class="footer-column">
+                    <h3>Snitch PC</h3>
+                    <ul class="footer-links">
+                        <li><a href="#">О компании</a></li>
+                        <li><a href="#">Наши преимущества</a></li>
+                        <li><a href="#">Отзывы</a></li>
+                        <li><a href="#">Вакансии</a></li>
+                    </ul>
+                </div>
+
+                <div class="footer-column">
+                    <h3>Каталог</h3>
+                    <ul class="footer-links">
+                        <li><a href="#">Игровые ПК</a></li>
+                        <li><a href="#">Игровые ноутбуки</a></li>
+                        <li><a href="#">Периферия</a></li>
+                        <li><a href="#">Комплектующие</a></li>
+                    </ul>
+                </div>
+
+                <div class="footer-column">
+                    <h3>Помощь</h3>
+                    <ul class="footer-links">
+                        <li><a href="#">Доставка и оплата</a></li>
+                        <li><a href="#">Гарантия</a></li>
+                        <li><a href="#">Возврат и обмен</a></li>
+                    </ul>
+                </div>
+
+                <div class="footer-column">
+                    <h3>Контакты</h3>
+                    <ul class="footer-links">
+                        <li><a href="tel:+74951234567">+7 (950) 124-04-58</a></li>
+                        <li><a href="mailto:info@snitchpc.ru">info@snitchpc.ru</a></li>
+                        <li>Чебоксары, ул. Гиндина, 12</li>
+                        <li>Пн-Пт: 10:00-20:00</li>
+                    </ul>
+                </div>
+            </div>
+
+            <div class="footer-bottom">
+                <p>© 2025 Snitch PC. Все права защищены.</p>
+            </div>
+        </div>
+    </footer>
+
+    <script>
+        // Переключение между вкладками
+        document.querySelectorAll('.account-tab').forEach(tab => {
+            tab.addEventListener('click', () => {
+                // Удаляем активный класс у всех вкладок и контента
+                document.querySelectorAll('.account-tab').forEach(t => t.classList.remove('active'));
+                document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+
+                // Добавляем активный класс к выбранной вкладке и соответствующему контенту
+                tab.classList.add('active');
+                const tabId = tab.getAttribute('data-tab');
+                document.getElementById(tabId).classList.add('active');
+            });
+        });
+    </script>
+</body>
+</html>

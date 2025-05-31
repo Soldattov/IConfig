@@ -1,14 +1,18 @@
 {% extends "base.html" %}
 {% load static %}
 
-
-
-
 {% block head %}
 <link rel="stylesheet" href="{% static 'css/styles.css' %}">
 
 <style>
-    /* Стили модального окна и затемнения фона */
+    :root {
+        --primary: #1e1e2d;
+        --secondary: #2d2d42;
+        --accent: #ff5e3a;
+        --text: #ffffff;
+        --text-secondary: #b5b5c3;
+    }
+
     .modal {
         position: fixed;
         z-index: 1000;
@@ -61,95 +65,300 @@
         margin-left: 10px;
     }
 
-    .saved-configurations {
-        margin: 30px auto;
-        width: 90%;
-        font-family: Arial, sans-serif;
+
+
+    .container {
+        width: 100%;
+        max-width: 1200px;
+        margin: 0 auto;
+        padding: 0 15px;
     }
 
-    .saved-configurations h3 {
-        text-align: center;
+    .btn {
+        display: inline-block;
+        padding: 14px 30px;
+        background-color: var(--accent);
+        color: white;
+        border-radius: 6px;
+        text-decoration: none;
+        font-weight: max-content;
+        font-size: max-content;
+        transition: all 0.3s;
+        border: none;
+        cursor: pointer;
+        width: max-content;
+
+    }
+    .profile-form form {
+        display: flex;
+        flex-direction: column;
+        gap: 10px; /* Регулирует интервал между кнопками */
+    }
+    
+
+    .btn:hover {
+        background-color: #ff4a2a;
+        transform: translateY(-2px);
+    }
+
+    .btn-outline {
+        background: transparent;
+        border: 1px solid var(--accent);
+        color: var(--accent);
+    }
+
+    .btn-outline:hover {
+        background: var(--accent);
+        color: white;
+    }
+
+    .btn-danger {
+        background-color: #dc3545;
+        border-color: #dc3545;
+    }
+
+    .btn-danger:hover {
+        background-color: #c82333;
+        border-color: #bd2130;
+    }
+
+    .profile-header {
+        background: var(--primary);
+        border-radius: 8px;
+        padding: 20px;
+        margin-bottom: 20px;
+    }
+
+    .profile-header h2 {
+        color: var(--text);
         margin-bottom: 15px;
     }
 
-    .saved-configurations table {
-        width: 100%;
-        border-collapse: collapse;
+    .user-info {
+        color: var(--text-secondary);
     }
 
-    .saved-configurations th,
-    .saved-configurations td {
-        padding: 10px;
-        border: 1px solid #ddd;
-        /* Отключаем возможность выделения текста по отдельным ячейкам */
-        -webkit-user-select: none;
-        -moz-user-select: none;
-        -ms-user-select: none;
-        user-select: none;
+    .welcome-message {
+        font-size: 1.2em;
+        margin-bottom: 10px;
+        color: var(--text);
     }
 
-    /* Заголовок таблицы */
-    .saved-configurations th {
-        background-color: #1407d686;
-        text-align: left;
+    .email-info {
+        font-size: 1em;
     }
 
-    /* Задаём относительные ширины столбцов */
-    .saved-configurations .col-number {
-        width: 10%;
+    .profile-actions {
+        display: flex;
+        gap: 10px;
+        margin-bottom: 20px;
     }
 
-    .saved-configurations .col-price {
-        width: 20%;
+    .profile-actions .btn {
+        display: flex;
+        align-items: center;
+        gap: 8px;
     }
 
-    .saved-configurations .col-config {
-        width: 70%;
-
+    .profile-actions .btn i {
+        font-size: 16px;
     }
 
-    /* При наведении на строку подсвечиваем её */
-    .saved-configurations tbody tr:hover {
-        background-color: #f9f9f9;
+    .saved-configurations {
+        margin-top: 30px;
     }
 
-    /* Класс для выбранной строки */
-    .saved-configurations tbody tr.selected {
-        background-color: #d0eaff;
+    .configurations-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+        gap: 20px;
+        margin-top: 20px;
+    }
+
+    .configuration-card {
+        background: var(--primary);
+        border-radius: 8px;
+        padding: 20px;
+        border-left: 3px solid var(--accent);
+    }
+
+    .configuration-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 15px;
+    }
+
+    .configuration-header h3 {
+        margin: 0;
+        color: var(--text);
+    }
+
+    .configuration-actions {
+        display: flex;
+        gap: 10px;
+    }
+
+    .configuration-actions button {
+        background: none;
+        border: none;
+        color: var(--text-secondary);
+        cursor: pointer;
+        padding: 5px;
+        transition: color 0.3s;
+    }
+
+    .configuration-actions button:hover {
+        color: var(--accent);
+    }
+
+    .configuration-details {
+        margin-bottom: 15px;
+    }
+
+    .configuration-details p {
+        margin: 5px 0;
+        color: var(--text-secondary);
+    }
+
+    .configuration-footer {
+        display: flex;
+        gap: 10px;
+    }
+
+    .configuration-footer .btn {
+        flex: 1;
+    }
+
+    .no-configurations {
+        text-align: center;
+        padding: 40px;
+        background: var(--primary);
+        border-radius: 8px;
+        color: var(--text-secondary);
+    }
+
+    .no-configurations p {
+        margin-bottom: 20px;
+    }
+
+    @media (max-width: 768px) {
+        .profile-actions {
+            flex-direction: column;
+        }
+
+        .configuration-footer {
+            flex-direction: column;
+        }
     }
 </style>
 {% endblock %}
 
-
 {% block content %}
-<div class="container">
-    <h2>Здравствуйте, {{ user.first_name }}</h2>
-    <p>Ваш email: {{ user.email }}</p>
-    <button id="change-password-btn" class="btn">Изменить пароль</button>
-    <a href="{% url 'logout' %}" class="btn">Выйти</a>
-    <button id="delete-account-btn" class="btn btn-danger">Удалить учетную запись</button>
-    <div id="loader" style="display: none;">Удаление учетной записи...</div>
+<link rel="stylesheet" href="{% static 'css/profile.css' %}">
 
-    <div class="saved-configurations">
-        <h3>Сохраненные конфигурации</h3>
-        <table>
-            <thead>
-                <tr>
+<section class="account-section">
+    <div class="container">
+        <div class="account-header">
+            <div class="account-avatar">
+                <i class="fas fa-user"></i>
+            </div>
+            <div class="account-info">
+                <h2>{{ user.get_full_name|default:user.username }}</h2>
+                <p>{{ user.email }}</p>
+            </div>
+            <h3>&nbsp;&nbsp;&nbsp;</h3>
+            <a href="{% url 'logout' %}" class="btn">Выйти</a>
+            
+        </div>
 
-                    <th class="col-number">Номер</th>
-                    <th class="col-config">Конфигурация</th>
-                    <th class="col-price">Стоимость</th>
-                </tr>
-            </thead>
-            <tbody>
-                <!-- заполнить -->
-            </tbody>
-        </table>
+        <div class="account-tabs">
+            <div class="account-tab active" data-tab="profile">Профиль</div>
+            <div class="account-tab" data-tab="configurations">Сохранённые конфигурации</div>
+            <div class="account-tab" data-tab="orders">Мои заказы</div>
+        </div>
+
+        <div class="tab-content active" id="profile">
+            <div class="profile-form">
+                <h3>Личные данные</h3>
+
+                <form method="post">
+                    {% csrf_token %}
+                    <div class="form-group">
+                        <label for="id_first_name">Имя</label>
+                        <input type="text" id="id_first_name" name="first_name" value="{{ user.first_name }}">
+                    </div>
+
+
+                    <button type="submit" class="btn">Сохранить новое Имя</button>
+                    <button type="button" id="change-password-btn" class="btn">Изменить пароль</button>
+                    
+                    <button id="delete-account-btn" class="btn btn-danger">Удалить учетную запись</button>
+                </form>
+            </div>
+        </div>
+
+        <div class="tab-content" id="configurations">
+            <h3>Мои сборки</h3>
+            <div class="configurations-list">
+                {% for config in configurations %}
+                <div class="configuration-card">
+                    <div class="configuration-header">
+                        <div>
+                            <div class="configuration-title">{{ config.name }}</div>
+                            <div class="configuration-date">Создано: {{ config.created_at|date:"d.m.Y" }}</div>
+                        </div>
+                        <div class="configuration-actions">
+                            <a href="{% url 'main:view_configuration' config.id %}"
+                                class="btn btn-outline btn-sm">Открыть в конфигураторе</a>
+                            <button class="btn btn-sm">Добавить в корзину</button>
+                        </div>
+                    </div>
+
+                    <table class="configuration-table">
+                        <thead>
+                            <tr>
+                                <th>Компонент</th>
+                                <th>Модель</th>
+                                <th>Цена</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for component in config.components.all %}
+                            <tr>
+                                <td>{{ component.get_component_type_display }}</td>
+                                <td>{{ component.name }}</td>
+                                <td>{{ component.price }} ₽</td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+
+                    <div class="configuration-total">
+                        Итого: <span>{{ config.total_price }} ₽</span>
+                    </div>
+                </div>
+                {% empty %}
+                <div class="empty-message">
+                    <i class="fas fa-desktop"></i>
+                    <h3>У вас пока нет сохранённых конфигураций</h3>
+                    <p>Создайте свою первую сборку в конфигураторее</p>
+                    <a href="{% url 'config' %}" class="btn" style="margin-top: 20px;">Создать конфигурацию</a>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+
+        <div class="tab-content" id="orders">
+            <div class="empty-message">
+                <i class="fas fa-box-open"></i>
+                <h3>У вас пока нет заказов</h3>
+                <p>После оформления заказа вы сможете отслеживать его статус здесь</p>
+                <a href="{% url 'main:index' %}" class="btn" style="margin-top: 20px;">Перейти в каталог</a>
+            </div>
+        </div>
     </div>
-</div>
-{% endblock %}
-
-{% block scripts %}
+</section>
 <!-- Скрипт для обработки удаления -->
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
 <script>
@@ -186,19 +395,16 @@
 
     // Обработчик клика для кнопки "Удалить учетную запись"
     document.getElementById('delete-account-btn').addEventListener('click', function () {
-        if (confirm("Вы уверены, что хотите удалить учетную запись?")) {
-            deleteAccount().then(function () {
-                // Успешное удаление: перенаправляем на главную страницу
-                setTimeout(function () {
-                    window.location.href = '/';
-                }, 2000);
-            }, function () {
-                // Ошибка при удалении
-                alert("Ошибка удаления учетной записи.");
-            });
-        }
-    });
-
+    if (confirm("Вы уверены, что хотите удалить учетную запись?")) {
+        deleteAccount().then(function () {
+            // Успешное удаление: перенаправляем на главную страницу сразу
+            window.location.href = '/';
+        }, function () {
+            // Ошибка при удалении
+            alert("Ошибка удаления учетной записи.");
+        });
+    }
+});
     // Функция для получения CSRF-токена из cookies
     function getCookie(name) {
         let cookieValue = null;
@@ -243,7 +449,6 @@
 </div>
 <!-- Затемнённый фон -->
 <div id="modal-backdrop" class="modal-backdrop" style="display: none;"></div>
-
 <script>
     // Функция получения CSRF-токена 
     function getCookie(name) {
@@ -417,6 +622,21 @@
             .catch(error => {
                 alert("Ошибка: " + error);
             });
+    });
+</script>
+<script>
+    // Переключение между вкладками
+    document.querySelectorAll('.account-tab').forEach(tab => {
+        tab.addEventListener('click', () => {
+            // Удаляем активный класс у всех вкладок и контента
+            document.querySelectorAll('.account-tab').forEach(t => t.classList.remove('active'));
+            document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+
+            // Добавляем активный класс к выбранной вкладке и соответствующему контенту
+            tab.classList.add('active');
+            const tabId = tab.getAttribute('data-tab');
+            document.getElementById(tabId).classList.add('active');
+        });
     });
 </script>
 {% endblock %}

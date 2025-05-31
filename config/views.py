@@ -6,6 +6,7 @@
 3. Обработки запросов к базе данных
 """
 
+from django.core.cache import cache
 from django.shortcuts import render
 from django.http import JsonResponse, Http404
 from .models import (
@@ -29,14 +30,49 @@ def configurator(request):
         HttpResponse: Отрисованная страница конфигуратора
     """
     # Получаем все компоненты из базы данных
-    gpus = ParsedGPU.objects.all()
-    cpus = ParsedCPU.objects.all()
-    motherboards = ParsedMotherboard.objects.all()
-    rams = ParsedRAM.objects.all()
-    coolings = ParsedCooling.objects.all()
-    power_supplies = ParsedPowerSupply.objects.all()
-    storages = ParsedStorage.objects.all()
-    cases = ParsedCase.objects.all()
+    gpus = cache.get('gpus')
+    if gpus is None:
+        gpus = ParsedGPU.objects.all()
+        cache.set('gpus', gpus, 3600)
+        #проверка
+        print("GPUs загружены из базы данных")
+    else:
+        print("GPUs получены из кэша")
+
+    cpus = cache.get('cpus')
+    if cpus is None:
+        cpus = ParsedCPU.objects.all()
+        cache.set('cpus', cpus, 3600)
+
+    motherboards = cache.get('motherboards')
+    if motherboards is None:
+        motherboards = ParsedMotherboard.objects.all()
+        cache.set('motherboards', motherboards, 3600)
+
+    rams = cache.get('rams')
+    if rams is None:
+        rams = ParsedRAM.objects.all()
+        cache.set('rams', rams, 3600)
+
+    coolings = cache.get('coolings')
+    if coolings is None:
+        coolings = ParsedCooling.objects.all()
+        cache.set('coolings', coolings, 3600)
+
+    power_supplies = cache.get('power_supplies')
+    if power_supplies is None:
+        power_supplies = ParsedPowerSupply.objects.all()
+        cache.set('power_supplies', power_supplies, 3600)
+
+    storages = cache.get('storages')
+    if storages is None:
+        storages = ParsedStorage.objects.all()
+        cache.set('storages', storages, 3600)
+
+    cases = cache.get('cases')
+    if cases is None:
+        cases = ParsedCase.objects.all()
+        cache.set('cases', cases, 3600)
 
     # Формируем контекст с данными для шаблона
     context = {

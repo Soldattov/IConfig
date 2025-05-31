@@ -9,33 +9,54 @@ from django.http import JsonResponse
 import json
 from django.contrib.auth import update_session_auth_hash
 from django.contrib.auth.views import LoginView
+from main.models import SavedConfiguration
+import random
+import smtplib
 
     
 def register_view(request):
     if request.method == 'POST':
         form = UserRegistrationForm(request.POST)
+        email = request.POST.get('email')
+        
+        # Если пользователь с таким email уже существует, выводим нужное сообщение
+        if CustomUser.objects.filter(email=email).exists():
+            return render(request, 'main/index.html', {
+                'form': form,
+                'register_error': "Пользователь с таким email уже существует.",
+                'show_register_modal': True
+            })
+            
         if form.is_valid():
-            user = form.save(commit=False)
-            user.username = user.email  # Используем email как логин
-            user.is_verified = False     # Email пока не подтверждён
-            user.save()
+            registration_data = form.cleaned_data
 
-            # Генерируем шестизначный код подтверждения
-            user.generate_verification_code()
+            # Генерируем случайный шестизначный код подтверждения
+            verification_code = str(random.randint(100000, 999999))
+            
+            # Сохраняем регистрационные данные и код подтверждения в сессии
+            request.session['registration_data'] = registration_data
+            request.session['verification_code'] = verification_code
 
-            # Отправляем письмо с кодом подтверждения
-            send_mail(
-                'Подтверждение регистрации',
-                f'Ваш код подтверждения: {user.verification_code}',
-                'snitch_pc@mail.ru',  # либо "Имя сервиса <noreply@yourdomain.com>"
-                [user.email],
-                fail_silently=False,
-            )
+            try:
+                # Отправляем письмо с кодом подтверждения
+                send_mail(
+                    'Подтверждение регистрации',
+                    f'Ваш код подтверждения: {verification_code}',
+                    'snitch_pc@mail.ru',  # либо "Имя сервиса <noreply@yourdomain.com>"
+                    [email],
+                    fail_silently=False,
+                )
+            except (smtplib.SMTPDataError, smtplib.SMTPRecipientsRefused) as e:
+                return render(request, 'main/index.html', {
+                    'form': form,
+                    'register_error': "Такой электронной почты не существует.",
+                    'show_register_modal': True
+                })
 
-            # Вместо автоматического входа рендерим шаблон с флагом для открытия модального окна ввода кода
+            # Если письмо отправилось успешно, отображаем окно ввода кода подтверждения
             return render(request, 'main/index.html', {
                 'show_verification_modal': True,
-                'email': user.email,  # Передаем email в скрытое поле
+                'email': email,
             })
         else:
             return render(request, 'main/index.html', {
@@ -67,25 +88,68 @@ def logout_view(request):
 
 @login_required
 def profile_view(request):
-    return render(request, 'users/profile.html')
+    user = request.user
+
+    # Если форма отправлена (POST) — обновляем только имя пользователя
+    if request.method == 'POST':
+        first_name = request.POST.get('first_name')
+
+        if first_name and first_name != user.first_name:
+            user.first_name = first_name
+            user.save()
+            # Обновляем сессионный хеш, чтобы изменения вступили в силу
+            update_session_auth_hash(request, user)
+
+        # Перенаправляем пользователя на страницу профиля для отражения изменений
+        return redirect('profile')
+
+    # Исходная логика: получение конфигураций и вывод в консоль
+    print('Получение профиля пользователя:', user.username)
+    configs = SavedConfiguration.objects.filter(user=user).prefetch_related('components')
+    print('Найдено конфигураций:', configs.count())
+    for config in configs:
+        print(f'Конфигурация: {config.name}, ID: {config.id}, Компонентов: {config.components.count()}')
+        for component in config.components.all():
+            print(f'  - {component.component_type}: {component.name} ({component.price} ₽)')
+
+    context = {
+        'user': user,
+        'configurations': configs,
+        'page_title': 'Профиль'
+    }
+    return render(request, 'users/profile.html', context)
 
 def verify_email_view(request):
     if request.method == 'POST':
-        email = request.POST.get('email')
         input_code = request.POST.get('verification_code')
+        # Получаем данные регистрации и код из сессии
+        registration_data = request.session.get('registration_data')
+        session_code = request.session.get('verification_code')
 
-        try:
-            user = CustomUser.objects.get(email=email)
-        except CustomUser.DoesNotExist:
+        if not registration_data or not session_code:
             return render(request, 'main/index.html', {
-                'verify_error': 'Пользователь не найден!',
-                'show_verification_modal': True
+                'verify_error': 'Сессия регистрации устарела, пожалуйста, зарегистрируйтесь заново.',
+                'show_register_modal': True
             })
 
-        if user.verification_code == input_code:
+        email = registration_data.get('email', '')
+        if input_code == session_code:
+            # Создаем пользователя, передавая email как для email, так и для username
+            password = registration_data.get('password1')  # убедитесь, что в форме это имя поля для пароля
+            user = CustomUser.objects.create_user(
+                username=email,
+                email=email,
+                password=password,
+                first_name=registration_data.get('first_name'),
+                # Если у вас есть другие обязательные поля, добавьте их сюда
+            )
             user.is_verified = True
-            user.verification_code = None  # Очищаем код после подтверждения
             user.save()
+
+            # Очистка данных регистрации из сессии
+            del request.session['registration_data']
+            del request.session['verification_code']
+
             login(request, user)
             return redirect('main:index')
         else:
@@ -150,4 +214,3 @@ def change_password(request):
         return JsonResponse({"success": False, "error": str(e)}, status=500)
     
 
-    

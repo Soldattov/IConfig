@@ -133,6 +133,7 @@ def parse_gpu_page2(driver, url):
         
         # Пытаемся развернуть все характеристики
         try:
+            # ждем пока кнопка развернуть станет доступной 
             expand_button = WebDriverWait(driver, 5).until(
                 EC.element_to_be_clickable((By.CLASS_NAME, "product-characteristics__expand"))
             )
@@ -347,10 +348,10 @@ def parse_cpu_page2(driver, url):
         if not model:
             logger.warning(f"Модель не найдена на странице: {url}")
         
-        cores_amount = tech_spec.get("Общее количество ядер", "6")         # если ключ отличается, измените его
-        frequency = tech_spec.get("Базовая частота процессора", "3.5 ГГц")           # можно применять extract_number, если нужно число
+        cores_amount = extract_number(tech_spec.get("Общее количество ядер", "6 шт"))      
+        frequency =extract_number(tech_spec.get("Базовая частота процессора", "3.5 Ггц"))           # можно применять extract_number, если нужно число
         socket = tech_spec.get("Сокет", "")
-        tdp = tech_spec.get("Тепловыделение (TDP)", "60 Вт") #такого критерия нет
+        tdp = extract_number(tech_spec.get("Тепловыделение (TDP)", "60 ВТ")) #такого критерия нет
         
         # Получаем URL изображения
         image_path = download_image(image_url, model, 'cpu')
@@ -480,10 +481,10 @@ def parse_motherboard_page(driver, url):
 
         form_factor = tech_spec.get("Форм-фактор", "")
         socket = tech_spec.get("Сокет", "")
-        ram_slots = tech_spec.get("Количество слотов памяти", "2")
+        ram_slots = extract_number(tech_spec.get("Количество слотов памяти", "2 шт"))
         ram_type = tech_spec.get("Тип поддерживаемой памяти", "")
-        nvme_slot = tech_spec.get("Количество разъемов M.2", "0")
-        sata_slot = tech_spec.get("Количество портов SATA", "0")
+        nvme_slot = extract_number(tech_spec.get("Количество разъемов M.2", "0 шт"))
+        sata_slot = extract_number(tech_spec.get("Количество портов SATA", "0 шт"))
 
         # Получаем URL изображения
         image_path = download_image(image_url, model, 'motherboard')
@@ -1223,8 +1224,8 @@ def get_urls_from_page(driver):
             except Exception as e:
                 logger.warning(f"Не удалось найти элементы по селектору {selector}: {e}")
                 continue
-        
-        # Если селекторы не сработали, пробуем через BeautifulSoup
+        """
+        Если селекторы не сработали, пробуем через BeautifulSoup
         soup = BeautifulSoup(driver.page_source, 'lxml')
         elements = soup.find_all('a', class_=lambda x: x and ('catalog-product__name' in x or 'ui-link_black' in x or 'product-card-top__name' in x))
         for element in elements:
@@ -1242,7 +1243,7 @@ def get_urls_from_page(driver):
         
         logger.error("Не удалось найти ссылки на товары на странице")
         return []
-        
+        """
     except Exception as e:
         logger.error(f"Ошибка при получении URL-адресов: {e}")
         return []
